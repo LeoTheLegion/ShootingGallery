@@ -18,11 +18,9 @@ namespace ShootingGallery
 
         private MouseState mState;
         bool mReleased = true;
-        private int score = 0;
 
         private const int crosshairRadius = 25;
 
-        double timer = 10;
 
         public Game1()
         {
@@ -56,15 +54,7 @@ namespace ShootingGallery
 
             // TODO: Add your update logic here
 
-            if(timer > 0)
-            {
-                timer -= gameTime.ElapsedGameTime.TotalSeconds;
-            }
-
-            if(timer < 0)
-            {
-                timer = 0;
-            } 
+            GameManager.ReduceGameTime(gameTime.ElapsedGameTime.TotalSeconds);
 
             mState = Mouse.GetState();
 
@@ -72,9 +62,9 @@ namespace ShootingGallery
             {
                 float mouseTargetDist = Vector2.Distance(targetPosition, mState.Position.ToVector2());
 
-                if(mouseTargetDist < targetRadius && timer > 0)
+                if(mouseTargetDist < targetRadius && !GameManager.isGameOver)
                 {
-                    score++;
+                    GameManager.AddScore(1);
 
                     Random rand = new Random();
 
@@ -103,10 +93,10 @@ namespace ShootingGallery
             
             _spriteBatch.Draw(backgroundSprite, new Vector2(0, 0), Color.White);
 
-            _spriteBatch.DrawString(gameFont, "Score: " + score.ToString(), new Vector2(3, 3), Color.White);
-            _spriteBatch.DrawString(gameFont, "Time: " + Math.Ceiling(timer).ToString(), new Vector2(3, 40), Color.White);
+            _spriteBatch.DrawString(gameFont, "Score: " + GameManager.GetScore().ToString(), new Vector2(3, 3), Color.White);
+            _spriteBatch.DrawString(gameFont, "Time: " + Math.Ceiling(GameManager.GetGameTime()).ToString(), new Vector2(3, 40), Color.White);
 
-            if(timer > 0)
+            if(!GameManager.isGameOver)
             {
                 _spriteBatch.Draw(targetSprite,
                 targetPosition - new Vector2(targetRadius, targetRadius)
