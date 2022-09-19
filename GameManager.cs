@@ -13,12 +13,11 @@ namespace ShootingGallery
         public static bool isGameOver => timer <= 0;
 
         public static void ReduceGameTime(double x) { 
-            if(timer <= 0)
+            timer -= x;
+            if (timer < 0)
             {
                 timer = 0;
-                return;
             }
-            timer -= x;
         }
 
         public static double GetGameTime() => timer;
