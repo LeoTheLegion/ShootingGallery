@@ -10,13 +10,9 @@ namespace ShootingGallery
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
 
-        private Entity _target;
-        private Texture2D  crosshairsSprite, backgroundSprite;
+        private Entity _target,_crossHair;
+        private Texture2D   backgroundSprite;
         private SpriteFont gameFont;
-
-        private MouseState mState;
-
-        private const int crosshairRadius = 25;
 
         public static Game1 instance;
         public static int WIDTH => instance._graphics.PreferredBackBufferWidth;
@@ -35,7 +31,7 @@ namespace ShootingGallery
             // TODO: Add your initialization logic here
 
             _target = new Target(new Vector2(300, 300));
-
+            _crossHair = new Crosshair();
             base.Initialize();
         }
 
@@ -46,8 +42,8 @@ namespace ShootingGallery
             // TODO: use this.Content to load your game content here
 
             _target.LoadContent(Content);
+            _crossHair.LoadContent(Content);
 
-            crosshairsSprite = Content.Load<Texture2D>("crosshairs");
             backgroundSprite = Content.Load<Texture2D>("sky");
             gameFont = Content.Load<SpriteFont>("galleryFont");
         }
@@ -58,7 +54,7 @@ namespace ShootingGallery
                 Exit();
 
             // TODO: Add your update logic here
-            mState = Mouse.GetState();
+            _crossHair.Update(ref gameTime);
 
             if (!GameManager.isGameOver)
             {
@@ -88,9 +84,7 @@ namespace ShootingGallery
                 _target.Render(ref _spriteBatch);
             }
 
-            _spriteBatch.Draw(crosshairsSprite, 
-                mState.Position.ToVector2() - new Vector2(crosshairRadius,crosshairRadius),
-                Color.White);
+            _crossHair.Render(ref _spriteBatch);
 
             _spriteBatch.End();
 
