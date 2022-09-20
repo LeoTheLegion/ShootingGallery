@@ -12,10 +12,8 @@ namespace ShootingGallery
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
 
-        private Entity _target,_crossHair,_background;
+        
         private List<Entity> _entities;
-
-        private Text _score, _timer;
 
         public static Game1 instance;
         public static int WIDTH => instance._graphics.PreferredBackBufferWidth;
@@ -32,8 +30,9 @@ namespace ShootingGallery
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
+            Entity _target, _crossHair, _background;
 
-            _target = new Target(new Vector2(300, 300));
+             _target = new Target(new Vector2(300, 300));
             _target.SetSort(1);
 
             _crossHair = new Crosshair();
@@ -41,6 +40,8 @@ namespace ShootingGallery
 
             _background = new Decorative("sky", new Vector2(0, 0));
             _background.SetSort(-1);
+
+            Text _score, _timer;
 
             _score = new Text("galleryFont", "Score: Null", new Vector2(3, 3));
             _score.SetSort(0);
@@ -54,6 +55,8 @@ namespace ShootingGallery
             _entities.Add(_background);
             _entities.Add(_score);
             _entities.Add(_timer);
+
+            GameManager.Init(ref _score, ref _timer, ref _target);
 
             base.Initialize();
         }
@@ -81,18 +84,7 @@ namespace ShootingGallery
                 (x, y) => x.GetSort().CompareTo(y.GetSort())
                 );
 
-            _score.SetText("Score: " + GameManager.GetScore().ToString());
-            _timer.SetText("Time: " + Math.Ceiling(GameManager.GetGameTime()).ToString());
-
-
-            if (!GameManager.isGameOver)
-            {
-                GameManager.ReduceGameTime(gameTime.ElapsedGameTime.TotalSeconds);
-            }
-            else
-            {
-                _target.SetActive(false);
-            }
+            GameManager.Update(ref gameTime);
 
             for (int i = 0; i < _entities.Count; i++)
             {

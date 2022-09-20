@@ -13,7 +13,8 @@ namespace ShootingGallery
     {
         private static double timer = 10;
         private static int score = 0;
-
+        private static Text _scoreUI, _timerUI;
+        private static Entity _target;
 
         public static bool isGameOver => timer <= 0;
 
@@ -29,5 +30,28 @@ namespace ShootingGallery
 
         public static int GetScore() => score;
         public static void AddScore(int x) => score += x;
+
+        internal static void Init(ref Text score, ref Text timer, ref Entity target)
+        {
+            _scoreUI = score;
+            _timerUI = timer;
+            _target = target;
+        }
+
+        internal static void Update(ref GameTime gameTime)
+        {
+            _scoreUI.SetText("Score: " + score.ToString());
+            _timerUI.SetText("Time: " + Math.Ceiling(timer).ToString());
+
+
+            if (!isGameOver)
+            {
+                ReduceGameTime(gameTime.ElapsedGameTime.TotalSeconds);
+            }
+            else
+            {
+                _target.SetActive(false);
+            }
+        }
     }
 }
