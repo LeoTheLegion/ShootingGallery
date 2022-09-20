@@ -16,7 +16,7 @@ namespace ShootingGallery
     {
         private const int targetRadius = 45;
 
-        public Target(Vector2 targetPosition)
+        public Target(Vector2 targetPosition) : base()
         {
             this._position = targetPosition;
         }

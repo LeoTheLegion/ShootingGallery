@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using ShootingGallery.Core;
 using System;
+using System.Collections.Generic;
 
 namespace ShootingGallery
 {
@@ -12,6 +13,7 @@ namespace ShootingGallery
         private SpriteBatch _spriteBatch;
 
         private Entity _target,_crossHair,_background;
+        private List<Entity> _entities;
 
         private Text _score, _timer;
 
@@ -32,10 +34,26 @@ namespace ShootingGallery
             // TODO: Add your initialization logic here
 
             _target = new Target(new Vector2(300, 300));
+            _target.SetSort(1);
+
             _crossHair = new Crosshair();
+            _crossHair.SetSort(2);
+
             _background = new Decorative("sky", new Vector2(0, 0));
+            _background.SetSort(-1);
+
             _score = new Text("galleryFont", "Score: Null", new Vector2(3, 3));
+            _score.SetSort(0);
+
             _timer = new Text("galleryFont", "Time: Null", new Vector2(3, 40));
+            _timer.SetSort(0);
+
+            _entities = new List<Entity>();
+            _entities.Add(_target);
+            _entities.Add(_crossHair);
+            _entities.Add(_background);
+            _entities.Add(_score);
+            _entities.Add(_timer);
 
             base.Initialize();
         }
@@ -46,11 +64,10 @@ namespace ShootingGallery
 
             // TODO: use this.Content to load your game content here
 
-            _target.LoadContent(Content);
-            _crossHair.LoadContent(Content);
-            _background.LoadContent(Content);
-            _score.LoadContent(Content);
-            _timer.LoadContent(Content);
+            for (int i = 0; i < _entities.Count; i++)
+            {
+                _entities[i].LoadContent(Content);
+            }
         }
 
         protected override void Update(GameTime gameTime)
@@ -59,8 +76,10 @@ namespace ShootingGallery
                 Exit();
 
             // TODO: Add your update logic here
-            _crossHair.Update(ref gameTime);
-            _background.Update(ref gameTime);
+
+            _entities.Sort(
+                (x, y) => x.GetSort().CompareTo(y.GetSort())
+                );
 
             _score.SetText("Score: " + GameManager.GetScore().ToString());
             _timer.SetText("Time: " + Math.Ceiling(GameManager.GetGameTime()).ToString());
@@ -69,8 +88,16 @@ namespace ShootingGallery
             if (!GameManager.isGameOver)
             {
                 GameManager.ReduceGameTime(gameTime.ElapsedGameTime.TotalSeconds);
+            }
+            else
+            {
+                _target.SetActive(false);
+            }
 
-                _target.Update(ref gameTime);
+            for (int i = 0; i < _entities.Count; i++)
+            {
+                if(_entities[i].GetActive())
+                    _entities[i].Update(ref gameTime);
             }
 
             base.Update(gameTime);
@@ -84,17 +111,11 @@ namespace ShootingGallery
 
             _spriteBatch.Begin();
 
-            _background.Render(ref _spriteBatch);
-
-            _score.Render(ref _spriteBatch);
-            _timer.Render(ref _spriteBatch);
-
-            if(!GameManager.isGameOver)
+            for (int i = 0; i < _entities.Count; i++)
             {
-                _target.Render(ref _spriteBatch);
+                if (_entities[i].GetActive())
+                    _entities[i].Render(ref _spriteBatch);
             }
-
-            _crossHair.Render(ref _spriteBatch);
 
             _spriteBatch.End();
 

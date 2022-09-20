@@ -1,8 +1,11 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework;
+using ShootingGallery.Core;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Formats.Asn1.AsnWriter;
 
 namespace ShootingGallery
 {
@@ -10,6 +13,8 @@ namespace ShootingGallery
     {
         private static double timer = 10;
         private static int score = 0;
+
+
         public static bool isGameOver => timer <= 0;
 
         public static void ReduceGameTime(double x) { 

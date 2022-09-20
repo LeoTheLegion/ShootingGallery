@@ -8,5 +8,8 @@ namespace ShootingGallery.Core
 {
     public abstract class UI : Entity
     {
+        protected UI() : base()
+        {
+        }
     }
 }

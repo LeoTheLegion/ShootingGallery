@@ -16,6 +16,10 @@ namespace ShootingGallery
     {
         private const int crosshairRadius = 25;
 
+        public Crosshair() : base()
+        {
+        }
+
         public override void LoadContent(ContentManager content)
         {
             _sprite = content.Load<Texture2D>("crosshairs");

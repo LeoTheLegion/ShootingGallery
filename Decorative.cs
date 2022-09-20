@@ -14,7 +14,7 @@ namespace ShootingGallery
     public class Decorative : WorldSpaceEntity
     {
         private string _assetName;
-        public Decorative(string assetName,Vector2 position)
+        public Decorative(string assetName,Vector2 position) : base()
         {
             this._assetName = assetName;
             this._position = position; 
