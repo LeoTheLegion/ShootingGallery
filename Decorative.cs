@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace ShootingGallery
 {
-    public class Decorative : Entity
+    public class Decorative : WorldSpaceEntity
     {
         private string _assetName;
         public Decorative(string assetName,Vector2 position)

@@ -12,7 +12,8 @@ namespace ShootingGallery
         private SpriteBatch _spriteBatch;
 
         private Entity _target,_crossHair,_background;
-        private SpriteFont gameFont;
+
+        private Text _score, _timer;
 
         public static Game1 instance;
         public static int WIDTH => instance._graphics.PreferredBackBufferWidth;
@@ -33,6 +34,8 @@ namespace ShootingGallery
             _target = new Target(new Vector2(300, 300));
             _crossHair = new Crosshair();
             _background = new Decorative("sky", new Vector2(0, 0));
+            _score = new Text("galleryFont", "Score: Null", new Vector2(3, 3));
+            _timer = new Text("galleryFont", "Time: Null", new Vector2(3, 40));
 
             base.Initialize();
         }
@@ -46,8 +49,8 @@ namespace ShootingGallery
             _target.LoadContent(Content);
             _crossHair.LoadContent(Content);
             _background.LoadContent(Content);
-
-            gameFont = Content.Load<SpriteFont>("galleryFont");
+            _score.LoadContent(Content);
+            _timer.LoadContent(Content);
         }
 
         protected override void Update(GameTime gameTime)
@@ -58,6 +61,10 @@ namespace ShootingGallery
             // TODO: Add your update logic here
             _crossHair.Update(ref gameTime);
             _background.Update(ref gameTime);
+
+            _score.SetText("Score: " + GameManager.GetScore().ToString());
+            _timer.SetText("Time: " + Math.Ceiling(GameManager.GetGameTime()).ToString());
+
 
             if (!GameManager.isGameOver)
             {
@@ -79,8 +86,8 @@ namespace ShootingGallery
 
             _background.Render(ref _spriteBatch);
 
-            _spriteBatch.DrawString(gameFont, "Score: " + GameManager.GetScore().ToString(), new Vector2(3, 3), Color.White);
-            _spriteBatch.DrawString(gameFont, "Time: " + Math.Ceiling(GameManager.GetGameTime()).ToString(), new Vector2(3, 40), Color.White);
+            _score.Render(ref _spriteBatch);
+            _timer.Render(ref _spriteBatch);
 
             if(!GameManager.isGameOver)
             {

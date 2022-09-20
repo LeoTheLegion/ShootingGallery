@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace ShootingGallery
 {
-    public class Target : Entity
+    public class Target : WorldSpaceEntity
     {
         private const int targetRadius = 45;
 
