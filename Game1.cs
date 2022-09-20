@@ -10,8 +10,7 @@ namespace ShootingGallery
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
 
-        private Entity _target,_crossHair;
-        private Texture2D   backgroundSprite;
+        private Entity _target,_crossHair,_background;
         private SpriteFont gameFont;
 
         public static Game1 instance;
@@ -22,7 +21,7 @@ namespace ShootingGallery
         {
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
-            IsMouseVisible = false;
+            IsMouseVisible = true;
             instance = this;
         }
 
@@ -32,6 +31,8 @@ namespace ShootingGallery
 
             _target = new Target(new Vector2(300, 300));
             _crossHair = new Crosshair();
+            _background = new Decorative("sky", new Vector2(0, 0));
+
             base.Initialize();
         }
 
@@ -43,8 +44,8 @@ namespace ShootingGallery
 
             _target.LoadContent(Content);
             _crossHair.LoadContent(Content);
+            _background.LoadContent(Content);
 
-            backgroundSprite = Content.Load<Texture2D>("sky");
             gameFont = Content.Load<SpriteFont>("galleryFont");
         }
 
@@ -55,6 +56,7 @@ namespace ShootingGallery
 
             // TODO: Add your update logic here
             _crossHair.Update(ref gameTime);
+            _background.Update(ref gameTime);
 
             if (!GameManager.isGameOver)
             {
@@ -72,9 +74,9 @@ namespace ShootingGallery
 
             // TODO: Add your drawing code here
 
-            _spriteBatch.Begin();  
-            
-            _spriteBatch.Draw(backgroundSprite, new Vector2(0, 0), Color.White);
+            _spriteBatch.Begin();
+
+            _background.Render(ref _spriteBatch);
 
             _spriteBatch.DrawString(gameFont, "Score: " + GameManager.GetScore().ToString(), new Vector2(3, 3), Color.White);
             _spriteBatch.DrawString(gameFont, "Time: " + Math.Ceiling(GameManager.GetGameTime()).ToString(), new Vector2(3, 40), Color.White);

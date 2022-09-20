@@ -11,6 +11,9 @@ namespace ShootingGallery
 {
     public abstract class Entity
     {
+        protected Vector2 _position;
+        protected Texture2D _sprite;
+
         public abstract void LoadContent(ContentManager content);
         public abstract void Update(ref GameTime gameTime);
         public abstract void Render(ref SpriteBatch _spriteBatch);

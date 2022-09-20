@@ -1,7 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,14 +10,20 @@ using System.Threading.Tasks;
 
 namespace ShootingGallery
 {
-    public class Crosshair : Entity
+    public class Decorative : Entity
     {
-        private const int crosshairRadius = 25;
+        private string _assetName;
+        public Decorative(string assetName,Vector2 position)
+        {
+            this._assetName = assetName;
+            this._position = position; 
+        }
 
         public override void LoadContent(ContentManager content)
         {
-            _sprite = content.Load<Texture2D>("crosshairs");
+            _sprite = content.Load<Texture2D>(_assetName);
         }
+
         public override void Update(ref GameTime gameTime)
         {
 
@@ -26,9 +31,7 @@ namespace ShootingGallery
 
         public override void Render(ref SpriteBatch _spriteBatch)
         {
-            _spriteBatch.Draw(_sprite,
-                Mouse.GetState().Position.ToVector2() - new Vector2(crosshairRadius, crosshairRadius),
-                Color.White);
+            _spriteBatch.Draw(_sprite, _position, Color.White);
         }
 
         public override void Delete()
