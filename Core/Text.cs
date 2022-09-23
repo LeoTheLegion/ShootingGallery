@@ -12,7 +12,7 @@ namespace ShootingGallery.Core
 {
     internal class Text : UI
     {
-        protected SpriteFont _gameFont;
+        protected Font _gameFont;
         protected string _assetName;
         protected string _text;
 
@@ -21,11 +21,7 @@ namespace ShootingGallery.Core
             this._assetName = assetName;
             this._position = position;
             this._text = text;
-        }
-
-        public override void LoadContent(ContentManager content)
-        {
-            this._gameFont = content.Load<SpriteFont>(this._assetName);
+            this._gameFont = (Font)Resources.Load(assetName);
         }
 
         public override void Update(ref GameTime gameTime)
@@ -35,7 +31,7 @@ namespace ShootingGallery.Core
 
         public override void Render(ref SpriteBatch _spriteBatch)
         {
-            _spriteBatch.DrawString(_gameFont, _text, _position, Color.White);
+            _spriteBatch.DrawString(_gameFont.GetSpriteFont(), _text, _position, Color.White);
         }
 
         public virtual void SetText(string x) => this._text = x;

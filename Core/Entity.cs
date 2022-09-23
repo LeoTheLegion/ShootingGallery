@@ -19,9 +19,9 @@ namespace ShootingGallery.Core
         protected Entity()
         {
             _active = true;
+            EntityManagementSystem.Register(this);
         }
 
-        public abstract void LoadContent(ContentManager content);
         public abstract void Update(ref GameTime gameTime);
         public abstract void Render(ref SpriteBatch _spriteBatch);
         public abstract void Delete();

@@ -19,12 +19,8 @@ namespace ShootingGallery
         public Target(Vector2 targetPosition) : base()
         {
             this._position = targetPosition;
+            this._sprite = (Sprite)Resources.Load("target");
         }
-
-        public override void LoadContent(ContentManager content)
-        {
-            _sprite = content.Load<Texture2D>("target");
-        }            
 
         public override void Update(ref GameTime gameTime)
         {
@@ -48,7 +44,7 @@ namespace ShootingGallery
 
         public override void Render(ref SpriteBatch _spriteBatch)
         {
-            _spriteBatch.Draw(_sprite,
+            _spriteBatch.Draw(_sprite.GetTexture2D(),
                 _position - new Vector2(targetRadius, targetRadius)
                 , Color.White);
         }

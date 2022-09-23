@@ -18,12 +18,9 @@ namespace ShootingGallery
 
         public Crosshair() : base()
         {
+            this._sprite = (Sprite)Resources.Load("crosshairs");
         }
 
-        public override void LoadContent(ContentManager content)
-        {
-            _sprite = content.Load<Texture2D>("crosshairs");
-        }
         public override void Update(ref GameTime gameTime)
         {
 
@@ -31,7 +28,7 @@ namespace ShootingGallery
 
         public override void Render(ref SpriteBatch _spriteBatch)
         {
-            _spriteBatch.Draw(_sprite,
+            _spriteBatch.Draw(_sprite.GetTexture2D(),
                 Mouse.GetState().Position.ToVector2() - new Vector2(crosshairRadius, crosshairRadius),
                 Color.White);
         }
