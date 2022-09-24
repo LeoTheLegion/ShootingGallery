@@ -29,9 +29,5 @@ namespace ShootingGallery
             _spriteBatch.Draw(_sprite.GetTexture2D(), _position, Color.White);
         }
 
-        public override void Delete()
-        {
-            throw new NotImplementedException();
-        }
     }
 }

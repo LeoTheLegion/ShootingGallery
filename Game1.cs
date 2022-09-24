@@ -26,6 +26,12 @@ namespace ShootingGallery
 
         protected override void Initialize()
         {
+            Resources.Init(new Dictionary<string, Asset>(){
+                {"crosshairs", new Sprite("crosshairs") },
+                {"sky", new Sprite("sky") },
+                {"target", new Sprite("target") },
+                {"galleryFont", new Font("galleryFont") }
+            });
             // TODO: Add your initialization logic here
             Entity _target, _crossHair, _background;
 
@@ -33,7 +39,7 @@ namespace ShootingGallery
             _target.SetSort(1);
 
             _crossHair = new Crosshair();
-            _crossHair.SetSort(2);
+            _crossHair.SetSort(3);
 
             _background = new Decorative("sky", new Vector2(0, 0));
             _background.SetSort(-1);
@@ -78,7 +84,7 @@ namespace ShootingGallery
 
             // TODO: Add your drawing code here
 
-            _spriteBatch.Begin();
+            _spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend);
 
             EntityManagementSystem.Render(ref _spriteBatch);
 

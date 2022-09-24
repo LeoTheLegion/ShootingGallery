@@ -33,9 +33,5 @@ namespace ShootingGallery
                 Color.White);
         }
 
-        public override void Delete()
-        {
-            throw new NotImplementedException();
-        }
     }
 }

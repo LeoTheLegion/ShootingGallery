@@ -34,6 +34,14 @@ namespace ShootingGallery
                 {
                     GameManager.AddScore(1);
 
+                    new FloatingPopUpText(
+                        "galleryFont",
+                        "1",
+                        this._position,
+                        this._position + new Vector2(0, -20),
+                        2f
+                        );
+
                     Random rand = new Random();
 
                     _position.X = rand.Next(targetRadius, Game1.WIDTH - targetRadius);
@@ -47,11 +55,6 @@ namespace ShootingGallery
             _spriteBatch.Draw(_sprite.GetTexture2D(),
                 _position - new Vector2(targetRadius, targetRadius)
                 , Color.White);
-        }
-
-        public override void Delete()
-        {
-            throw new NotImplementedException();
         }
     }
 }

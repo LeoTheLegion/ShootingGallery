@@ -24,7 +24,10 @@ namespace ShootingGallery.Core
 
         public abstract void Update(ref GameTime gameTime);
         public abstract void Render(ref SpriteBatch _spriteBatch);
-        public abstract void Delete();
+        public virtual void Destroy()
+        {
+            EntityManagementSystem.Unregister(this);
+        }
 
         public virtual void SetSort(int x) => sort = x;
         public virtual int GetSort() { return sort; } 

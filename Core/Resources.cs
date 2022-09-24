@@ -10,13 +10,12 @@ namespace ShootingGallery.Core
 {
     public static class Resources
     {
-        private static Dictionary<string,Asset> _assets = new Dictionary<string, Asset>()//should be pass in
+        private static Dictionary<string, Asset> _assets;
+
+        public static void Init(Dictionary<string, Asset> dictionary)
         {
-            {"crosshairs", new Sprite("crosshairs") },
-            {"sky", new Sprite("sky") },
-            {"target", new Sprite("target") },
-            {"galleryFont", new Font("galleryFont") }
-        };
+            _assets = dictionary;
+        }
 
         public static void LoadContent(ContentManager _content)
         {
@@ -29,5 +28,7 @@ namespace ShootingGallery.Core
         public static Asset Load(string t) {
             return _assets[t]; 
         }
+
+        
     }
 }
