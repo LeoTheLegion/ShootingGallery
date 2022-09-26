@@ -44,7 +44,7 @@ namespace ShootingGallery
             _background = new Decorative("sky", new Vector2(0, 0));
             _background.SetSort(-1);
 
-            Text _score, _timer;
+            Text _score, _timer , _gameoverMessage;
 
             _score = new Text("galleryFont", "Score: Null", new Vector2(3, 3));
             _score.SetSort(0);
@@ -52,7 +52,9 @@ namespace ShootingGallery
             _timer = new Text("galleryFont", "Time: Null", new Vector2(3, 40));
             _timer.SetSort(0);
 
-            GameManager.Init(ref _score, ref _timer, ref _target);
+            _gameoverMessage = new Text("galleryFont", "Game Over - Press Space To Play Again", new Vector2(100, 100));
+
+            GameManager.Init(ref _score, ref _timer, ref _gameoverMessage, ref _target);
 
             base.Initialize();
         }
