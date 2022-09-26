@@ -30,6 +30,8 @@ namespace ShootingGallery
                 {"crosshairs", new Sprite("crosshairs") },
                 {"sky", new Sprite("sky") },
                 {"target", new Sprite("target") },
+                {"button", new Sprite("button") },
+                {"button_hover", new Sprite("button_hover") },
                 {"galleryFont", new Font("galleryFont") }
             });
             // TODO: Add your initialization logic here
@@ -52,9 +54,13 @@ namespace ShootingGallery
             _timer = new Text("galleryFont", "Time: Null", new Vector2(3, 40));
             _timer.SetSort(0);
 
-            _gameoverMessage = new Text("galleryFont", "Game Over - Press Space To Play Again", new Vector2(100, 100));
+            _gameoverMessage = new Text("galleryFont", "Game Over - Press Button To Play Again", new Vector2(120, 150));
 
-            GameManager.Init(ref _score, ref _timer, ref _gameoverMessage, ref _target);
+            Button _restartButton = new Button("button", "button_hover", "galleryFont", new Vector2(300, 250), "Restart");
+
+            _restartButton.SetOnPress(() => GameManager.RestartRound());
+
+            GameManager.Init(ref _score, ref _timer, ref _gameoverMessage,ref _restartButton, ref _target);
 
             base.Initialize();
         }

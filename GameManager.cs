@@ -17,6 +17,7 @@ namespace ShootingGallery
         private static double timer;
         private static int score = 0;
         private static Text _scoreUI, _timerUI, _gameOverMessageUI; // should be events handled
+        private static Button _restartButton;
         private static Entity _target;
 
         public static bool isGameOver => timer <= 0;
@@ -27,13 +28,16 @@ namespace ShootingGallery
         public static int GetScore() => score;
         public static void AddScore(int x) => score += x;
 
-        public static void Init(ref Text scoreUI, ref Text timerUI, ref Text gameOverMessageUI, ref Entity target)
+        public static void Init(ref Text scoreUI, ref Text timerUI, ref Text gameOverMessageUI, ref Button restartButton , ref Entity target)
         {
             _scoreUI = scoreUI;
             _timerUI = timerUI;
             _target = target;
             _gameOverMessageUI = gameOverMessageUI;
+            _restartButton = restartButton;
             RestartRound();
+
+            timer = 0;
         }
 
         public static void Update(ref GameTime gameTime)
@@ -45,6 +49,7 @@ namespace ShootingGallery
             {
                 _target.SetActive(true);
                 _gameOverMessageUI.SetActive(false);
+                _restartButton.SetActive(false);
 
                 timer -= gameTime.ElapsedGameTime.TotalSeconds;
 
@@ -55,13 +60,14 @@ namespace ShootingGallery
             {
                 _target.SetActive(false);
                 _gameOverMessageUI.SetActive(true);
+                _restartButton.SetActive(true);
 
                 if (Keyboard.GetState().IsKeyDown(Keys.Space))
                     RestartRound();
 
             }
         }
-        private static void RestartRound()
+        public static void RestartRound()
         {
             timer = ROUNDTIME;
             score = 0;
