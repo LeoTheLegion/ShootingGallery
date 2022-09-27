@@ -11,11 +11,18 @@ namespace ShootingGallery.Core
 {
     public class Button : UI
     {
+        private Vector2 _hoverOffset;
         private Sprite _normal;
         private Sprite _hover;
         private Font _font;
         private string _text;
-        private Rectangle _bounds;
+        private Rectangle _bounds
+        {
+            get
+            {
+                return _hover.GetTexture2D().Bounds;
+            }
+        }
         private bool _ishovering;
 
         public delegate void onPress();
@@ -28,8 +35,8 @@ namespace ShootingGallery.Core
             this._font = (Font)Resources.Load(font);
             this._text = text;
             this._position = pos;
-            this._bounds = new Rectangle(0, 0, 190, 49);
             this._ishovering = false;
+            this._hoverOffset = new Vector2(0, 4);
         }
 
         public Button SetOnPress(onPress d){
@@ -51,25 +58,30 @@ namespace ShootingGallery.Core
             {
                 _onPress?.Invoke();
             }
-
         }
 
         public override void Render(ref SpriteBatch _spriteBatch)
         {
+            Vector2 text_midPoint = _font.GetSpriteFont().MeasureString(this._text)/2;
+
+            Rectangle bounds = this._bounds;
+
+            Vector2 button_midPoint = new Vector2(bounds.Width/2, bounds.Height/2);
+
             if (this._ishovering)
             {
-                _spriteBatch.Draw(_hover.GetTexture2D(), this._position, _bounds, Color.White);
+                _spriteBatch.Draw(_hover.GetTexture2D(), this._position, bounds, Color.White);
 
-                Vector2 text_offset = new Vector2(45, 8);
+                Vector2 text_offset = button_midPoint - text_midPoint + _hoverOffset;
 
                 _spriteBatch.DrawString(_font.GetSpriteFont(), _text, this._position + text_offset, Color.White);
             }
                 
             else
             {
-                _spriteBatch.Draw(_normal.GetTexture2D(), this._position, _bounds, Color.White);
+                _spriteBatch.Draw(_normal.GetTexture2D(), this._position, bounds, Color.White);
 
-                Vector2 text_offset = new Vector2(45, 4);
+                Vector2 text_offset = button_midPoint - text_midPoint;
 
                 _spriteBatch.DrawString(_font.GetSpriteFont(), _text, this._position + text_offset, Color.White);
             }

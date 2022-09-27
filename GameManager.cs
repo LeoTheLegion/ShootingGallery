@@ -48,6 +48,7 @@ namespace ShootingGallery
         public static void StartGame()
         {
             started = true;
+            RestartRound();
         }
 
         public static void Update(ref GameTime gameTime)
