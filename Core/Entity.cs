@@ -29,7 +29,11 @@ namespace ShootingGallery.Core
             EntityManagementSystem.Unregister(this);
         }
 
-        public virtual void SetSort(int x) => sort = x;
+        public virtual Entity SetSort(int x) {
+            sort = x;
+            return this;
+        }
+
         public virtual int GetSort() { return sort; } 
         public virtual void SetActive(bool active) => _active = active;
         public virtual bool GetActive() { return _active; }

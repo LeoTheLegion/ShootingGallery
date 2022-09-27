@@ -38,5 +38,6 @@ namespace ShootingGallery.Core
 
         public virtual void SetText(string x) => this._text = x;
 
+
     }
 }

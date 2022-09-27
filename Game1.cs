@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Input;
 using ShootingGallery.Core;
 using System;
 using System.Collections.Generic;
+using static System.Formats.Asn1.AsnWriter;
 
 namespace ShootingGallery
 {
@@ -37,16 +38,17 @@ namespace ShootingGallery
             // TODO: Add your initialization logic here
             Entity _target, _crossHair, _background;
 
-             _target = new Target(new Vector2(300, 300));
-            _target.SetSort(1);
+             _target = new Target(new Vector2(300, 300))
+                .SetSort(1);
 
-            _crossHair = new Crosshair();
-            _crossHair.SetSort(3);
+            _crossHair = new Crosshair()
+                .SetSort(3);
 
-            _background = new Decorative("sky", new Vector2(0, 0));
-            _background.SetSort(-1);
+            _background = new Decorative("sky", new Vector2(0, 0))
+                .SetSort(-1);
 
-            Text _score, _timer , _gameoverMessage;
+            Text _score, _timer, _gameoverMessage,_startMessage;
+            Button _restartButton, _startButton;
 
             _score = new Text("galleryFont", "Score: Null", new Vector2(3, 3));
             _score.SetSort(0);
@@ -55,12 +57,15 @@ namespace ShootingGallery
             _timer.SetSort(0);
 
             _gameoverMessage = new Text("galleryFont", "Game Over - Press Button To Play Again", new Vector2(120, 150));
+            _startMessage = new Text("galleryFont", "Welcome to Michael's Shooting Gallery!", new Vector2(120, 150));
 
-            Button _restartButton = new Button("button", "button_hover", "galleryFont", new Vector2(300, 250), "Restart");
+            _restartButton = new Button("button", "button_hover", "galleryFont", new Vector2(300, 250), "Restart");
+            _startButton = new Button("button", "button_hover", "galleryFont", new Vector2(300, 250), "Play");
 
-            _restartButton.SetOnPress(() => GameManager.RestartRound());
-
-            GameManager.Init(ref _score, ref _timer, ref _gameoverMessage,ref _restartButton, ref _target);
+            GameManager.Init(ref _score, ref _timer,
+                ref _gameoverMessage,ref _restartButton,
+                ref _startMessage, ref _startButton,
+                ref _target);
 
             base.Initialize();
         }

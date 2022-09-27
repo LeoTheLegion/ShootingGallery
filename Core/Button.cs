@@ -32,8 +32,9 @@ namespace ShootingGallery.Core
             this._ishovering = false;
         }
 
-        public void SetOnPress(onPress d){
+        public Button SetOnPress(onPress d){
             this._onPress = d;
+            return this; 
         }
 
         public override void Update(ref GameTime gameTime)
