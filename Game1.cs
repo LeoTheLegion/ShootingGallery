@@ -21,7 +21,7 @@ namespace ShootingGallery
         {
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
-            IsMouseVisible = true;
+            IsMouseVisible = false;
             instance = this;
         }
 
