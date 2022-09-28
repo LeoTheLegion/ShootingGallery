@@ -2,7 +2,7 @@
 
 A Simple Shooting Gallery game like Duck hunt to learn the Monogame Framework.
 
-##Scope
+## Scope
 
 - Start Menu
 		 - **Button** to Start Gameplay
@@ -14,5 +14,5 @@ A Simple Shooting Gallery game like Duck hunt to learn the Monogame Framework.
 - Gameover
 		 - **Button** to Start Gameplay
 
-##Time Taken
+## Time Taken
 Around 6 hours. 20% - 30% spend on experimentation 
