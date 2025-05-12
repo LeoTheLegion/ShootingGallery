@@ -1,4 +1,5 @@
-﻿using CoreEssentials.GameSystems.EntitySystems.EntityOOPSystem;
+﻿using CoreEssentials.Debugging;
+using CoreEssentials.GameSystems.EntitySystems.EntityOOPSystem;
 using CoreEssentials.GUI;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -15,6 +16,8 @@ namespace ShootingGallery
         private float _transparency;
 
         private Canvas _canvas;
+
+        private Label _label;
 
         private const float Distance = 10f;
         private string _text;
@@ -45,6 +48,8 @@ namespace ShootingGallery
                 VerticalAlignment = VerticalAlignment.Top
             };
 
+            _label = label;
+
             _canvas.AddWidget(label);
         }
 
@@ -59,18 +64,23 @@ namespace ShootingGallery
 
             this._timeLeft -= deltaTime;
 
+            _canvas.SetPosition(this._position);
+            _canvas.Update(gameTime);
+
+            _label.Opacity = _transparency;
+
             if (_timeLeft <= 0)
                 this.Destroy();
+        }
+
+        public override void Render(SpriteBatch _spriteBatch)
+        {
         }
 
         public override void OnDestroy()
         {
             base.OnDestroy();
             _canvas.CleanUp();
-        }
-
-        public override void Render(SpriteBatch _spriteBatch)
-        {
         }
 
         private float smoothFunction(float currentTime , float totalTime, float strength)
