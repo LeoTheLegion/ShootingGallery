@@ -37,6 +37,9 @@
 /processorParam:TextureFormat=Color
 /build:button.png
 
+#begin crosshair_sprite.xml
+/copy:crosshair_sprite.xml
+
 #begin crosshairs.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -67,6 +70,9 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:sky.png
+
+#begin target_sprite.xml
+/copy:target_sprite.xml
 
 #begin target.png
 /importer:TextureImporter

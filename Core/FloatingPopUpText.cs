@@ -1,33 +1,55 @@
-﻿using Microsoft.Xna.Framework;
+﻿using CoreEssentials.GameSystems.EntitySystems.EntityOOPSystem;
+using CoreEssentials.GUI;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using ShootingGallery.Core;
+using Myra.Graphics2D.UI;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ShootingGallery
 {
-    public class FloatingPopUpText : Text
+    public class FloatingPopUpText : Entity
     {
         private Vector2 _velocity;
         private float _timeLeft, _totalTime;
         private float _transparencyChangeRate;
         private float _transparency;
 
-        public FloatingPopUpText(string assetName, string text, Vector2 position, Vector2 end, float time) : base(assetName, text, position)
+        private Canvas _canvas;
+
+        private const float Distance = 10f;
+        private string _text;
+
+        public FloatingPopUpText(Vector2 position, float time, string text)
         {
+            this._position = position;
+            this._text = text;
+
+            Vector2 end = position + new Vector2(0, -Distance);
             this._velocity = (end - position) / time;
             this._timeLeft = this._totalTime = time;
+
             this._transparency = 1f;
             this._transparencyChangeRate = this._transparency / time;
             
+            _canvas = new Canvas();
         }
 
-        public override void Update(ref GameTime gameTime) 
+        public override void OnStart()
         {
-            base.Update(ref gameTime);
+            base.OnStart();
+
+            var label = new Label
+            {
+                Text = _text,
+                HorizontalAlignment = HorizontalAlignment.Left,
+                VerticalAlignment = VerticalAlignment.Top
+            };
+
+            _canvas.AddWidget(label);
+        }
+
+        public override void Update(GameTime gameTime) 
+        {
 
             float deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
@@ -41,9 +63,14 @@ namespace ShootingGallery
                 this.Destroy();
         }
 
-        public override void Render(ref SpriteBatch _spriteBatch)
+        public override void OnDestroy()
         {
-            _spriteBatch.DrawString(_gameFont.GetSpriteFont(), _text, _position, _color * _transparency);
+            base.OnDestroy();
+            _canvas.CleanUp();
+        }
+
+        public override void Render(SpriteBatch _spriteBatch)
+        {
         }
 
         private float smoothFunction(float currentTime , float totalTime, float strength)
