@@ -38,12 +38,10 @@ namespace ShootingGallery
             {
                 RadiationAmount = radiationAmount;
             }
-        }
-
-        // Constants
+        }        // Constants
         protected const int targetRadius = 45;
         protected const float DefaultScale = 0.3f;
-        protected const double TimeToFullSize = 3.0;
+        protected const double TimeToFullSize = 0.75; // Even faster growth (reduced from 1.5)
         
         // State
         protected float _scale;
@@ -53,8 +51,7 @@ namespace ShootingGallery
         protected string _spriteName;
         protected Color _tintColor = Color.White;
         protected bool _isDestroyed = false;
-        
-        // Target type identifiers
+          // Target type identifiers
         public enum TargetType
         {
             Standard,
@@ -64,16 +61,18 @@ namespace ShootingGallery
         public TargetType Type { get; protected set; }
         public bool IsDestroyed => _isDestroyed;
         
+        // Add a property to check if the target is fully grown (scale is at max)
+        public bool IsFullyGrown => _scale >= 1.0f;
+        
         protected Scene Scene { get; private set; }
         
         // Store a reference to the scene
         public void SetScene(Scene scene)
         {
-            this.Scene = scene;
-        }
+            this.Scene = scene;        }
 
         // Add a public getter for the position
-        public Vector2 Position => _position;
+        public new Vector2 Position => _position;
 
         protected BaseTarget(Vector2 targetPosition, string spriteName) : base()
         {
@@ -195,15 +194,15 @@ namespace ShootingGallery
             // Destroy this target instead of moving it randomly
             Destroy();
         }
-        
-        private int CalculateScore()
+          private int CalculateScore()
         {
-            // Score based on size (smaller = harder to hit = more points)
-            if (_scale < .4f)
+            // Score based on size (fully grown = more points)
+            if (_scale >= 1.0f)
+                return 15; // Fully grown targets are worth more
+            else if (_scale >= 0.6f)
                 return 10;
-            else if (_scale < 0.8f)
-                return 5;            else
-                return 1;
+            else
+                return 5;
         }
     }
 
@@ -225,16 +224,15 @@ namespace ShootingGallery
             // Destroy this target instead of moving it randomly
             Destroy();
         }
-        
-        private int CalculateScore()
+          private int CalculateScore()
         {
-            // Higher scores for radioactive targets
-            if (_scale < .4f)
+            // Higher scores for radioactive targets, especially when fully grown
+            if (_scale >= 1.0f)
+                return 30; // Fully grown radioactive targets worth a lot
+            else if (_scale >= 0.6f)
                 return 20;
-            else if (_scale < 0.8f)
-                return 10;
             else
-                return 5;
+                return 10;
         }
     }    // Bomb Target (game over when hit)
     public class BombTarget : BaseTarget

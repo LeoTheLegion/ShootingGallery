@@ -20,7 +20,7 @@ namespace ShootingGallery
             public Vector2 Position { get; }
             public bool IsRandomShot { get; }
             public int? ArmIndex { get; } // Null for main, otherwise mutated arm index
-            
+
             public ShootEventArgs(Vector2 position, bool isRandomShot = false, int? armIndex = null)
             {
                 Position = position;
@@ -51,11 +51,11 @@ namespace ShootingGallery
             _random = new Random();
             _armPositions = new List<Vector2>();
             _armRotations = new List<float>();
-            
+
             // Initialize with 1 arm (the main one)
             _armPositions.Add(Vector2.Zero);
             _armRotations.Add(0f);
-            
+
             _lastMouseState = Mouse.GetState();
         }
 
@@ -68,15 +68,15 @@ namespace ShootingGallery
         public void SetMutationLevel(int level)
         {
             _mutationLevel = Math.Clamp(level, 0, 3); // Max 4 arms (1 original + 3 mutations)
-            
+
             // Reset arm positions
             _armPositions.Clear();
             _armRotations.Clear();
-            
+
             // Always have the main arm
             _armPositions.Add(Vector2.Zero);
             _armRotations.Add(0f);
-            
+
             // Add additional arms based on mutation level
             for (int i = 0; i < _mutationLevel; i++)
             {
@@ -86,95 +86,95 @@ namespace ShootingGallery
                     (float)Math.Cos(angle) * ArmDistanceFromCenter,
                     (float)Math.Sin(angle) * ArmDistanceFromCenter
                 );
-                
+
                 _armPositions.Add(offset);
                 _armRotations.Add(angle);
             }
         }
-
         public override void Update(GameTime gameTime)
         {
             // Update the position of the crosshair to follow the mouse
             MouseState currentMouseState = Mouse.GetState();
             Vector2 mousePosition = currentMouseState.Position.ToVector2();
             this._position = mousePosition - new Vector2(crosshairRadius, crosshairRadius);
-            
+
             // Handle shooting with the main crosshair
-            if (currentMouseState.LeftButton == ButtonState.Pressed && 
+            if (currentMouseState.LeftButton == ButtonState.Pressed &&
                 _lastMouseState.LeftButton == ButtonState.Released &&
                 _canShoot)
             {
                 Console.WriteLine("Shot fired at: " + mousePosition);
                 OnShoot?.Invoke(this, new ShootEventArgs(mousePosition));
             }
-            
-            // Handle random shots from mutated arms
-            if (_mutationLevel > 0)
-            {
-                _randomShotTimer -= (float)gameTime.ElapsedGameTime.TotalSeconds;
-                
-                if (_randomShotTimer <= 0)
-                {
-                    // Pick a single mutated arm (not the main one)
-                    int mutatedArmCount = _armPositions.Count - 1;
-                    if (mutatedArmCount > 0)
-                    {
-                        int randomMutatedArm = _random.Next(1, _armPositions.Count); // 1..N
-                        Vector2 randomShotPosition = GetRandomShotPosition();
-                        // Trigger the shooting event, passing the arm index
-                        OnShoot?.Invoke(this, new ShootEventArgs(randomShotPosition, true, randomMutatedArm));
-                    }
-                    // Reset the timer with some randomness
-                    _randomShotTimer = RandomShotCooldown - (_mutationLevel * 0.2f) + (float)(_random.NextDouble() * 0.5f);
-                }
-            }
-            
+
             _lastMouseState = currentMouseState;
         }
-        
-        // Add a method for EntitySystem-compatible Update
-        public void Update(ref GameTime gameTime)
-        {
-            Update(gameTime);
-        }
 
-        private Vector2 GetRandomShotPosition()
+        // Method to trigger a random shot from a mutated arm
+        // This will be called by GameManager when the player hits a target
+        public void TriggerRandomShot()
         {
-            // If there are targets, pick a regular target at random
-            if (_currentTargets != null && _currentTargets.Count > 0)
+            // Only proceed if we have mutated arms
+            if (_mutationLevel > 0)
             {
-                // Filter to only get regular targets
-                var regularTargets = _currentTargets.Where(t => t is RegularTarget).ToList();
-                
-                if (regularTargets.Count > 0)
-                {
-                    int idx = _random.Next(regularTargets.Count);
-                    return regularTargets[idx].Position;
+                // Pick a single mutated arm (not the main one)
+                int mutatedArmCount = _armPositions.Count - 1;
+                if (mutatedArmCount > 0)                {
+                    int randomMutatedArm = _random.Next(1, _armPositions.Count); // 1..N
+                    Vector2 randomShotPosition = GetRandomShotPosition();
+                    
+                    // Only shoot if we found a valid target (not the indicator position)
+                    if (randomShotPosition.X >= 0 && randomShotPosition.Y >= 0)
+                    {
+                        // Trigger the shooting event, passing the arm index
+                        OnShoot?.Invoke(this, new ShootEventArgs(randomShotPosition, true, randomMutatedArm));
+                        Console.WriteLine($"Random shot triggered from mutated arm {randomMutatedArm} at position {randomShotPosition}");
+                    }
+                    else
+                    {
+                        Console.WriteLine("No fully grown regular targets available for random shot - skipping");
+                    }
                 }
             }
-            
-            // Fallback: random position in the window if no regular targets found
-            return new Vector2(
-                _random.Next(50, ScreenManager.ScreenWidth - 50),
-                _random.Next(50, ScreenManager.ScreenHeight - 50)
-            );
+        }
+          private Vector2 GetRandomShotPosition()
+        {
+            // If there are targets, pick a fully grown regular target at random
+            if (_currentTargets != null && _currentTargets.Count > 0)
+            {
+                // Filter to only get fully grown regular targets
+                var fullyGrownRegularTargets = _currentTargets
+                    .Where(t => t is RegularTarget && t.IsFullyGrown)
+                    .ToList();
+
+                if (fullyGrownRegularTargets.Count > 0)
+                {
+                    int idx = _random.Next(fullyGrownRegularTargets.Count);
+                    return fullyGrownRegularTargets[idx].Position;
+                }
+                
+                // No fully grown targets available, so return null indicator position
+                // This will be handled in TriggerRandomShot to prevent shooting
+                return new Vector2(-1, -1);
+            }            // No targets at all, so return null indicator position
+            return new Vector2(-1, -1);
         }
 
         public override void Render(SpriteBatch _spriteBatch)
         {
             // Draw the main crosshair
             _sprite.Draw(_spriteBatch, _position, Color.White, 0f, SpriteEffects.None, 0f);
-            
+
             // Draw the mutated arms
             Color mutatedColor = new Color(0, 255, 0, 200); // Glowing green for radiation effect
-            
+
             for (int i = 1; i < _armPositions.Count; i++) // Start from 1 to skip the main arm
             {
                 Vector2 armPosition = _position + _armPositions[i];
                 _sprite.Draw(_spriteBatch, armPosition, mutatedColor, _armRotations[i], 0.8f, SpriteEffects.None, 0f);
             }
         }
-        
+
         // Add a method for EntitySystem-compatible Render
         public void Render(ref SpriteBatch _spriteBatch)
         {
