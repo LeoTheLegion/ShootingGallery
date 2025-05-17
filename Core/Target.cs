@@ -236,20 +236,63 @@ namespace ShootingGallery
             else
                 return 5;
         }
-    }
-    // Bomb Target (game over when hit)
+    }    // Bomb Target (game over when hit)
     public class BombTarget : BaseTarget
     {
+        // Constants for the auto-fade behavior
+        private const double FadeStartTime = 5.0; // Time before bomb starts fading (seconds)
+        private const double FadeDuration = 3.0; // Duration of fade effect (seconds)
+        
+        // State for tracking lifetime and alpha
+        private double _lifeTime = 0; // How long this bomb has existed
+        private float _alpha = 1.0f; // Transparency (1.0f = fully visible, 0.0f = invisible)
+        
         public BombTarget(Vector2 targetPosition) : base(targetPosition, "target")
         {
             Type = TargetType.Bomb;
-            _tintColor = new Color(255, 0, 0); // Red tint for bomb
+            _tintColor = new Color((byte)255, (byte)0, (byte)0, (byte)255); // Red tint for bomb
+        }
+        
+        public override void Update(GameTime gameTime)
+        {
+            // Call the base Update method first
+            base.Update(gameTime);
+            
+            // Increment lifetime
+            _lifeTime += gameTime.ElapsedGameTime.TotalSeconds;
+            
+            // Start fading once we reach FadeStartTime
+            if (_lifeTime > FadeStartTime)
+            {
+                // Calculate how far through the fade we are (0.0 to 1.0)
+                float fadeProgress = (float)((_lifeTime - FadeStartTime) / FadeDuration);
+                
+                // Update alpha value (clamped between 0 and 1)
+                _alpha = Math.Max(0, 1.0f - fadeProgress);
+                
+                // Update tint color with new alpha (explicitly using byte for all parameters)
+                byte alpha = (byte)Math.Round(_alpha * 255);
+                _tintColor = new Color((byte)255, (byte)0, (byte)0, alpha);
+                
+                // When fully faded out, destroy the bomb
+                if (_alpha <= 0)
+                {
+                    Console.WriteLine("Bomb has faded away completely and will be destroyed");
+                    Destroy();
+                }
+            }
         }
         
         protected override void ProcessHit()
         {
             // Game over!
             ReportGameOver();
+        }
+        
+        public override void Render(SpriteBatch _spriteBatch)
+        {
+            // Use the faded tint color for rendering
+            _sprite.Draw(_spriteBatch, _position, _tintColor, 0f, Vector2.One * _scale, SpriteEffects.None, 0);
         }
     }
     
