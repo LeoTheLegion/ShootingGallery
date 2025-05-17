@@ -16,7 +16,7 @@ namespace ShootingGallery
         public class GameOverEventArgs : EventArgs
         {
             public int FinalScore { get; }
-            
+
             public GameOverEventArgs(int finalScore)
             {
                 FinalScore = finalScore;
@@ -31,7 +31,7 @@ namespace ShootingGallery
         private const int TARGET_SPAWN_DELAY = 3; // Seconds between target spawns
         private const float BOMB_CHANCE = 0.2f; // 20% chance for a bomb
         private const float RADIOACTIVE_CHANCE = 0.3f; // 30% chance for radioactive target
-        
+
         // Game state
         private double _timer;
         private int _score = 0;
@@ -41,11 +41,11 @@ namespace ShootingGallery
         private ShootingGallery.Core.TextEntity _scoreUI;
         private ShootingGallery.Core.TextEntity _timerUI;
         private ShootingGallery.Core.TextEntity _multiplierUI;
-        
+
         // Linked entities
         private RadiationManager _radiationManager;
         private Crosshair _crosshair;
-        
+
         // Target tracking
         private List<BaseTarget> _activeTargets = new List<BaseTarget>();
         private Random _random = new Random();
@@ -54,13 +54,22 @@ namespace ShootingGallery
         public double GetGameTime() => _timer;
         public int GetScore() => _score;
         public float GetTimeMultiplier() => _timeMultiplier;
-          // Setters
+        // Setters
         public void AddScore(int points) => _score += (int)(points * _timeMultiplier);
         public void SetScoreUI(ShootingGallery.Core.TextEntity scoreUI) => _scoreUI = scoreUI;
         public void SetTimerUI(ShootingGallery.Core.TextEntity timerUI) => _timerUI = timerUI;
         public void SetMultiplierUI(ShootingGallery.Core.TextEntity multiplierUI) => _multiplierUI = multiplierUI;
         public void SetRadiationManager(RadiationManager radiationManager) => _radiationManager = radiationManager;
-        public void SetCrosshair(Crosshair crosshair) => _crosshair = crosshair;
+        public void SetCrosshair(Crosshair crosshair)
+        {
+            _crosshair = crosshair;
+
+            if (_crosshair != null)
+            {
+                Console.WriteLine("Crosshair is not null, subscribing to shoot event.");
+                _crosshair.OnShoot += HandleCrosshairShoot;
+            }
+        }
 
         public GameManager()
         {
@@ -73,24 +82,23 @@ namespace ShootingGallery
         public override void OnStart()
         {
             base.OnStart();
-            
+
             // Initialize with a few targets
             for (int i = 0; i < 3; i++)
             {
                 SpawnRandomTarget();
             }
-            
-            if (_crosshair != null)
-            {
-                _crosshair.OnShoot += HandleCrosshairShoot;
-            }
         }
-        
         private void HandleCrosshairShoot(object sender, Crosshair.ShootEventArgs e)
         {
+            // Log the shot for debugging
+            Console.WriteLine($"Shot detected at position: {e.Position}");
+
             // Check for target hits
             foreach (var target in _activeTargets)
             {
+                // Log the target being checked
+                Console.WriteLine($"Checking target at position: {target.Position}, distance: {Vector2.Distance(target.Position, e.Position)}");
                 target.HandleShot(e.Position);
             }
         }
@@ -104,16 +112,16 @@ namespace ShootingGallery
         private void ProcessGameplay(GameTime gameTime)
         {
             float elapsedSeconds = (float)gameTime.ElapsedGameTime.TotalSeconds;
-            
+
             // Update timer
             _timer -= elapsedSeconds;
-            
+
             // Update time multiplier (decreases over time)
             _timeMultiplier = MathHelper.Max(
-                _timeMultiplier - (TIME_MULTIPLIER_DECAY * elapsedSeconds), 
+                _timeMultiplier - (TIME_MULTIPLIER_DECAY * elapsedSeconds),
                 TIME_MULTIPLIER_MIN
             );
-            
+
             // Update UI
             _scoreUI.SetText("Score: " + _score.ToString());
             _timerUI.SetText("Time: " + Math.Ceiling(_timer).ToString());
@@ -126,18 +134,18 @@ namespace ShootingGallery
                 OnGameOver?.Invoke(this, new GameOverEventArgs(_score));
             }
         }
-        
+
         private void UpdateTargetSpawning(GameTime gameTime)
         {
             _targetSpawnTimer -= gameTime.ElapsedGameTime.TotalSeconds;
-            
+
             if (_targetSpawnTimer <= 0)
             {
                 SpawnRandomTarget();
-                
+
                 // Calculate next spawn time (with some randomness)
                 _targetSpawnTimer = TARGET_SPAWN_DELAY + (_random.NextDouble() * 2);
-                
+
                 // Spawn more targets as time goes on
                 if (_timer < ROUND_TIME * 0.75)
                 {
@@ -152,20 +160,20 @@ namespace ShootingGallery
                     _targetSpawnTimer *= 0.7;
                 }
             }
-            
+
             // Clean up destroyed targets
             _activeTargets.RemoveAll(t => t == null || t.IsDestroyed);
         }
-          private void SpawnRandomTarget()
+        private void SpawnRandomTarget()
         {
             Vector2 randomPosition = new Vector2(
                 _random.Next(50, ScreenManager.ScreenWidth - 50),
                 _random.Next(50, ScreenManager.ScreenHeight - 50)
             );
-            
+
             BaseTarget newTarget;
             double roll = _random.NextDouble();
-            
+
             if (roll < BOMB_CHANCE)
             {
                 // Spawn a bomb
@@ -181,26 +189,26 @@ namespace ShootingGallery
                 // Spawn a regular target
                 newTarget = EntitySystem.CreateEntity<RegularTarget>(randomPosition);
             }
-            
+
             // Subscribe to target events
-            newTarget.OnScore += (sender, args) => 
+            newTarget.OnScore += (sender, args) =>
             {
                 AddScore(args.Score);
             };
-            
-            newTarget.OnRadiationChange += (sender, args) => 
+
+            newTarget.OnRadiationChange += (sender, args) =>
             {
                 if (_radiationManager != null)
                 {
                     _radiationManager.AddRadiation(args.RadiationAmount);
                 }
             };
-                  newTarget.OnGameOver += (sender, args) => 
-            {
-                // Game over from hitting a bomb
-                OnGameOver?.Invoke(this, new GameOverEventArgs(_score));
-            };
-            
+            newTarget.OnGameOver += (sender, args) =>
+      {
+          // Game over from hitting a bomb
+          OnGameOver?.Invoke(this, new GameOverEventArgs(_score));
+      };
+
             _activeTargets.Add(newTarget);
         }
 
@@ -209,20 +217,20 @@ namespace ShootingGallery
             _timer = ROUND_TIME;
             _score = 0;
             _timeMultiplier = TIME_MULTIPLIER_START;
-            
+
             // Clear existing targets
             foreach (var target in _activeTargets)
             {
                 target.Destroy();
             }
             _activeTargets.Clear();
-            
+
             // Reset radiation
             if (_radiationManager != null)
             {
                 _radiationManager.Reset();
             }
-            
+
             // Spawn new targets
             for (int i = 0; i < 3; i++)
             {

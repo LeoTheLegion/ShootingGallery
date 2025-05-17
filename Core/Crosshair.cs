@@ -39,16 +39,16 @@ namespace ShootingGallery
         private bool _canShoot = true;
         private MouseState _lastMouseState;
 
-        public Crosshair() : base()
-        {
-            this._sprite = AssetManager.LoadAsset<Sprite>("crosshair_sprite.xml");
-            _random = new Random();
-            _armPositions = new List<Vector2>();
-            _armRotations = new List<float>();
-            
-            // Initialize with 1 arm (the main one)
-            _armPositions.Add(Vector2.Zero);
-            _armRotations.Add(0f);
+    public Crosshair() : base()
+    {
+        this._sprite = AssetManager.LoadAsset<Sprite>("crosshair_sprite.xml");
+        _random = new Random();
+        _armPositions = new List<Vector2>();
+        _armRotations = new List<float>();
+        
+        // Initialize with 1 arm (the main one)
+        _armPositions.Add(Vector2.Zero);
+        _armRotations.Add(0f);
             
             _lastMouseState = Mouse.GetState();
         }
@@ -92,6 +92,7 @@ namespace ShootingGallery
                 _lastMouseState.LeftButton == ButtonState.Released &&
                 _canShoot)
             {
+                Console.WriteLine("Shot fired at: " + mousePosition);
                 OnShoot?.Invoke(this, new ShootEventArgs(mousePosition));
             }
             
@@ -118,7 +119,14 @@ namespace ShootingGallery
             
             _lastMouseState = currentMouseState;
         }
-          private Vector2 GetRandomShotPosition()
+        
+        // Add a method for EntitySystem-compatible Update
+        public void Update(ref GameTime gameTime)
+        {
+            Update(gameTime);
+        }
+
+        private Vector2 GetRandomShotPosition()
         {
             // Create a random shot position within the game window
             return new Vector2(
@@ -140,6 +148,12 @@ namespace ShootingGallery
                 Vector2 armPosition = _position + _armPositions[i];
                 _sprite.Draw(_spriteBatch, armPosition, mutatedColor, _armRotations[i], 0.8f, SpriteEffects.None, 0f);
             }
+        }
+        
+        // Add a method for EntitySystem-compatible Render
+        public void Render(ref SpriteBatch _spriteBatch)
+        {
+            Render(_spriteBatch);
         }
 
         public void Dispose()

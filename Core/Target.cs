@@ -1,5 +1,6 @@
 ﻿using CoreEssentials.Assets;
 using CoreEssentials.GameSystems.EntitySystems.EntityOOPSystem;
+using CoreEssentials.SceneManagement;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ShootingGallery.Core;
@@ -60,8 +61,19 @@ namespace ShootingGallery
             Radioactive,
             Bomb
         }
-          public TargetType Type { get; protected set; }
+        public TargetType Type { get; protected set; }
         public bool IsDestroyed => _isDestroyed;
+        
+        protected Scene Scene { get; private set; }
+        
+        // Store a reference to the scene
+        public void SetScene(Scene scene)
+        {
+            this.Scene = scene;
+        }
+
+        // Add a public getter for the position
+        public Vector2 Position => _position;
 
         protected BaseTarget(Vector2 targetPosition, string spriteName) : base()
         {
@@ -77,16 +89,20 @@ namespace ShootingGallery
         public override void OnStart()
         {
             base.OnStart();
-            this._sprite = AssetManager.LoadAsset<Sprite>(_spriteName);
+            this._sprite = AssetManager.LoadAsset<Sprite>("target_sprite.xml");
+            
             MoveRandomly();
+            Console.WriteLine($"Target moved to random position: {_position}");
         }
 
         public virtual void HandleShot(Vector2 shotPosition)
         {
             float distanceToShot = Vector2.Distance(_position, shotPosition);
+            Console.WriteLine($"HandleShot: Target at {_position}, Shot at {shotPosition}, Distance: {distanceToShot}, HitRadius: {targetRadius * _scale}");
 
             if (distanceToShot < targetRadius * _scale)
             {
+                Console.WriteLine("Hit detected! Processing...");
                 ProcessHit();
             }
         }
@@ -122,12 +138,19 @@ namespace ShootingGallery
             _time += gameTime.ElapsedGameTime.TotalSeconds;
             _scale = (float)Math.MinMagnitude(_time / TimeToFullSize, 1);
         }
-          protected void MoveRandomly()
+        
+        // Add a method for EntitySystem-compatible Update
+        public void Update(ref GameTime gameTime)
+        {
+            Update(gameTime);
+        }
+
+        protected void MoveRandomly()
         {
             _position.X = _random.Next(targetRadius, ScreenManager.ScreenWidth - targetRadius);
             _position.Y = _random.Next(targetRadius, ScreenManager.ScreenHeight - targetRadius);
         }
-          protected void Reset()
+        protected void Reset()
         {
             _scale = DefaultScale;
             _time = 0;
@@ -136,7 +159,15 @@ namespace ShootingGallery
         public override void Render(SpriteBatch _spriteBatch)
         {
             _sprite.Draw(_spriteBatch, _position, _tintColor, 0f, Vector2.One * _scale, SpriteEffects.None, 0);
-        }        public virtual void Dispose()
+        }
+        
+        // Add a method for EntitySystem-compatible Render
+        public void Render(ref SpriteBatch _spriteBatch)
+        {
+            Render(_spriteBatch);
+        }
+
+        public virtual void Dispose()
         {
             AssetManager.UnloadAsset<Sprite>(_sprite.Name);
         }
@@ -152,7 +183,7 @@ namespace ShootingGallery
     // Standard Target (regular points)
     public class RegularTarget : BaseTarget
     {
-        public RegularTarget(Vector2 targetPosition) : base(targetPosition, "target_sprite.xml")
+        public RegularTarget(Vector2 targetPosition) : base(targetPosition, "target")
         {
             Type = TargetType.Standard;
         }
@@ -178,11 +209,10 @@ namespace ShootingGallery
                 return 1;
         }
     }
-    
     // Radioactive Target (higher radiation, higher score)
     public class RadioactiveTarget : BaseTarget
     {
-        public RadioactiveTarget(Vector2 targetPosition) : base(targetPosition, "target_sprite.xml")
+        public RadioactiveTarget(Vector2 targetPosition) : base(targetPosition, "target")
         {
             Type = TargetType.Radioactive;
             _tintColor = new Color(0, 255, 0); // Green tint for radioactive
@@ -209,11 +239,10 @@ namespace ShootingGallery
                 return 5;
         }
     }
-    
     // Bomb Target (game over when hit)
     public class BombTarget : BaseTarget
     {
-        public BombTarget(Vector2 targetPosition) : base(targetPosition, "target_sprite.xml")
+        public BombTarget(Vector2 targetPosition) : base(targetPosition, "target")
         {
             Type = TargetType.Bomb;
             _tintColor = new Color(255, 0, 0); // Red tint for bomb
