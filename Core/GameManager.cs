@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework;
 using ShootingGallery.Core;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace ShootingGallery
 {
@@ -31,6 +32,13 @@ namespace ShootingGallery
         private const int TARGET_SPAWN_DELAY = 3; // Seconds between target spawns
         private const float BOMB_CHANCE = 0.2f; // 20% chance for a bomb
         private const float RADIOACTIVE_CHANCE = 0.3f; // 30% chance for radioactive target
+
+        // Target grid configuration
+        private const int GRID_ROWS = 5;
+        private const int GRID_COLS = 5;
+        private const int TARGET_SIZE = 64; // Size of target sprite
+        private bool[,] _occupiedCells; // true = occupied, false = free
+        private Dictionary<Vector2, (int Row, int Col)> _targetPositionToCell; // Maps positions to grid cells
 
         // Game state
         private double _timer;
@@ -86,18 +94,82 @@ namespace ShootingGallery
             _score = 0;
             _timeMultiplier = TIME_MULTIPLIER_START;
             _targetSpawnTimer = 0;
-        }
-
-        public override void OnStart()
+            
+            // Initialize grid
+            _occupiedCells = new bool[GRID_ROWS, GRID_COLS];
+            _targetPositionToCell = new Dictionary<Vector2, (int, int)>();
+        }        public override void OnStart()
         {
             base.OnStart();
 
-            // Initialize with a few targets
-            for (int i = 0; i < 3; i++)
+            // Populate the entire grid with targets at startup
+            for (int row = 0; row < GRID_ROWS; row++)
             {
-                SpawnRandomTarget();
+                for (int col = 0; col < GRID_COLS; col++)
+                {
+                    // Calculate position for this cell
+                    float cellWidth = ScreenManager.ScreenWidth / (float)GRID_COLS;
+                    float cellHeight = ScreenManager.ScreenHeight / (float)GRID_ROWS;
+                    
+                    Vector2 position = new Vector2(
+                        col * cellWidth + (cellWidth / 2),
+                        row * cellHeight + (cellHeight / 2)
+                    );
+                    
+                    // Mark cell as occupied
+                    _occupiedCells[row, col] = true;
+                    
+                    // Create a target (mostly regular targets with some special ones)
+                    BaseTarget newTarget;
+                    double roll = _random.NextDouble();
+
+                    if (roll < BOMB_CHANCE)
+                    {
+                        newTarget = EntitySystem.CreateEntity<BombTarget>(position);
+                        Console.WriteLine($"Created BOMB at grid ({row},{col}): {position}");
+                    }
+                    else if (roll < BOMB_CHANCE + RADIOACTIVE_CHANCE)
+                    {
+                        newTarget = EntitySystem.CreateEntity<RadioactiveTarget>(position);
+                        Console.WriteLine($"Created RADIOACTIVE at grid ({row},{col}): {position}");
+                    }
+                    else
+                    {
+                        newTarget = EntitySystem.CreateEntity<RegularTarget>(position);
+                        Console.WriteLine($"Created REGULAR at grid ({row},{col}): {position}");
+                    }
+                    
+                    // Store mapping from position to grid cell
+                    _targetPositionToCell[position] = (row, col);
+
+                    // Subscribe to target events
+                    newTarget.OnScore += (sender, args) =>
+                    {
+                        AddScore(args.Score);
+                    };
+
+                    newTarget.OnRadiationChange += (sender, args) =>
+                    {
+                        if (_radiationManager != null)
+                        {
+                            _radiationManager.AddRadiation(args.RadiationAmount);
+                        }
+                    };
+                    
+                    newTarget.OnGameOver += (sender, args) =>
+                    {
+                        // Game over from hitting a bomb
+                        OnGameOver?.Invoke(this, new GameOverEventArgs(_score));
+                    };
+
+                    _activeTargets.Add(newTarget);
+                }
             }
+            
+            // Update crosshair targets list
+            UpdateCrosshairTargets();
         }
+        
         private void HandleCrosshairShoot(object sender, Crosshair.ShootEventArgs e)
         {
             // Log the shot for debugging
@@ -119,9 +191,7 @@ namespace ShootingGallery
             
             // Keep crosshair's target list updated
             UpdateCrosshairTargets();
-        }
-
-        private void ProcessGameplay(GameTime gameTime)
+        }        private void ProcessGameplay(GameTime gameTime)
         {
             float elapsedSeconds = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
@@ -146,66 +216,119 @@ namespace ShootingGallery
                 OnGameOver?.Invoke(this, new GameOverEventArgs(_score));
             }
         }
-
-        private void UpdateTargetSpawning(GameTime gameTime)
+        
+        private (Vector2 Position, int Row, int Col)? GetAvailableGridCell()
         {
-            _targetSpawnTimer -= gameTime.ElapsedGameTime.TotalSeconds;
+            // Calculate grid cell size based on screen dimensions
+            float cellWidth = ScreenManager.ScreenWidth / (float)GRID_COLS;
+            float cellHeight = ScreenManager.ScreenHeight / (float)GRID_ROWS;
 
-            if (_targetSpawnTimer <= 0)
+            Console.WriteLine($"Grid cell size: {cellWidth}x{cellHeight}");
+            
+            // Check if any cells are available
+            bool anyAvailable = false;
+            for (int row = 0; row < GRID_ROWS; row++)
             {
-                SpawnRandomTarget();
-                UpdateCrosshairTargets(); // Update after spawning
-
-                // Calculate next spawn time (with some randomness)
-                _targetSpawnTimer = TARGET_SPAWN_DELAY + (_random.NextDouble() * 2);
-
-                // Spawn more targets as time goes on
-                if (_timer < ROUND_TIME * 0.75)
+                for (int col = 0; col < GRID_COLS; col++)
                 {
-                    _targetSpawnTimer *= 0.9;
+                    if (!_occupiedCells[row, col])
+                    {
+                        anyAvailable = true;
+                        break;
+                    }
                 }
-                if (_timer < ROUND_TIME * 0.5)
+                if (anyAvailable) break;
+            }
+            
+            // If no cells available, return null
+            if (!anyAvailable)
+            {
+                Console.WriteLine("No grid cells available");
+                return null;
+            }
+            
+            // Find a random unoccupied cell
+            int attempts = 0;
+            while (attempts < 100) // Prevent infinite loop
+            {
+                int row = _random.Next(0, GRID_ROWS);
+                int col = _random.Next(0, GRID_COLS);
+                
+                if (!_occupiedCells[row, col])
                 {
-                    _targetSpawnTimer *= 0.8;
+                    // Mark cell as occupied
+                    _occupiedCells[row, col] = true;
+                    
+                    // Calculate position (center of cell with offset for target center)
+                    Vector2 position = new Vector2(
+                        col * cellWidth + (cellWidth / 2),
+                        row * cellHeight + (cellHeight / 2)
+                    );
+                    
+                    Console.WriteLine($"Target positioned at grid ({row},{col}) -> screen position {position}");
+                    return (position, row, col);
                 }
-                if (_timer < ROUND_TIME * 0.25)
+                
+                attempts++;
+            }
+            
+            // If we tried 100 times and couldn't find a spot, do a direct search
+            for (int row = 0; row < GRID_ROWS; row++)
+            {
+                for (int col = 0; col < GRID_COLS; col++)
                 {
-                    _targetSpawnTimer *= 0.7;
+                    if (!_occupiedCells[row, col])
+                    {
+                        _occupiedCells[row, col] = true;
+                        
+                        // Calculate position (center of cell with offset for target center)
+                        Vector2 position = new Vector2(
+                            col * cellWidth + (cellWidth / 2),
+                            row * cellHeight + (cellHeight / 2)
+                        );
+                        
+                        Console.WriteLine($"Target positioned at grid ({row},{col}) -> screen position {position}");
+                        return (position, row, col);
+                    }
                 }
             }
-
-            // Clean up destroyed targets
-            bool targetsRemoved = _activeTargets.RemoveAll(t => t == null || t.IsDestroyed) > 0;
-            if (targetsRemoved)
-            {
-                UpdateCrosshairTargets(); // Update if any targets were removed
-            }
-        }
-        private void SpawnRandomTarget()
+            
+            // Should never get here if anyAvailable was true
+            return null;
+        }        private void SpawnRandomTarget()
         {
-            Vector2 randomPosition = new Vector2(
-                _random.Next(50, ScreenManager.ScreenWidth - 50),
-                _random.Next(50, ScreenManager.ScreenHeight - 50)
-            );
-
+            var cellInfo = GetAvailableGridCell();
+            
+            // If no available cell, don't spawn
+            if (cellInfo == null)
+            {
+                Console.WriteLine("No available grid cells for new target!");
+                return;
+            }
+            
+            var (position, row, col) = cellInfo.Value;
+            
             BaseTarget newTarget;
             double roll = _random.NextDouble();
 
             if (roll < BOMB_CHANCE)
             {
-                // Spawn a bomb
-                newTarget = EntitySystem.CreateEntity<BombTarget>(randomPosition);
+                newTarget = EntitySystem.CreateEntity<BombTarget>(position);
+                Console.WriteLine($"Created BOMB at position {position}");
             }
             else if (roll < BOMB_CHANCE + RADIOACTIVE_CHANCE)
             {
-                // Spawn a radioactive target
-                newTarget = EntitySystem.CreateEntity<RadioactiveTarget>(randomPosition);
+                newTarget = EntitySystem.CreateEntity<RadioactiveTarget>(position);
+                Console.WriteLine($"Created RADIOACTIVE at position {position}");
             }
             else
             {
-                // Spawn a regular target
-                newTarget = EntitySystem.CreateEntity<RegularTarget>(randomPosition);
+                newTarget = EntitySystem.CreateEntity<RegularTarget>(position);
+                Console.WriteLine($"Created REGULAR at position {position}");
             }
+
+            // Store mapping from position to grid cell
+            _targetPositionToCell[position] = (row, col);
 
             // Subscribe to target events
             newTarget.OnScore += (sender, args) =>
@@ -220,16 +343,15 @@ namespace ShootingGallery
                     _radiationManager.AddRadiation(args.RadiationAmount);
                 }
             };
+            
             newTarget.OnGameOver += (sender, args) =>
-      {
-          // Game over from hitting a bomb
-          OnGameOver?.Invoke(this, new GameOverEventArgs(_score));
-      };
+            {
+                // Game over from hitting a bomb
+                OnGameOver?.Invoke(this, new GameOverEventArgs(_score));
+            };
 
             _activeTargets.Add(newTarget);
-        }
-
-        public void RestartRound()
+        }        public void RestartRound()
         {
             _timer = ROUND_TIME;
             _score = 0;
@@ -241,6 +363,16 @@ namespace ShootingGallery
                 target.Destroy();
             }
             _activeTargets.Clear();
+            
+            // Reset grid state
+            for (int row = 0; row < GRID_ROWS; row++)
+            {
+                for (int col = 0; col < GRID_COLS; col++)
+                {
+                    _occupiedCells[row, col] = false;
+                }
+            }
+            _targetPositionToCell.Clear();
 
             // Reset radiation
             if (_radiationManager != null)
@@ -248,10 +380,113 @@ namespace ShootingGallery
                 _radiationManager.Reset();
             }
 
-            // Spawn new targets
-            for (int i = 0; i < 3; i++)
+            // Repopulate the entire grid
+            for (int row = 0; row < GRID_ROWS; row++)
+            {
+                for (int col = 0; col < GRID_COLS; col++)
+                {
+                    // Calculate position for this cell
+                    float cellWidth = ScreenManager.ScreenWidth / (float)GRID_COLS;
+                    float cellHeight = ScreenManager.ScreenHeight / (float)GRID_ROWS;
+                    
+                    Vector2 position = new Vector2(
+                        col * cellWidth + (cellWidth / 2),
+                        row * cellHeight + (cellHeight / 2)
+                    );
+                    
+                    // Mark cell as occupied
+                    _occupiedCells[row, col] = true;
+                    
+                    // Create a target (mostly regular targets with some special ones)
+                    BaseTarget newTarget;
+                    double roll = _random.NextDouble();
+
+                    if (roll < BOMB_CHANCE)
+                    {
+                        newTarget = EntitySystem.CreateEntity<BombTarget>(position);
+                    }
+                    else if (roll < BOMB_CHANCE + RADIOACTIVE_CHANCE)
+                    {
+                        newTarget = EntitySystem.CreateEntity<RadioactiveTarget>(position);
+                    }
+                    else
+                    {
+                        newTarget = EntitySystem.CreateEntity<RegularTarget>(position);
+                    }
+                    
+                    // Store mapping from position to grid cell
+                    _targetPositionToCell[position] = (row, col);
+
+                    // Subscribe to target events
+                    newTarget.OnScore += (sender, args) =>
+                    {
+                        AddScore(args.Score);
+                    };
+
+                    newTarget.OnRadiationChange += (sender, args) =>
+                    {
+                        if (_radiationManager != null)
+                        {
+                            _radiationManager.AddRadiation(args.RadiationAmount);
+                        }
+                    };
+                    
+                    newTarget.OnGameOver += (sender, args) =>
+                    {
+                        // Game over from hitting a bomb
+                        OnGameOver?.Invoke(this, new GameOverEventArgs(_score));
+                    };
+
+                    _activeTargets.Add(newTarget);
+                }
+            }
+            
+            // Update crosshair targets list
+            UpdateCrosshairTargets();
+        }
+
+        private void UpdateTargetSpawning(GameTime gameTime)
+        {
+            _targetSpawnTimer -= gameTime.ElapsedGameTime.TotalSeconds;            if (_targetSpawnTimer <= 0)
             {
                 SpawnRandomTarget();
+                UpdateCrosshairTargets();
+
+                _targetSpawnTimer = TARGET_SPAWN_DELAY + (_random.NextDouble() * 2);
+
+                // Spawn more targets as time goes on
+                if (_timer < ROUND_TIME * 0.75) _targetSpawnTimer *= 0.9;
+                if (_timer < ROUND_TIME * 0.5) _targetSpawnTimer *= 0.8;
+                if (_timer < ROUND_TIME * 0.25) _targetSpawnTimer *= 0.7;
+            }
+            
+            // Clean up destroyed targets and their grid positions
+            var destroyedTargets = _activeTargets.Where(t => t == null || t.IsDestroyed).ToList();
+            foreach (var target in destroyedTargets)
+            {
+                if (target != null)
+                {
+                    Vector2 position = target.Position;
+                    Console.WriteLine($"Target destroyed at position {position}");
+                    
+                    // Free up the grid cell
+                    if (_targetPositionToCell.TryGetValue(position, out var cell))
+                    {
+                        _occupiedCells[cell.Row, cell.Col] = false;
+                        _targetPositionToCell.Remove(position);
+                        Console.WriteLine($"Freed up grid cell ({cell.Row}, {cell.Col})");
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Warning: Could not find grid cell for position {position}");
+                    }
+                }
+            }
+            _activeTargets.RemoveAll(t => t == null || t.IsDestroyed);
+            
+            if (destroyedTargets.Any())
+            {
+                UpdateCrosshairTargets();
             }
         }
     }

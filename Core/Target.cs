@@ -80,8 +80,7 @@ namespace ShootingGallery
             this._position = targetPosition;
             this._scale = DefaultScale;
             this._time = 0f;
-            this._random = new Random();
-            this._spriteName = spriteName;
+            this._random = new Random();            this._spriteName = spriteName;
             
             Type = TargetType.Standard; // Default
         }
@@ -91,8 +90,8 @@ namespace ShootingGallery
             base.OnStart();
             this._sprite = AssetManager.LoadAsset<Sprite>("target_sprite.xml");
             
-            MoveRandomly();
-            Console.WriteLine($"Target moved to random position: {_position}");
+            // No longer move randomly on start - use the position provided in constructor
+            Console.WriteLine($"Target spawned at position: {_position}");
         }
 
         public virtual void HandleShot(Vector2 shotPosition)
@@ -173,8 +172,7 @@ namespace ShootingGallery
         }
         
         public new void Destroy()
-        {
-            base.Destroy();
+        {            base.Destroy();
             _isDestroyed = true;
             Dispose();
         }
@@ -194,8 +192,8 @@ namespace ShootingGallery
             ReportScore(score);
             ReportRadiationChange(1.0f); // Regular radiation amount
             
-            MoveRandomly();
-            Reset();
+            // Destroy this target instead of moving it randomly
+            Destroy();
         }
         
         private int CalculateScore()
@@ -204,11 +202,11 @@ namespace ShootingGallery
             if (_scale < .4f)
                 return 10;
             else if (_scale < 0.8f)
-                return 5;
-            else
+                return 5;            else
                 return 1;
         }
     }
+
     // Radioactive Target (higher radiation, higher score)
     public class RadioactiveTarget : BaseTarget
     {
@@ -224,8 +222,8 @@ namespace ShootingGallery
             ReportScore(score);
             ReportRadiationChange(3.0f); // Triple radiation amount
             
-            MoveRandomly();
-            Reset();
+            // Destroy this target instead of moving it randomly
+            Destroy();
         }
         
         private int CalculateScore()
