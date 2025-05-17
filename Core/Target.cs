@@ -108,11 +108,10 @@ namespace ShootingGallery
         {
             _scale = _DEFAULTSCALE;
             _time = 0;
-        }
-
+        }       
         public override void Render(SpriteBatch _spriteBatch)
         {
-            _sprite.Draw(_spriteBatch, _position, Color.White, 0f, SpriteEffects.None, 0);
+            _sprite.Draw(_spriteBatch, _position, Color.White, 0f, Vector2.One * _scale, SpriteEffects.None, 0);
         }
 
         public void Dispose()
