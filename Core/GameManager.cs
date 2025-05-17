@@ -54,6 +54,15 @@ namespace ShootingGallery
         public double GetGameTime() => _timer;
         public int GetScore() => _score;
         public float GetTimeMultiplier() => _timeMultiplier;
+
+        private void UpdateCrosshairTargets()
+        {
+            if (_crosshair != null)
+            {
+                _crosshair.SetCurrentTargets(_activeTargets);
+            }
+        }
+
         // Setters
         public void AddScore(int points) => _score += (int)(points * _timeMultiplier);
         public void SetScoreUI(ShootingGallery.Core.TextEntity scoreUI) => _scoreUI = scoreUI;
@@ -107,6 +116,9 @@ namespace ShootingGallery
         {
             ProcessGameplay(gameTime);
             UpdateTargetSpawning(gameTime);
+            
+            // Keep crosshair's target list updated
+            UpdateCrosshairTargets();
         }
 
         private void ProcessGameplay(GameTime gameTime)
@@ -142,6 +154,7 @@ namespace ShootingGallery
             if (_targetSpawnTimer <= 0)
             {
                 SpawnRandomTarget();
+                UpdateCrosshairTargets(); // Update after spawning
 
                 // Calculate next spawn time (with some randomness)
                 _targetSpawnTimer = TARGET_SPAWN_DELAY + (_random.NextDouble() * 2);
@@ -162,7 +175,11 @@ namespace ShootingGallery
             }
 
             // Clean up destroyed targets
-            _activeTargets.RemoveAll(t => t == null || t.IsDestroyed);
+            bool targetsRemoved = _activeTargets.RemoveAll(t => t == null || t.IsDestroyed) > 0;
+            if (targetsRemoved)
+            {
+                UpdateCrosshairTargets(); // Update if any targets were removed
+            }
         }
         private void SpawnRandomTarget()
         {

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using CoreEssentials.Assets;
 using CoreEssentials.GameSystems.EntitySystems.EntityOOPSystem;
 using Microsoft.Xna.Framework;
@@ -18,11 +19,13 @@ namespace ShootingGallery
         {
             public Vector2 Position { get; }
             public bool IsRandomShot { get; }
+            public int? ArmIndex { get; } // Null for main, otherwise mutated arm index
             
-            public ShootEventArgs(Vector2 position, bool isRandomShot = false)
+            public ShootEventArgs(Vector2 position, bool isRandomShot = false, int? armIndex = null)
             {
                 Position = position;
                 IsRandomShot = isRandomShot;
+                ArmIndex = armIndex;
             }
         }
 
@@ -39,18 +42,27 @@ namespace ShootingGallery
         private bool _canShoot = true;
         private MouseState _lastMouseState;
 
-    public Crosshair() : base()
-    {
-        this._sprite = AssetManager.LoadAsset<Sprite>("crosshair_sprite.xml");
-        _random = new Random();
-        _armPositions = new List<Vector2>();
-        _armRotations = new List<float>();
-        
-        // Initialize with 1 arm (the main one)
-        _armPositions.Add(Vector2.Zero);
-        _armRotations.Add(0f);
+        // Reference to the current targets in the scene
+        private IList<BaseTarget> _currentTargets;
+
+        public Crosshair() : base()
+        {
+            this._sprite = AssetManager.LoadAsset<Sprite>("crosshair_sprite.xml");
+            _random = new Random();
+            _armPositions = new List<Vector2>();
+            _armRotations = new List<float>();
+            
+            // Initialize with 1 arm (the main one)
+            _armPositions.Add(Vector2.Zero);
+            _armRotations.Add(0f);
             
             _lastMouseState = Mouse.GetState();
+        }
+
+        // Allow setting the current targets from outside
+        public void SetCurrentTargets(IList<BaseTarget> targets)
+        {
+            _currentTargets = targets;
         }
 
         public void SetMutationLevel(int level)
@@ -103,15 +115,15 @@ namespace ShootingGallery
                 
                 if (_randomShotTimer <= 0)
                 {
-                    // Get a random arm (except the main one)
-                    int randomArmIndex = _random.Next(1, _armPositions.Count);
-                    
-                    // Calculate a random position to shoot at
-                    Vector2 randomShotPosition = GetRandomShotPosition();
-                    
-                    // Trigger the shooting event
-                    OnShoot?.Invoke(this, new ShootEventArgs(randomShotPosition, true));
-                    
+                    // Pick a single mutated arm (not the main one)
+                    int mutatedArmCount = _armPositions.Count - 1;
+                    if (mutatedArmCount > 0)
+                    {
+                        int randomMutatedArm = _random.Next(1, _armPositions.Count); // 1..N
+                        Vector2 randomShotPosition = GetRandomShotPosition();
+                        // Trigger the shooting event, passing the arm index
+                        OnShoot?.Invoke(this, new ShootEventArgs(randomShotPosition, true, randomMutatedArm));
+                    }
                     // Reset the timer with some randomness
                     _randomShotTimer = RandomShotCooldown - (_mutationLevel * 0.2f) + (float)(_random.NextDouble() * 0.5f);
                 }
@@ -128,7 +140,20 @@ namespace ShootingGallery
 
         private Vector2 GetRandomShotPosition()
         {
-            // Create a random shot position within the game window
+            // If there are targets, pick a regular target at random
+            if (_currentTargets != null && _currentTargets.Count > 0)
+            {
+                // Filter to only get regular targets
+                var regularTargets = _currentTargets.Where(t => t is RegularTarget).ToList();
+                
+                if (regularTargets.Count > 0)
+                {
+                    int idx = _random.Next(regularTargets.Count);
+                    return regularTargets[idx].Position;
+                }
+            }
+            
+            // Fallback: random position in the window if no regular targets found
             return new Vector2(
                 _random.Next(50, ScreenManager.ScreenWidth - 50),
                 _random.Next(50, ScreenManager.ScreenHeight - 50)
