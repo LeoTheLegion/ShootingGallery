@@ -11,6 +11,9 @@ game.Graphics.PreferredBackBufferWidth = 1280;
 game.Graphics.PreferredBackBufferHeight = 720;
 game.Graphics.ApplyChanges();
 
+// Initialize ScreenManager
+ScreenManager.Initialize(game);
+
 // Create a loading screen with custom colors
 LoadingScene loadingScene = new LoadingScene(
     "Loading Character Demo...", 

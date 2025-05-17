@@ -14,6 +14,8 @@ public class TextEntity: Entity
     private Canvas _canvas;
     private FontAsset _fontAsset;
     private string _text;
+    private Color _textColor = Color.White;
+    private float _scale = 1.0f;
 
     private Label _label;
 
@@ -24,8 +26,7 @@ public class TextEntity: Entity
 
         _fontAsset = AssetManager.LoadAsset<FontAsset>("galleryFont");
         _text = text;
-    }
-
+    }    
     public override void OnStart()
     {
         base.OnStart();
@@ -33,15 +34,15 @@ public class TextEntity: Entity
         var label = new Label
         {
             Text = _text,
-            HorizontalAlignment = HorizontalAlignment.Left,
-            VerticalAlignment = VerticalAlignment.Top
+            TextColor = _textColor
         };
 
         _label = label;
-
+        UpdateScale();
+        
         _canvas.AddWidget(label);
     }
-
+    
     public override void Update(GameTime gameTime)
     {
         base.Update(gameTime);
@@ -49,6 +50,13 @@ public class TextEntity: Entity
         _canvas.SetPosition(this._position);
 
         _canvas.Update(gameTime);
+    }
+
+    public override void Render(SpriteBatch _spriteBatch)
+    {
+        base.Render(_spriteBatch);
+
+        Debug.Primitives.DrawCircle(_spriteBatch, _position, 5, Color.Red);
     }
 
     public override void OnDestroy()
@@ -61,5 +69,28 @@ public class TextEntity: Entity
     {
         _text = v;
         _label.Text = v;
+    }
+    
+    public void SetColor(Color color)
+    {
+        _textColor = color;
+        if (_label != null)
+        {
+            _label.TextColor = color;
+        }
+    }
+    
+    public void SetScale(float scale)
+    {
+        _scale = scale;
+        UpdateScale();
+    }
+    
+    private void UpdateScale()
+    {
+        if (_label != null)
+        {
+            _label.Scale = new Vector2(_scale);
+        }
     }
 }

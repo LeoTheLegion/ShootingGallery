@@ -2,17 +2,19 @@
 using CoreEssentials.GameSystems.EntitySystems.EntityOOPSystem;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
+using ShootingGallery.Core;
 using System;
 
 namespace ShootingGallery
-{
-    public class Target : Entity, IDisposable
+{    // Base Target class with common functionality
+    public abstract class BaseTarget : Entity, IDisposable
     {
-        // Event for score reporting
+        // Events
         public event EventHandler<ScoreEventArgs> OnScore;
+        public event EventHandler<GameOverEventArgs> OnGameOver;
+        public event EventHandler<RadiationEventArgs> OnRadiationChange;
 
-        // Event arguments for score events
+        // Event arguments
         public class ScoreEventArgs : EventArgs
         {
             public int Score { get; }
@@ -25,99 +27,210 @@ namespace ShootingGallery
             }
         }
 
-        private const int targetRadius = 45;
-        private const float _DEFAULTSCALE = .3f;
-        private float _scale;
-        private const double _TIMETOFULLSIZE = 3.0;
-        private double _time;
+        public class GameOverEventArgs : EventArgs { }
 
-        private Random rand;
+        public class RadiationEventArgs : EventArgs
+        {
+            public float RadiationAmount { get; }
+            
+            public RadiationEventArgs(float radiationAmount)
+            {
+                RadiationAmount = radiationAmount;
+            }
+        }
 
-        private Sprite _sprite;
+        // Constants
+        protected const int targetRadius = 45;
+        protected const float DefaultScale = 0.3f;
+        protected const double TimeToFullSize = 3.0;
+        
+        // State
+        protected float _scale;
+        protected double _time;
+        protected Random _random;
+        protected Sprite _sprite;
+        protected string _spriteName;
+        protected Color _tintColor = Color.White;
+        protected bool _isDestroyed = false;
+        
+        // Target type identifiers
+        public enum TargetType
+        {
+            Standard,
+            Radioactive,
+            Bomb
+        }
+          public TargetType Type { get; protected set; }
+        public bool IsDestroyed => _isDestroyed;
 
-        public Target(Vector2 targetPosition) : base()
+        protected BaseTarget(Vector2 targetPosition, string spriteName) : base()
         {
             this._position = targetPosition;
-            this._scale = _DEFAULTSCALE;
+            this._scale = DefaultScale;
             this._time = 0f;
-            this.rand = new Random();
+            this._random = new Random();
+            this._spriteName = spriteName;
+            
+            Type = TargetType.Standard; // Default
         }
 
         public override void OnStart()
         {
             base.OnStart();
-            this._sprite = AssetManager.LoadAsset<Sprite>("target_sprite.xml");
+            this._sprite = AssetManager.LoadAsset<Sprite>(_spriteName);
             MoveRandomly();
         }
 
-        public override void Update(GameTime gameTime)
+        public virtual void HandleShot(Vector2 shotPosition)
         {
-            var mState = Mouse.GetState();
+            float distanceToShot = Vector2.Distance(_position, shotPosition);
 
-            if (mState.LeftButton == ButtonState.Pressed)
+            if (distanceToShot < targetRadius * _scale)
             {
-                float mouseTargetDist = Vector2.Distance(_position, mState.Position.ToVector2());
-
-                if (mouseTargetDist < targetRadius * _scale)
-                {
-                    int score = CalculateScore();
-
-                    ReportScore(score);
-                    MoveRandomly();
-                    Reset();
-                }
+                ProcessHit();
             }
-
-            _time += gameTime.ElapsedGameTime.TotalSeconds;
-
-            _scale = (float)Math.MinMagnitude(_time / _TIMETOFULLSIZE, 1);
         }
+        
+        protected abstract void ProcessHit();
 
-        private int CalculateScore()
+        protected void ReportScore(int score)
         {
-            int score;
-
-            if (_scale < .4f)
-                score = 10;
-            else if (_scale < 0.8f)
-                score = 5;
-            else
-                score = 1;
-            return score;
-        }
-        private void ReportScore(int score)
-        {
-
             this.EntitySystem.CreateEntity<FloatingPopUpText>(
                 this._position,
                 2f,
                 score.ToString()
-                );
+            );
 
             // Trigger the OnScore event
             OnScore?.Invoke(this, new ScoreEventArgs(score, this._position));
         }
-
-        private void MoveRandomly()
+        
+        protected void ReportGameOver()
         {
-
-            _position.X = rand.Next(targetRadius, 1280 - targetRadius);
-            _position.Y = rand.Next(targetRadius, 720 - targetRadius);
+            // Trigger game over
+            OnGameOver?.Invoke(this, new GameOverEventArgs());
         }
-        private void Reset()
+        
+        protected void ReportRadiationChange(float amount)
         {
-            _scale = _DEFAULTSCALE;
+            // Trigger radiation change
+            OnRadiationChange?.Invoke(this, new RadiationEventArgs(amount));
+        }
+
+        public override void Update(GameTime gameTime)
+        {
+            _time += gameTime.ElapsedGameTime.TotalSeconds;
+            _scale = (float)Math.MinMagnitude(_time / TimeToFullSize, 1);
+        }
+          protected void MoveRandomly()
+        {
+            _position.X = _random.Next(targetRadius, ScreenManager.ScreenWidth - targetRadius);
+            _position.Y = _random.Next(targetRadius, ScreenManager.ScreenHeight - targetRadius);
+        }
+          protected void Reset()
+        {
+            _scale = DefaultScale;
             _time = 0;
-        }       
+        }
+        
         public override void Render(SpriteBatch _spriteBatch)
         {
-            _sprite.Draw(_spriteBatch, _position, Color.White, 0f, Vector2.One * _scale, SpriteEffects.None, 0);
-        }
-
-        public void Dispose()
+            _sprite.Draw(_spriteBatch, _position, _tintColor, 0f, Vector2.One * _scale, SpriteEffects.None, 0);
+        }        public virtual void Dispose()
         {
             AssetManager.UnloadAsset<Sprite>(_sprite.Name);
         }
+        
+        public new void Destroy()
+        {
+            base.Destroy();
+            _isDestroyed = true;
+            Dispose();
+        }
+    }
 
+    // Standard Target (regular points)
+    public class RegularTarget : BaseTarget
+    {
+        public RegularTarget(Vector2 targetPosition) : base(targetPosition, "target_sprite.xml")
+        {
+            Type = TargetType.Standard;
+        }
+
+        protected override void ProcessHit()
+        {
+            int score = CalculateScore();
+            ReportScore(score);
+            ReportRadiationChange(1.0f); // Regular radiation amount
+            
+            MoveRandomly();
+            Reset();
+        }
+        
+        private int CalculateScore()
+        {
+            // Score based on size (smaller = harder to hit = more points)
+            if (_scale < .4f)
+                return 10;
+            else if (_scale < 0.8f)
+                return 5;
+            else
+                return 1;
+        }
+    }
+    
+    // Radioactive Target (higher radiation, higher score)
+    public class RadioactiveTarget : BaseTarget
+    {
+        public RadioactiveTarget(Vector2 targetPosition) : base(targetPosition, "target_sprite.xml")
+        {
+            Type = TargetType.Radioactive;
+            _tintColor = new Color(0, 255, 0); // Green tint for radioactive
+        }
+        
+        protected override void ProcessHit()
+        {
+            int score = CalculateScore();
+            ReportScore(score);
+            ReportRadiationChange(3.0f); // Triple radiation amount
+            
+            MoveRandomly();
+            Reset();
+        }
+        
+        private int CalculateScore()
+        {
+            // Higher scores for radioactive targets
+            if (_scale < .4f)
+                return 20;
+            else if (_scale < 0.8f)
+                return 10;
+            else
+                return 5;
+        }
+    }
+    
+    // Bomb Target (game over when hit)
+    public class BombTarget : BaseTarget
+    {
+        public BombTarget(Vector2 targetPosition) : base(targetPosition, "target_sprite.xml")
+        {
+            Type = TargetType.Bomb;
+            _tintColor = new Color(255, 0, 0); // Red tint for bomb
+        }
+        
+        protected override void ProcessHit()
+        {
+            // Game over!
+            ReportGameOver();
+        }
+    }
+    
+    // Legacy Target class for backward compatibility
+    public class Target : RegularTarget
+    {
+        public Target(Vector2 targetPosition) : base(targetPosition)
+        {
+        }
     }
 }

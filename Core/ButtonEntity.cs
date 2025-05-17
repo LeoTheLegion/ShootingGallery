@@ -1,7 +1,9 @@
 using System;
+using CoreEssentials.Debugging;
 using CoreEssentials.GameSystems.EntitySystems.EntityOOPSystem;
 using CoreEssentials.GUI;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using Myra.Graphics2D.UI;
 
 namespace ShootingGallery.Core;
@@ -33,14 +35,22 @@ public class ButtonEntity : Entity
 
         _canvas.AddWidget(button);
     }
-
     public override void Update(GameTime gameTime)
     {
         base.Update(gameTime);
 
+        // Center the button by positioning the canvas directly at the specified position
+        // No additional offset needed as the button has centered alignment
         _canvas.SetPosition(this._position);
 
         _canvas.Update(gameTime);
+    }
+
+    public override void Render(SpriteBatch _spriteBatch)
+    {
+        base.Render(_spriteBatch);
+
+        Debug.Primitives.DrawCircle(_spriteBatch, _position, 5, Color.Red);
     }
 
     public override void OnDestroy()
