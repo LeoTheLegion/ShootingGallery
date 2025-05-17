@@ -22,16 +22,14 @@ namespace ShootingGallery
             {
                 FinalScore = finalScore;
             }
-        }
-
-        // Game constants
-        private const double ROUND_TIME = 300; // 5 minutes in seconds
+        }        // Game constants
+        private const double ROUND_TIME = 300; // 5 minutes in seconds        
         private const float TIME_MULTIPLIER_START = 10.0f; // Starting multiplier
         private const float TIME_MULTIPLIER_MIN = 1.0f; // Minimum multiplier
         private const float TIME_MULTIPLIER_DECAY = 0.2f; // Decay per second
-        private const int TARGET_SPAWN_DELAY = 3; // Seconds between target spawns
+        private const int TARGET_SPAWN_DELAY = 1; // Seconds between target spawns (reduced from 3)
         private const float BOMB_CHANCE = 0.2f; // 20% chance for a bomb
-        private const float RADIOACTIVE_CHANCE = 0.3f; // 30% chance for radioactive target
+        private const float RADIOACTIVE_CHANCE = 0.15f; // 15% chance for radioactive target (reduced from 30%)
 
         // Target grid configuration
         private const int GRID_ROWS = 5;
@@ -448,16 +446,16 @@ namespace ShootingGallery
         private void UpdateTargetSpawning(GameTime gameTime)
         {
             _targetSpawnTimer -= gameTime.ElapsedGameTime.TotalSeconds;            if (_targetSpawnTimer <= 0)
-            {
-                SpawnRandomTarget();
+            {                SpawnRandomTarget();
                 UpdateCrosshairTargets();
 
-                _targetSpawnTimer = TARGET_SPAWN_DELAY + (_random.NextDouble() * 2);
+                // Faster spawning - reduce base delay and random factor
+                _targetSpawnTimer = (TARGET_SPAWN_DELAY / 2.0) + (_random.NextDouble() * 1);
 
-                // Spawn more targets as time goes on
-                if (_timer < ROUND_TIME * 0.75) _targetSpawnTimer *= 0.9;
-                if (_timer < ROUND_TIME * 0.5) _targetSpawnTimer *= 0.8;
-                if (_timer < ROUND_TIME * 0.25) _targetSpawnTimer *= 0.7;
+                // Spawn more targets as time goes on (increased spawn rate)
+                if (_timer < ROUND_TIME * 0.75) _targetSpawnTimer *= 0.8;
+                if (_timer < ROUND_TIME * 0.5) _targetSpawnTimer *= 0.7;
+                if (_timer < ROUND_TIME * 0.25) _targetSpawnTimer *= 0.6;
             }
             
             // Clean up destroyed targets and their grid positions
