@@ -11,9 +11,7 @@ namespace ShootingGallery
     public class GameManager : Entity
     {
         // Event for game over
-        public event EventHandler<GameOverEventArgs> OnGameOver;
-
-        // Event args for game over
+        public event EventHandler<GameOverEventArgs> OnGameOver;        // Event args for game over
         public class GameOverEventArgs : EventArgs
         {
             public int FinalScore { get; }
@@ -24,17 +22,15 @@ namespace ShootingGallery
             }
         }
         // Game constants       
-        private const double ROUND_TIME = 60; // 1 minute in seconds (reduced from 5 minutes)        
-        private const float TIME_MULTIPLIER_START = 10.0f; // Starting multiplier
-        private const float TIME_MULTIPLIER_MIN = 1.0f; // Minimum multiplier
-        private const float TIME_MULTIPLIER_DECAY = 0.3f; // Faster decay per second (adjusted for shorter game)
-        private const double TARGET_SPAWN_DELAY = 0.25; // Even faster spawn delay (reduced from 0.5)
-        private const float BOMB_CHANCE = 0.2f; // 20% chance for a bomb
-        private const float RADIOACTIVE_CHANCE = 0.15f; // 15% chance for radioactive target (reduced from 30%)
-
-        // Target grid configuration
-        private const int GRID_ROWS = 5;
-        private const int GRID_COLS = 5;
+        private const double ROUND_TIME = GameConstants.ROUND_TIME;      
+        private const float TIME_MULTIPLIER_START = GameConstants.TIME_MULTIPLIER_START;
+        private const float TIME_MULTIPLIER_MIN = GameConstants.TIME_MULTIPLIER_MIN;
+        private const float TIME_MULTIPLIER_DECAY = GameConstants.TIME_MULTIPLIER_DECAY;
+        private const double TARGET_SPAWN_DELAY = GameConstants.TARGET_SPAWN_DELAY;
+        private const float BOMB_CHANCE = GameConstants.BOMB_CHANCE;
+        private const float RADIOACTIVE_CHANCE = GameConstants.RADIOACTIVE_CHANCE;        // Target grid configuration
+        private const int GRID_ROWS = GameConstants.GRID_ROWS;
+        private const int GRID_COLS = GameConstants.GRID_COLS;
         private const int TARGET_SIZE = 64; // Size of target sprite
         private bool[,] _occupiedCells; // true = occupied, false = free
         private Dictionary<Vector2, (int Row, int Col)> _targetPositionToCell; // Maps positions to grid cells
@@ -469,15 +465,14 @@ namespace ShootingGallery
         private void UpdateTargetSpawning(GameTime gameTime)
         {
             _targetSpawnTimer -= gameTime.ElapsedGameTime.TotalSeconds; if (_targetSpawnTimer <= 0)
-            {
-                SpawnRandomTarget();
+            {                SpawnRandomTarget();
                 UpdateCrosshairTargets();                // Faster spawning - extremely aggressive spawn rates for shorter game
-                _targetSpawnTimer = (TARGET_SPAWN_DELAY / 2.0) + (_random.NextDouble() * 0.2);
+                _targetSpawnTimer = (TARGET_SPAWN_DELAY / 2.0) + (_random.NextDouble() * GameConstants.TARGET_SPAWN_RANDOM_FACTOR);
 
                 // Spawn more targets as time goes on (increased spawn rate with shorter thresholds)
-                if (_timer < 45) _targetSpawnTimer *= 0.6;  // After 15 seconds
-                if (_timer < 30) _targetSpawnTimer *= 0.5;  // After 30 seconds
-                if (_timer < 15) _targetSpawnTimer *= 0.4;  // After 45 seconds
+                if (_timer < GameConstants.SPAWN_ACCEL_THRESHOLD_1) _targetSpawnTimer *= GameConstants.SPAWN_ACCEL_MULTIPLIER_1;  // After 15 seconds
+                if (_timer < GameConstants.SPAWN_ACCEL_THRESHOLD_2) _targetSpawnTimer *= GameConstants.SPAWN_ACCEL_MULTIPLIER_2;  // After 30 seconds
+                if (_timer < GameConstants.SPAWN_ACCEL_THRESHOLD_3) _targetSpawnTimer *= GameConstants.SPAWN_ACCEL_MULTIPLIER_3;  // After 45 seconds
             }
 
             // Clean up destroyed targets and their grid positions

@@ -39,9 +39,9 @@ namespace ShootingGallery
                 RadiationAmount = radiationAmount;
             }
         }        // Constants
-        protected const int targetRadius = 45;
-        protected const float DefaultScale = 0.3f;
-        protected const double TimeToFullSize = 0.75; // Even faster growth (reduced from 1.5)
+        protected const int targetRadius = GameConstants.TARGET_RADIUS;
+        protected const float DefaultScale = GameConstants.TARGET_DEFAULT_SCALE;
+        protected const double TimeToFullSize = GameConstants.TARGET_TIME_TO_FULL_SIZE;
         
         // State
         protected float _scale;
@@ -58,11 +58,10 @@ namespace ShootingGallery
             Radioactive,
             Bomb
         }
-        public TargetType Type { get; protected set; }
-        public bool IsDestroyed => _isDestroyed;
+        public TargetType Type { get; protected set; }        public bool IsDestroyed => _isDestroyed;
         
         // Add a property to check if the target is fully grown (scale is at max)
-        public bool IsFullyGrown => _scale >= 1.0f;
+        public bool IsFullyGrown => _scale >= GameConstants.TARGET_GROWTH_LARGE;
         
         protected Scene Scene { get; private set; }
         
@@ -183,26 +182,23 @@ namespace ShootingGallery
         public RegularTarget(Vector2 targetPosition) : base(targetPosition, "target")
         {
             Type = TargetType.Standard;
-        }
-
-        protected override void ProcessHit()
+        }        protected override void ProcessHit()
         {
             int score = CalculateScore();
             ReportScore(score);
-            ReportRadiationChange(1.0f); // Regular radiation amount
+            ReportRadiationChange(GameConstants.RADIATION_REGULAR); // Regular radiation amount
             
             // Destroy this target instead of moving it randomly
             Destroy();
-        }
-          private int CalculateScore()
+        }private int CalculateScore()
         {
             // Score based on size (fully grown = more points)
-            if (_scale >= 1.0f)
-                return 15; // Fully grown targets are worth more
-            else if (_scale >= 0.6f)
-                return 10;
+            if (_scale >= GameConstants.TARGET_GROWTH_LARGE)
+                return GameConstants.SCORE_REGULAR_LARGE; // Fully grown targets are worth more
+            else if (_scale >= GameConstants.TARGET_GROWTH_MEDIUM)
+                return GameConstants.SCORE_REGULAR_MEDIUM;
             else
-                return 5;
+                return GameConstants.SCORE_REGULAR_SMALL;
         }
     }
 
@@ -214,32 +210,30 @@ namespace ShootingGallery
             Type = TargetType.Radioactive;
             _tintColor = new Color(0, 255, 0); // Green tint for radioactive
         }
-        
-        protected override void ProcessHit()
+          protected override void ProcessHit()
         {
             int score = CalculateScore();
             ReportScore(score);
-            ReportRadiationChange(3.0f); // Triple radiation amount
+            ReportRadiationChange(GameConstants.RADIATION_RADIOACTIVE); // Triple radiation amount
             
             // Destroy this target instead of moving it randomly
             Destroy();
-        }
-          private int CalculateScore()
+        }private int CalculateScore()
         {
             // Higher scores for radioactive targets, especially when fully grown
-            if (_scale >= 1.0f)
-                return 30; // Fully grown radioactive targets worth a lot
-            else if (_scale >= 0.6f)
-                return 20;
+            if (_scale >= GameConstants.TARGET_GROWTH_LARGE)
+                return GameConstants.SCORE_RADIOACTIVE_LARGE; // Fully grown radioactive targets worth a lot
+            else if (_scale >= GameConstants.TARGET_GROWTH_MEDIUM)
+                return GameConstants.SCORE_RADIOACTIVE_MEDIUM;
             else
-                return 10;
+                return GameConstants.SCORE_RADIOACTIVE_SMALL;
         }
     }    // Bomb Target (game over when hit)
     public class BombTarget : BaseTarget
     {
         // Constants for the auto-fade behavior
-        private const double FadeStartTime = 5.0; // Time before bomb starts fading (seconds)
-        private const double FadeDuration = 3.0; // Duration of fade effect (seconds)
+        private const double FadeStartTime = GameConstants.BOMB_FADE_START_TIME;
+        private const double FadeDuration = GameConstants.BOMB_FADE_DURATION;
         
         // State for tracking lifetime and alpha
         private double _lifeTime = 0; // How long this bomb has existed

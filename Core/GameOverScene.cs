@@ -43,12 +43,10 @@ public class GameOverScene : Scene
             UIConstants.GetCenteredPosition(UIConstants.TITLE_Y),
             "GAME OVER");
         gameOverText.SetColor(Color.Red);
-        gameOverText.SetScale(2f);
-
-        // Create a text entity for the cause of game over
+        gameOverText.SetScale(2f);        // Create a text entity for the cause of game over
         string causeMessage = _bombHit
             ? "You hit a radioactive bomb!"
-            : "Your 5 minutes of shooting are up!";
+            : "Your 1 minute of shooting is up!";
 
         var causeText = entitySystem.CreateEntity<TextEntity>(
             UIConstants.GetCenteredPosition(UIConstants.CAUSE_Y),
