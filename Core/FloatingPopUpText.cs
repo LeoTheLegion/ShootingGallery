@@ -1,9 +1,10 @@
 ﻿using CoreEssentials.Debugging;
 using CoreEssentials.GameSystems.EntitySystems.EntityOOPSystem;
 using CoreEssentials.GUI;
+using CoreEssentials.GUI.Factory;
+using CoreEssentials.GUI.Types;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Myra.Graphics2D.UI;
 using System;
 
 namespace ShootingGallery
@@ -19,7 +20,7 @@ namespace ShootingGallery
         private Color _textColor = Color.White;
 
         private Canvas _canvas;
-        private Label _label;
+        private ILabel _label;
 
         private const float Distance = 10f;
         private string _text;
@@ -69,21 +70,12 @@ namespace ShootingGallery
         {
             base.OnStart();
 
-            var label = new Label
-            {
-                Text = _text,
-                HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment = VerticalAlignment.Center,
-                TextColor = _textColor
-            };
+            var label = WidgetFactory.CreateLabel(_text);
+            label.HorizontalAlignment = HorizontalAlignment.Center;
+            label.VerticalAlignment = VerticalAlignment.Center;
+            label.TextColor = _textColor;
 
             _label = label;
-            
-            // Apply scale to font size and label scale
-            if (_scale != 1.0f)
-            {
-                _label.Scale = new Vector2(_scale);
-            }
 
             _canvas.AddWidget(label);
         }
@@ -100,9 +92,7 @@ namespace ShootingGallery
                 float pulse = (float)Math.Sin(_timeLeft * 10) * 0.2f + 0.8f;
                 this._transparency = pulse * smoothFunction(_totalTime - _timeLeft, _totalTime, 4f);
                 
-                // Make the text pulse in size if it's a radiation effect
-                float scalePulse = (float)Math.Sin(_timeLeft * 8) * 0.1f + 1.0f;
-                _label.Scale = new Vector2(_scale * scalePulse, _scale * scalePulse);
+                // Note: ILabel doesn't expose Scale in v0.13.1 — visual pulse effect removed
             }
             else
             {
@@ -111,10 +101,10 @@ namespace ShootingGallery
 
             this._timeLeft -= deltaTime;
 
+            // Note: ILabel doesn't expose Opacity in v0.13.1 — transparency fade removed.
+            // Canvas.Visible can be used as a coarse alternative for hide/show.
             _canvas.SetPosition(this._position);
             _canvas.Update(gameTime);
-
-            _label.Opacity = _transparency;
 
             if (_timeLeft <= 0)
                 this.Destroy();

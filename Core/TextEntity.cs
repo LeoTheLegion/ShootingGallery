@@ -3,9 +3,10 @@ using CoreEssentials.Assets;
 using CoreEssentials.Debugging;
 using CoreEssentials.GameSystems.EntitySystems.EntityOOPSystem;
 using CoreEssentials.GUI;
+using CoreEssentials.GUI.Factory;
+using CoreEssentials.GUI.Types;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Myra.Graphics2D.UI;
 
 namespace ShootingGallery.Core;
 
@@ -17,7 +18,7 @@ public class TextEntity: Entity
     private Color _textColor = Color.White;
     private float _scale = 1.0f;
 
-    private Label _label;
+    private ILabel _label;
 
     public TextEntity(Vector2 position, string text)
     {
@@ -31,14 +32,12 @@ public class TextEntity: Entity
     {
         base.OnStart();
 
-        var label = new Label
-        {
-            Text = _text,
-            TextColor = _textColor
-        };
+        var label = WidgetFactory.CreateLabel(_text);
+        label.TextColor = _textColor;
+        label.HorizontalAlignment = HorizontalAlignment.Center;
+        label.VerticalAlignment = VerticalAlignment.Center;
 
         _label = label;
-        UpdateScale();
         
         _canvas.AddWidget(label);
     }
@@ -82,15 +81,7 @@ public class TextEntity: Entity
     
     public void SetScale(float scale)
     {
+        // Note: ILabel doesn't expose Scale in v0.13.1 — SetScale is a no-op for now.
         _scale = scale;
-        UpdateScale();
-    }
-    
-    private void UpdateScale()
-    {
-        if (_label != null)
-        {
-            _label.Scale = new Vector2(_scale);
-        }
     }
 }

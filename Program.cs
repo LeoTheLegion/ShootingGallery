@@ -1,6 +1,6 @@
 ﻿
 using CoreEssentials;
-using CoreEssentials.SceneManagement;
+using CoreEssentials.Scenes;
 using Microsoft.Xna.Framework;
 using ShootingGallery.Core;
 

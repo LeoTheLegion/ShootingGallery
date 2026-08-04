@@ -2,9 +2,9 @@ using System;
 using CoreEssentials.Debugging;
 using CoreEssentials.GameSystems.EntitySystems.EntityOOPSystem;
 using CoreEssentials.GUI;
+using CoreEssentials.GUI.Factory;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Myra.Graphics2D.UI;
 
 namespace ShootingGallery.Core;
 
@@ -26,9 +26,9 @@ public class ButtonEntity : Entity
     {
         base.OnStart();
 
-        var button = Button.CreateTextButton(text);
+        var button = WidgetFactory.CreateTextButton(text);
 
-        button.Click += (s, e) =>
+        button.Clicked += (b) =>
         {
             onClick?.Invoke();
         };

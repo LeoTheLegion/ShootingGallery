@@ -1,5 +1,5 @@
 ﻿using CoreEssentials.GameSystems.EntitySystems.EntityOOPSystem;
-using CoreEssentials.SceneManagement;
+using CoreEssentials.Scenes;
 using Microsoft.Xna.Framework;
 using ShootingGallery.Core;
 using System;
