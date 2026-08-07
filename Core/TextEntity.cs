@@ -81,7 +81,10 @@ public class TextEntity: Entity
     
     public void SetScale(float scale)
     {
-        // Note: ILabel doesn't expose Scale in v0.13.1 — SetScale is a no-op for now.
         _scale = scale;
+        if (_label != null)
+        {
+            _label.Scale = new Vector2(scale);
+        }
     }
 }

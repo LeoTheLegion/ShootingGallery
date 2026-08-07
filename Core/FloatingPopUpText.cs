@@ -91,8 +91,8 @@ namespace ShootingGallery
             {
                 float pulse = (float)Math.Sin(_timeLeft * 10) * 0.2f + 0.8f;
                 this._transparency = pulse * smoothFunction(_totalTime - _timeLeft, _totalTime, 4f);
-                
-                // Note: ILabel doesn't expose Scale in v0.13.1 — visual pulse effect removed
+
+                _label.Scale = new Vector2(pulse);
             }
             else
             {
@@ -101,10 +101,8 @@ namespace ShootingGallery
 
             this._timeLeft -= deltaTime;
 
-            // Note: ILabel doesn't expose Opacity in v0.13.1 — transparency fade removed.
-            // Canvas.Visible can be used as a coarse alternative for hide/show.
-            _canvas.SetPosition(this._position);
-            _canvas.Update(gameTime);
+            _label.Opacity = _transparency;
+            _canvas.SetPosition(this._position);            _canvas.Update(gameTime);
 
             if (_timeLeft <= 0)
                 this.Destroy();
