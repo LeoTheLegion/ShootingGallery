@@ -71,9 +71,9 @@ namespace ShootingGallery
             base.OnStart();
 
             var label = WidgetFactory.CreateLabel(_text);
-            label.HorizontalAlignment = HorizontalAlignment.Center;
-            label.VerticalAlignment = VerticalAlignment.Center;
             label.TextColor = _textColor;
+            // Workaround: position label at canvas origin via IWidget.Position instead of alignment properties
+            ((IWidget)label).Position = Vector2.Zero;
 
             _label = label;
 

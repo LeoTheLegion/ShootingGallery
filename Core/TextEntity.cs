@@ -34,14 +34,14 @@ public class TextEntity: Entity
 
         var label = WidgetFactory.CreateLabel(_text);
         label.TextColor = _textColor;
-        label.HorizontalAlignment = HorizontalAlignment.Center;
-        label.VerticalAlignment = VerticalAlignment.Center;
+        // Workaround: position label at canvas origin via IWidget.Position instead of alignment properties
+        ((IWidget)label).Position = Vector2.Zero;
 
         _label = label;
-        
+
         _canvas.AddWidget(label);
     }
-    
+
     public override void Update(GameTime gameTime)
     {
         base.Update(gameTime);
