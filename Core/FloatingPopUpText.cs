@@ -39,6 +39,9 @@ namespace ShootingGallery
             this._transparencyChangeRate = this._transparency / time;
             
             _canvas = new Canvas();
+
+            // v0.14.0: entity system handles lifetime instead of manual countdown
+            DestroyAfter(TimeSpan.FromSeconds(time));
         }
         
         // Floating text with custom color and scale
@@ -102,10 +105,8 @@ namespace ShootingGallery
             this._timeLeft -= deltaTime;
 
             _label.Opacity = _transparency;
-            _canvas.SetPosition(this._position);            _canvas.Update(gameTime);
-
-            if (_timeLeft <= 0)
-                this.Destroy();
+            _canvas.SetPosition(this._position);
+            _canvas.Update(gameTime);
         }
 
         public override void OnDestroy()

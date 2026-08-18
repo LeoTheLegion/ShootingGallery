@@ -49,22 +49,12 @@ namespace ShootingGallery
         private RadiationManager _radiationManager;
         private Crosshair _crosshair;
 
-        // Target tracking
-        private List<BaseTarget> _activeTargets = new List<BaseTarget>();
         private Random _random = new Random();
 
         // Getters
         public double GetGameTime() => _timer;
         public int GetScore() => _score;
         public float GetTimeMultiplier() => _timeMultiplier;
-
-        private void UpdateCrosshairTargets()
-        {
-            if (_crosshair != null)
-            {
-                _crosshair.SetCurrentTargets(_activeTargets);
-            }
-        }
 
         // Setters
         public void AddScore(int points) => _score += (int)(points * _timeMultiplier);
@@ -135,56 +125,49 @@ namespace ShootingGallery
                         Console.WriteLine($"Created REGULAR at grid ({row},{col}): {position}");
                     }
 
-                    // Store mapping from position to grid cell
-                    _targetPositionToCell[position] = (row, col);
-
-                    // Subscribe to target events
-                    newTarget.OnScore += (sender, args) =>
-                    {
-                        AddScore(args.Score);
-                    };
-
-                    newTarget.OnRadiationChange += (sender, args) =>
-                    {
-                        if (_radiationManager != null)
-                        {
-                            _radiationManager.AddRadiation(args.RadiationAmount);
-                        }
-                    };
-
-                    newTarget.OnGameOver += (sender, args) =>
-                    {
-                        // Game over from hitting a bomb
-                        OnGameOver?.Invoke(this, new GameOverEventArgs(_score));
-                    };
-
-                    _activeTargets.Add(newTarget);
+                    WireTargetEvents(newTarget, position, row, col);
                 }
             }
-
-            // Update crosshair targets list
-            UpdateCrosshairTargets();
         }
+        private void WireTargetEvents(BaseTarget target, Vector2 position, int row, int col)
+        {
+            _targetPositionToCell[position] = (row, col);
+
+            target.OnScore += (sender, args) => AddScore(args.Score);
+
+            target.OnRadiationChange += (sender, args) =>
+            {
+                if (_radiationManager != null)
+                    _radiationManager.AddRadiation(args.RadiationAmount);
+            };
+
+            target.OnGameOver += (sender, args) => OnGameOver?.Invoke(this, new GameOverEventArgs(_score));
+
+            // v0.14.0: free the grid cell when the target dies instead of scanning for dead targets every frame
+            target.OnDestroyed += (sender, deadPosition) =>
+            {
+                if (_targetPositionToCell.TryGetValue(deadPosition, out var cell))
+                {
+                    _occupiedCells[cell.Row, cell.Col] = false;
+                    _targetPositionToCell.Remove(deadPosition);
+                }
+            };
+        }
+
         private void HandleCrosshairShoot(object sender, Crosshair.ShootEventArgs e)
         {
             // Log the shot for debugging
             Console.WriteLine($"Shot detected at position: {e.Position}");
 
-            // Check for target hits
+            // v0.14.0: query live targets directly — destroyed targets are inactive and excluded
             bool targetHit = false;
-            foreach (var target in _activeTargets)
+            foreach (var target in EntitySystem.FindByType<BaseTarget>())
             {
-                // Log the target being checked
                 Console.WriteLine($"Checking target at position: {target.Position}, distance: {Vector2.Distance(target.Position, e.Position)}");
 
-                // Store the target's IsDestroyed state before handling the shot
-                bool wasDestroyed = target.IsDestroyed;
-
-                // Handle the shot
                 target.HandleShot(e.Position);
 
-                // If the target wasn't destroyed before and is now, it means we hit it
-                if (!wasDestroyed && target.IsDestroyed)
+                if (target.IsDestroyed)
                 {
                     targetHit = true;
                 }
@@ -202,9 +185,6 @@ namespace ShootingGallery
         {
             ProcessGameplay(gameTime);
             UpdateTargetSpawning(gameTime);
-
-            // Keep crosshair's target list updated
-            UpdateCrosshairTargets();
         }
         private void ProcessGameplay(GameTime gameTime)
         {
@@ -343,30 +323,7 @@ namespace ShootingGallery
                 Console.WriteLine($"Created REGULAR at position {position}");
             }
 
-            // Store mapping from position to grid cell
-            _targetPositionToCell[position] = (row, col);
-
-            // Subscribe to target events
-            newTarget.OnScore += (sender, args) =>
-            {
-                AddScore(args.Score);
-            };
-
-            newTarget.OnRadiationChange += (sender, args) =>
-            {
-                if (_radiationManager != null)
-                {
-                    _radiationManager.AddRadiation(args.RadiationAmount);
-                }
-            };
-
-            newTarget.OnGameOver += (sender, args) =>
-            {
-                // Game over from hitting a bomb
-                OnGameOver?.Invoke(this, new GameOverEventArgs(_score));
-            };
-
-            _activeTargets.Add(newTarget);
+            WireTargetEvents(newTarget, position, row, col);
         }
         public void RestartRound()
         {
@@ -374,12 +331,11 @@ namespace ShootingGallery
             _score = 0;
             _timeMultiplier = TIME_MULTIPLIER_START;
 
-            // Clear existing targets
-            foreach (var target in _activeTargets)
+            // Clear existing targets (OnDestroyed frees their grid cells)
+            foreach (var target in EntitySystem.FindByType<BaseTarget>())
             {
                 target.Destroy();
             }
-            _activeTargets.Clear();
 
             // Reset grid state
             for (int row = 0; row < GRID_ROWS; row++)
@@ -431,42 +387,16 @@ namespace ShootingGallery
                         newTarget = EntitySystem.CreateEntity<RegularTarget>(position);
                     }
 
-                    // Store mapping from position to grid cell
-                    _targetPositionToCell[position] = (row, col);
-
-                    // Subscribe to target events
-                    newTarget.OnScore += (sender, args) =>
-                    {
-                        AddScore(args.Score);
-                    };
-
-                    newTarget.OnRadiationChange += (sender, args) =>
-                    {
-                        if (_radiationManager != null)
-                        {
-                            _radiationManager.AddRadiation(args.RadiationAmount);
-                        }
-                    };
-
-                    newTarget.OnGameOver += (sender, args) =>
-                    {
-                        // Game over from hitting a bomb
-                        OnGameOver?.Invoke(this, new GameOverEventArgs(_score));
-                    };
-
-                    _activeTargets.Add(newTarget);
+                    WireTargetEvents(newTarget, position, row, col);
                 }
             }
-
-            // Update crosshair targets list
-            UpdateCrosshairTargets();
         }
 
         private void UpdateTargetSpawning(GameTime gameTime)
         {
             _targetSpawnTimer -= gameTime.ElapsedGameTime.TotalSeconds; if (_targetSpawnTimer <= 0)
             {                SpawnRandomTarget();
-                UpdateCrosshairTargets();                // Faster spawning - extremely aggressive spawn rates for shorter game
+                // Faster spawning - extremely aggressive spawn rates for shorter game
                 _targetSpawnTimer = (TARGET_SPAWN_DELAY / 2.0) + (_random.NextDouble() * GameConstants.TARGET_SPAWN_RANDOM_FACTOR);
 
                 // Spawn more targets as time goes on (increased spawn rate with shorter thresholds)
@@ -475,34 +405,7 @@ namespace ShootingGallery
                 if (_timer < GameConstants.SPAWN_ACCEL_THRESHOLD_3) _targetSpawnTimer *= GameConstants.SPAWN_ACCEL_MULTIPLIER_3;  // After 45 seconds
             }
 
-            // Clean up destroyed targets and their grid positions
-            var destroyedTargets = _activeTargets.Where(t => t == null || t.IsDestroyed).ToList();
-            foreach (var target in destroyedTargets)
-            {
-                if (target != null)
-                {
-                    Vector2 position = target.Position;
-                    Console.WriteLine($"Target destroyed at position {position}");
-
-                    // Free up the grid cell
-                    if (_targetPositionToCell.TryGetValue(position, out var cell))
-                    {
-                        _occupiedCells[cell.Row, cell.Col] = false;
-                        _targetPositionToCell.Remove(position);
-                        Console.WriteLine($"Freed up grid cell ({cell.Row}, {cell.Col})");
-                    }
-                    else
-                    {
-                        Console.WriteLine($"Warning: Could not find grid cell for position {position}");
-                    }
-                }
-            }
-            _activeTargets.RemoveAll(t => t == null || t.IsDestroyed);
-
-            if (destroyedTargets.Any())
-            {
-                UpdateCrosshairTargets();
-            }
+            // v0.14.0: grid cell cleanup happens in the OnDestroyed event — no per-frame scan needed
         }
     }
 }

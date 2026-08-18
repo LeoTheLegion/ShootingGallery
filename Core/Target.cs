@@ -14,6 +14,7 @@ namespace ShootingGallery
         public event EventHandler<ScoreEventArgs> OnScore;
         public event EventHandler<GameOverEventArgs> OnGameOver;
         public event EventHandler<RadiationEventArgs> OnRadiationChange;
+        public event EventHandler<Vector2> OnDestroyed;
 
         // Event arguments
         public class ScoreEventArgs : EventArgs
@@ -170,8 +171,10 @@ namespace ShootingGallery
         }
         
         public new void Destroy()
-        {            base.Destroy();
+        {
+            base.Destroy();
             _isDestroyed = true;
+            OnDestroyed?.Invoke(this, this._position);
             Dispose();
         }
     }

@@ -42,9 +42,6 @@ namespace ShootingGallery
         private bool _canShoot = true;
         private MouseState _lastMouseState;
 
-        // Reference to the current targets in the scene
-        private IList<BaseTarget> _currentTargets;
-
         public Crosshair() : base()
         {
             this._sprite = AssetManager.LoadAsset<Sprite>("crosshair_sprite.xml");
@@ -57,12 +54,6 @@ namespace ShootingGallery
             _armRotations.Add(0f);
 
             _lastMouseState = Mouse.GetState();
-        }
-
-        // Allow setting the current targets from outside
-        public void SetCurrentTargets(IList<BaseTarget> targets)
-        {
-            _currentTargets = targets;
         }
 
         public void SetMutationLevel(int level)
@@ -139,24 +130,22 @@ namespace ShootingGallery
         }
           private Vector2 GetRandomShotPosition()
         {
-            // If there are targets, pick a fully grown regular target at random
-            if (_currentTargets != null && _currentTargets.Count > 0)
-            {
-                // Filter to only get fully grown regular targets
-                var fullyGrownRegularTargets = _currentTargets
-                    .Where(t => t is RegularTarget && t.IsFullyGrown)
-                    .ToList();
+            // Query live targets directly — destroyed targets are inactive and excluded
+            var targets = EntitySystem.FindByType<BaseTarget>();
 
-                if (fullyGrownRegularTargets.Count > 0)
-                {
-                    int idx = _random.Next(fullyGrownRegularTargets.Count);
-                    return fullyGrownRegularTargets[idx].Position;
-                }
-                
-                // No fully grown targets available, so return null indicator position
-                // This will be handled in TriggerRandomShot to prevent shooting
-                return new Vector2(-1, -1);
-            }            // No targets at all, so return null indicator position
+            // Filter to only get fully grown regular targets
+            var fullyGrownRegularTargets = targets
+                .Where(t => t is RegularTarget && t.IsFullyGrown)
+                .ToList();
+
+            if (fullyGrownRegularTargets.Count > 0)
+            {
+                int idx = _random.Next(fullyGrownRegularTargets.Count);
+                return fullyGrownRegularTargets[idx].Position;
+            }
+
+            // No fully grown targets available, so return null indicator position
+            // This will be handled in TriggerRandomShot to prevent shooting
             return new Vector2(-1, -1);
         }
 
