@@ -159,9 +159,12 @@ namespace ShootingGallery
             // Log the shot for debugging
             Console.WriteLine($"Shot detected at position: {e.Position}");
 
-            // v0.14.0: query live targets directly — destroyed targets are inactive and excluded
+            // v0.14.0: spatial query — a target is only hittable if its center is within
+            // targetRadius * _scale (<= TARGET_RADIUS) of the shot, so this radius is the exact
+            // candidate set. FindNearby uses the spatial grid (O(1) avg) and excludes destroyed targets.
             bool targetHit = false;
-            foreach (var target in EntitySystem.FindByType<BaseTarget>())
+            float maxHitRadius = GameConstants.TARGET_RADIUS;
+            foreach (var target in EntitySystem.FindNearby<BaseTarget>(e.Position, maxHitRadius))
             {
                 Console.WriteLine($"Checking target at position: {target.Position}, distance: {Vector2.Distance(target.Position, e.Position)}");
 
