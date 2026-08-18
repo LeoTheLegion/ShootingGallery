@@ -1,5 +1,6 @@
 ﻿using CoreEssentials.Assets;
 using CoreEssentials.GameSystems.EntitySystems.EntityOOPSystem;
+using CoreEssentials.GameSystems.EntitySystems.EntityOOPSystem.Components.BuiltIn;
 using CoreEssentials.Scenes;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -49,6 +50,7 @@ namespace ShootingGallery
         protected double _time;
         protected Random _random;
         protected Sprite _sprite;
+        protected SpriteComponent _spriteComponent;
         protected string _spriteName;
         protected Color _tintColor = Color.White;
         protected bool _isDestroyed = false;
@@ -88,7 +90,16 @@ namespace ShootingGallery
         {
             base.OnStart();
             this._sprite = AssetManager.LoadAsset<Sprite>("target_sprite.xml");
-            
+
+            // v0.14.0: render via SpriteComponent so targets join z-layer texture batching.
+            // The base Entity.Render() draws the component using Owner.Position/Rotation/Scale,
+            // so no custom Render override is needed. Tint lives on the component's Color.
+            _spriteComponent = AddComponent(new SpriteComponent(_sprite));
+            _spriteComponent.Color = _tintColor;
+            RegisterForInstancedRendering(_sprite);
+            SetZLayer(0);
+            Scale = new Vector2(_scale);
+
             // No longer move randomly on start - use the position provided in constructor
             Console.WriteLine($"Target spawned at position: {_position}");
         }
@@ -135,6 +146,7 @@ namespace ShootingGallery
         {
             _time += gameTime.ElapsedGameTime.TotalSeconds;
             _scale = (float)Math.MinMagnitude(_time / TimeToFullSize, 1);
+            Scale = new Vector2(_scale);
         }
         
         // Add a method for EntitySystem-compatible Update
@@ -154,17 +166,6 @@ namespace ShootingGallery
             _time = 0;
         }
         
-        public override void Render(SpriteBatch _spriteBatch)
-        {
-            _sprite.Draw(_spriteBatch, _position, _tintColor, 0f, Vector2.One * _scale, SpriteEffects.None, 0);
-        }
-        
-        // Add a method for EntitySystem-compatible Render
-        public void Render(ref SpriteBatch _spriteBatch)
-        {
-            Render(_spriteBatch);
-        }
-
         public virtual void Dispose()
         {
             AssetManager.UnloadAsset<Sprite>(_sprite.Name);
@@ -268,7 +269,8 @@ namespace ShootingGallery
                 // Update tint color with new alpha (explicitly using byte for all parameters)
                 byte alpha = (byte)Math.Round(_alpha * 255);
                 _tintColor = new Color((byte)255, (byte)0, (byte)0, alpha);
-                
+                _spriteComponent.Color = _tintColor;
+
                 // When fully faded out, destroy the bomb
                 if (_alpha <= 0)
                 {
@@ -282,12 +284,6 @@ namespace ShootingGallery
         {
             // Game over!
             ReportGameOver();
-        }
-        
-        public override void Render(SpriteBatch _spriteBatch)
-        {
-            // Use the faded tint color for rendering
-            _sprite.Draw(_spriteBatch, _position, _tintColor, 0f, Vector2.One * _scale, SpriteEffects.None, 0);
         }
     }
     
