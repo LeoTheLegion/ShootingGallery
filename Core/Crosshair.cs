@@ -3,12 +3,48 @@ using System.Collections.Generic;
 using System.Linq;
 using CoreEssentials.Assets;
 using CoreEssentials.GameSystems.EntitySystems.EntityOOPSystem;
+using CoreEssentials.GameSystems.EntitySystems.EntityOOPSystem.Components.BuiltIn;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using ShootingGallery.Core;
 namespace ShootingGallery
 {
+    /// <summary>
+    /// A mutated crosshair arm. Rendered as a child entity of the <see cref="Crosshair"/> so it
+    /// inherits the crosshair's position (world = parent + local offset) and follows it for free.
+    /// </summary>
+    public class CrosshairArm : Entity
+    {
+        private Sprite _sprite;
+
+        // Glowing green + 0.8 scale matches the previous hand-drawn arm render.
+        private static readonly Color ArmColor = new Color(0, 255, 0, 200);
+        private const float ArmScale = 0.8f;
+
+        public override void OnStart()
+        {
+            base.OnStart();
+
+            _sprite = AssetManager.LoadAsset<Sprite>("crosshair_sprite.xml");
+            var spriteComponent = AddComponent(new SpriteComponent(_sprite));
+            spriteComponent.Color = ArmColor;
+            Scale = new Vector2(ArmScale);
+            RegisterForInstancedRendering(_sprite);
+            SetZLayer(10);
+        }
+
+        public override void OnDestroy()
+        {
+            base.OnDestroy();
+            if (_sprite != null)
+            {
+                AssetManager.UnloadAsset<Sprite>(_sprite.Name);
+                _sprite = null;
+            }
+        }
+    }
+
     public class Crosshair : Entity, IDisposable
     {
         // Event for shooting
@@ -31,14 +67,11 @@ namespace ShootingGallery
 
         private const int crosshairRadius = 25;
         private const float ArmDistanceFromCenter = 40f;
-        private const float RandomShotCooldown = 1.5f; // Time between random shots in seconds
 
         private Sprite _sprite;
         private int _mutationLevel = 0;
-        private float _randomShotTimer = 0f;
         private Random _random;
-        private List<Vector2> _armPositions;
-        private List<float> _armRotations;
+        private List<CrosshairArm> _arms = new List<CrosshairArm>();
         private bool _canShoot = true;
         private MouseState _lastMouseState;
 
@@ -46,40 +79,49 @@ namespace ShootingGallery
         {
             this._sprite = AssetManager.LoadAsset<Sprite>("crosshair_sprite.xml");
             _random = new Random();
-            _armPositions = new List<Vector2>();
-            _armRotations = new List<float>();
-
-            // Initialize with 1 arm (the main one)
-            _armPositions.Add(Vector2.Zero);
-            _armRotations.Add(0f);
-
             _lastMouseState = Mouse.GetState();
+        }
+
+        public override void OnStart()
+        {
+            base.OnStart();
+
+            // v0.14.0: main crosshair renders via SpriteComponent; arms are child entities.
+            var spriteComponent = AddComponent(new SpriteComponent(_sprite));
+            RegisterForInstancedRendering(_sprite);
+            SetZLayer(10);
         }
 
         public void SetMutationLevel(int level)
         {
             _mutationLevel = Math.Clamp(level, 0, 3); // Max 4 arms (1 original + 3 mutations)
 
-            // Reset arm positions
-            _armPositions.Clear();
-            _armRotations.Clear();
+            // Remove existing arms (destroyed entities are cleaned up by the system next frame)
+            foreach (var arm in _arms)
+            {
+                arm.Destroy();
+            }
+            _arms.Clear();
 
-            // Always have the main arm
-            _armPositions.Add(Vector2.Zero);
-            _armRotations.Add(0f);
+            if (EntitySystem == null)
+            {
+                return;
+            }
 
-            // Add additional arms based on mutation level
+            // Add additional arms based on mutation level, distributed in a circle around the main crosshair
             for (int i = 0; i < _mutationLevel; i++)
             {
-                // Calculate position of the arm (distributed in a circle around the main crosshair)
                 float angle = (float)(i * (2 * Math.PI / _mutationLevel));
                 Vector2 offset = new Vector2(
                     (float)Math.Cos(angle) * ArmDistanceFromCenter,
                     (float)Math.Sin(angle) * ArmDistanceFromCenter
                 );
 
-                _armPositions.Add(offset);
-                _armRotations.Add(angle);
+                var arm = EntitySystem.CreateEntity<CrosshairArm>();
+                arm.LocalPosition = offset;
+                arm.LocalRotation = angle;
+                AddChild(arm);
+                _arms.Add(arm);
             }
         }
         public override void Update(GameTime gameTime)
@@ -109,9 +151,10 @@ namespace ShootingGallery
             if (_mutationLevel > 0)
             {
                 // Pick a single mutated arm (not the main one)
-                int mutatedArmCount = _armPositions.Count - 1;
-                if (mutatedArmCount > 0)                {
-                    int randomMutatedArm = _random.Next(1, _armPositions.Count); // 1..N
+                int mutatedArmCount = _arms.Count;
+                if (mutatedArmCount > 0)
+                {
+                    int randomMutatedArm = _random.Next(1, mutatedArmCount + 1); // 1..N
                     Vector2 randomShotPosition = GetRandomShotPosition();
                     
                     // Only shoot if we found a valid target (not the indicator position)
@@ -147,27 +190,6 @@ namespace ShootingGallery
             // No fully grown targets available, so return null indicator position
             // This will be handled in TriggerRandomShot to prevent shooting
             return new Vector2(-1, -1);
-        }
-
-        public override void Render(SpriteBatch _spriteBatch)
-        {
-            // Draw the main crosshair
-            _sprite.Draw(_spriteBatch, _position, Color.White, 0f, SpriteEffects.None, 0f);
-
-            // Draw the mutated arms
-            Color mutatedColor = new Color(0, 255, 0, 200); // Glowing green for radiation effect
-
-            for (int i = 1; i < _armPositions.Count; i++) // Start from 1 to skip the main arm
-            {
-                Vector2 armPosition = _position + _armPositions[i];
-                _sprite.Draw(_spriteBatch, armPosition, mutatedColor, _armRotations[i], 0.8f, SpriteEffects.None, 0f);
-            }
-        }
-
-        // Add a method for EntitySystem-compatible Render
-        public void Render(ref SpriteBatch _spriteBatch)
-        {
-            Render(_spriteBatch);
         }
 
         public void Dispose()
