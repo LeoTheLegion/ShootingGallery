@@ -2,6 +2,7 @@
 using CoreEssentials.GameSystems.EntitySystems.EntityOOPSystem;
 using CoreEssentials.GameSystems.EntitySystems.EntityOOPSystem.Components.BuiltIn;
 using CoreEssentials.Scenes;
+using CoreEssentials.Tweening;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ShootingGallery.Core;
@@ -51,6 +52,8 @@ namespace ShootingGallery
         protected Random _random;
         protected Sprite _sprite;
         protected SpriteComponent _spriteComponent;
+        protected TweenComponent _tweenComponent;
+        protected TweenFloat _growthTween;
         protected string _spriteName;
         protected Color _tintColor = Color.White;
         protected bool _isDestroyed = false;
@@ -100,6 +103,11 @@ namespace ShootingGallery
             SetZLayer(0);
             Scale = new Vector2(_scale);
 
+            // v0.14.0: drive growth with a TweenComponent (linear 0 -> 1 over TimeToFullSize,
+            // matching the previous _time-based formula). base.Update() advances the tween.
+            _tweenComponent = AddComponent(new TweenComponent());
+            _growthTween = _tweenComponent.TweenToFloat(0f, 1f, (float)TimeToFullSize);
+
             // No longer move randomly on start - use the position provided in constructor
             Console.WriteLine($"Target spawned at position: {_position}");
         }
@@ -144,8 +152,9 @@ namespace ShootingGallery
 
         public override void Update(GameTime gameTime)
         {
+            base.Update(gameTime); // advances the growth tween
             _time += gameTime.ElapsedGameTime.TotalSeconds;
-            _scale = (float)Math.MinMagnitude(_time / TimeToFullSize, 1);
+            _scale = _growthTween.GetValue();
             Scale = new Vector2(_scale);
         }
         
