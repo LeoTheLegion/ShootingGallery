@@ -104,7 +104,8 @@ namespace ShootingGallery
 
             this._timeLeft -= deltaTime;
 
-            _label.Opacity = _transparency;
+            // Clamp: smoothFunction can drift slightly outside [0,1] and Myra's Opacity setter throws on out-of-range values
+            _label.Opacity = Math.Clamp(_transparency, 0f, 1f);
             _canvas.SetPosition(this._position);
             _canvas.Update(gameTime);
         }
