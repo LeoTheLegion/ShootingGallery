@@ -4,6 +4,7 @@ using System.Globalization;
 using System.IO;
 using System.Reflection;
 using System.Xml.Linq;
+using CoreEssentials.Assets;
 using CoreEssentials.GameSystems.EntitySystems.EntityOOPSystem;
 using Microsoft.Xna.Framework;
 
@@ -27,13 +28,16 @@ public static class SceneLoader
     /// <returns>A lookup of each entity's <c>Id</c> attribute to the created entity, for wiring typed references.</returns>
     public static Dictionary<string, Entity> LoadScene(EntitySystem system, string sceneName, Dictionary<string, Action> commands)
     {
-        string path = Path.Combine(AppContext.BaseDirectory, "Content", sceneName + ".xml");
-        if (!File.Exists(path))
-            throw new FileNotFoundException($"Scene definition not found: {path}");
+        // Load through CE's asset system (refcounted, content-manager-backed),
+        // consistent with how sprites/fonts are pulled. A missing file throws from XMLAsset.Load.
+        var xmlAsset = AssetManager.LoadAsset<XMLAsset>(sceneName + ".xml");
+        string xml = xmlAsset.XMLContent;
+        if (string.IsNullOrWhiteSpace(xml))
+            throw new FileNotFoundException($"Scene definition '{sceneName}.xml' is empty.");
 
-        var root = XDocument.Load(path).Root;
+        var root = XDocument.Parse(xml).Root;
         if (root == null || root.Name.LocalName != "Scene")
-            throw new FormatException($"'{path}' must have a <Scene> root element.");
+            throw new FormatException($"'{sceneName}.xml' must have a <Scene> root element.");
 
         var byId = new Dictionary<string, Entity>(StringComparer.Ordinal);
         foreach (var entityElem in root.Elements("Entity"))
