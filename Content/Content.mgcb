@@ -74,6 +74,9 @@
 #begin target_sprite.xml
 /copy:target_sprite.xml
 
+#begin start_menu.xml
+/copy:start_menu.xml
+
 #begin target.png
 /importer:TextureImporter
 /processor:TextureProcessor

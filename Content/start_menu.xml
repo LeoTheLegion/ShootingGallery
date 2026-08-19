@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Start menu layout. Positions use resolution-independent anchors:
+    HAnchor: Center (default) | Left | Right  -> X is an offset from that edge/center
+    VAnchor: Top (default)    | Bottom | Middle -> Y is an offset from that edge/middle
+  Colors accept named Color fields (LimeGreen) or "R,G,B[,A]".
+  ButtonEntity uses a Command name resolved to a delegate in code (see StartMenuScene).
+-->
+<Scene Name="StartMenu">
+  <Entity Type="TextEntity" HAnchor="Center" VAnchor="Top" Y="100">
+    <Property Name="Text" Value="URANIUM REVOLVER" />
+    <Property Name="Color" Value="LimeGreen" />
+    <Property Name="Scale" Value="2.5" />
+  </Entity>
+
+  <Entity Type="TextEntity" HAnchor="Center" VAnchor="Top" Y="160">
+    <Property Name="Text" Value="A Radioactive Shooting Gallery" />
+    <Property Name="Color" Value="Yellow" />
+    <Property Name="Scale" Value="1.5" />
+  </Entity>
+
+  <Entity Type="TextEntity" HAnchor="Center" VAnchor="Top" Y="240">
+    <Property Name="Text" Value="Shoot targets to score points and accumulate radiation" />
+    <Property Name="Color" Value="White" />
+  </Entity>
+
+  <Entity Type="TextEntity" HAnchor="Center" VAnchor="Top" Y="290">
+    <Property Name="Text" Value="Mutations will give you extra arms to shoot with" />
+    <Property Name="Color" Value="LightGreen" />
+  </Entity>
+
+  <Entity Type="TextEntity" HAnchor="Center" VAnchor="Top" Y="340">
+    <Property Name="Text" Value="Avoid radioactive bombs or face instant death!" />
+    <Property Name="Color" Value="Red" />
+  </Entity>
+
+  <Entity Type="TextEntity" HAnchor="Center" VAnchor="Top" Y="390">
+    <Property Name="Text" Value="WARNING: Extreme Radiation Exposure!" />
+    <Property Name="Color" Value="Orange" />
+    <Property Name="Scale" Value="1.2" />
+  </Entity>
+
+  <Entity Type="ButtonEntity" HAnchor="Center" VAnchor="Top" Y="490">
+    <Property Name="Text" Value="START MUTATION" />
+    <Property Name="Command" Value="StartGame" />
+  </Entity>
+
+  <Entity Type="TextEntity" HAnchor="Center" VAnchor="Bottom" Y="80">
+    <Property Name="Text" Value="Created with Uranium Power - Warning: May Cause Mutations" />
+    <Property Name="Color" Value="100,255,100" />
+  </Entity>
+
+  <Entity Type="FloatingPopUpText" HAnchor="Center" X="-300" VAnchor="Middle">
+    <Property Name="Text" Value="☢️ RADIATION ☢️" />
+    <Property Name="Time" Value="5" />
+    <Property Name="Color" Value="LimeGreen" />
+    <Property Name="Scale" Value="1.5" />
+  </Entity>
+
+  <Entity Type="FloatingPopUpText" HAnchor="Center" X="300" VAnchor="Middle">
+    <Property Name="Text" Value="☢️ RADIATION ☢️" />
+    <Property Name="Time" Value="5" />
+    <Property Name="Color" Value="LimeGreen" />
+    <Property Name="Scale" Value="1.5" />
+  </Entity>
+</Scene>
