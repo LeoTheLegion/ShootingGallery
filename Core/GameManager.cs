@@ -21,16 +21,18 @@ namespace ShootingGallery
                 FinalScore = finalScore;
             }
         }
-        // Game constants       
-        private const double ROUND_TIME = GameConstants.ROUND_TIME;      
-        private const float TIME_MULTIPLIER_START = GameConstants.TIME_MULTIPLIER_START;
-        private const float TIME_MULTIPLIER_MIN = GameConstants.TIME_MULTIPLIER_MIN;
-        private const float TIME_MULTIPLIER_DECAY = GameConstants.TIME_MULTIPLIER_DECAY;
-        private const double TARGET_SPAWN_DELAY = GameConstants.TARGET_SPAWN_DELAY;
-        private const float BOMB_CHANCE = GameConstants.BOMB_CHANCE;
-        private const float RADIOACTIVE_CHANCE = GameConstants.RADIOACTIVE_CHANCE;        // Target grid configuration
-        private const int GRID_ROWS = GameConstants.GRID_ROWS;
-        private const int GRID_COLS = GameConstants.GRID_COLS;
+        // Game configuration (static readonly so it captures the XML-loaded values
+        // from GameConstants, which must be runtime fields rather than compile-time consts)
+        private static readonly double ROUND_TIME = GameConstants.ROUND_TIME;
+        private static readonly float TIME_MULTIPLIER_START = GameConstants.TIME_MULTIPLIER_START;
+        private static readonly float TIME_MULTIPLIER_MIN = GameConstants.TIME_MULTIPLIER_MIN;
+        private static readonly float TIME_MULTIPLIER_DECAY = GameConstants.TIME_MULTIPLIER_DECAY;
+        private static readonly double TARGET_SPAWN_DELAY = GameConstants.TARGET_SPAWN_DELAY;
+        private static readonly float BOMB_CHANCE = GameConstants.BOMB_CHANCE;
+        private static readonly float RADIOACTIVE_CHANCE = GameConstants.RADIOACTIVE_CHANCE;
+        // Target grid configuration
+        private static readonly int GRID_ROWS = GameConstants.GRID_ROWS;
+        private static readonly int GRID_COLS = GameConstants.GRID_COLS;
         private const int TARGET_SIZE = 64; // Size of target sprite
         private bool[,] _occupiedCells; // true = occupied, false = free
         private Dictionary<Vector2, (int Row, int Col)> _targetPositionToCell; // Maps positions to grid cells

@@ -41,10 +41,11 @@ namespace ShootingGallery
             {
                 RadiationAmount = radiationAmount;
             }
-        }        // Constants
-        protected const int targetRadius = GameConstants.TARGET_RADIUS;
-        protected const float DefaultScale = GameConstants.TARGET_DEFAULT_SCALE;
-        protected const double TimeToFullSize = GameConstants.TARGET_TIME_TO_FULL_SIZE;
+        }        // Configuration (static readonly so it captures the XML-loaded values
+        // from GameConstants, which must be runtime fields rather than compile-time consts)
+        protected static readonly int targetRadius = GameConstants.TARGET_RADIUS;
+        protected static readonly float DefaultScale = GameConstants.TARGET_DEFAULT_SCALE;
+        protected static readonly double TimeToFullSize = GameConstants.TARGET_TIME_TO_FULL_SIZE;
         
         // State
         protected float _scale;
@@ -244,9 +245,9 @@ namespace ShootingGallery
     }    // Bomb Target (game over when hit)
     public class BombTarget : BaseTarget
     {
-        // Constants for the auto-fade behavior
-        private const double FadeStartTime = GameConstants.BOMB_FADE_START_TIME;
-        private const double FadeDuration = GameConstants.BOMB_FADE_DURATION;
+        // Configuration for the auto-fade behavior (static readonly to capture XML-loaded values)
+        private static readonly double FadeStartTime = GameConstants.BOMB_FADE_START_TIME;
+        private static readonly double FadeDuration = GameConstants.BOMB_FADE_DURATION;
         
         // State for tracking lifetime and alpha
         private double _lifeTime = 0; // How long this bomb has existed

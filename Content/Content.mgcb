@@ -83,6 +83,9 @@
 #begin game_over.xml
 /copy:game_over.xml
 
+#begin game_config.xml
+/copy:game_config.xml
+
 #begin target.png
 /importer:TextureImporter
 /processor:TextureProcessor

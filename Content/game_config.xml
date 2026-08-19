@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Game balance configuration. Every value here overrides the built-in defaults in
+  GameConstants. A missing file or missing keys fall back to those defaults, so the
+  game always starts. Shipped via the content pipeline (Content.mgcb /copy).
+  Numbers are parsed with invariant culture.
+-->
+<GameConfig>
+  <!-- Game timing -->
+  <Property Name="ROUND_TIME" Value="60.0" />
+  <Property Name="TIME_MULTIPLIER_START" Value="10.0" />
+  <Property Name="TIME_MULTIPLIER_MIN" Value="1.0" />
+  <Property Name="TIME_MULTIPLIER_DECAY" Value="0.3" />
+
+  <!-- Target spawning -->
+  <Property Name="TARGET_SPAWN_DELAY" Value="0.25" />
+  <Property Name="TARGET_SPAWN_RANDOM_FACTOR" Value="0.2" />
+
+  <!-- Target growth -->
+  <Property Name="TARGET_DEFAULT_SCALE" Value="0.3" />
+  <Property Name="TARGET_TIME_TO_FULL_SIZE" Value="0.75" />
+
+  <!-- Target type chances -->
+  <Property Name="BOMB_CHANCE" Value="0.2" />
+  <Property Name="RADIOACTIVE_CHANCE" Value="0.15" />
+
+  <!-- Bomb fade -->
+  <Property Name="BOMB_FADE_START_TIME" Value="5.0" />
+  <Property Name="BOMB_FADE_DURATION" Value="3.0" />
+
+  <!-- Target size -->
+  <Property Name="TARGET_RADIUS" Value="45" />
+
+  <!-- Target grid -->
+  <Property Name="GRID_ROWS" Value="5" />
+  <Property Name="GRID_COLS" Value="5" />
+
+  <!-- Scoring -->
+  <Property Name="SCORE_REGULAR_SMALL" Value="5" />
+  <Property Name="SCORE_REGULAR_MEDIUM" Value="10" />
+  <Property Name="SCORE_REGULAR_LARGE" Value="15" />
+  <Property Name="SCORE_RADIOACTIVE_SMALL" Value="10" />
+  <Property Name="SCORE_RADIOACTIVE_MEDIUM" Value="20" />
+  <Property Name="SCORE_RADIOACTIVE_LARGE" Value="30" />
+
+  <!-- Radiation -->
+  <Property Name="RADIATION_REGULAR" Value="1.0" />
+  <Property Name="RADIATION_RADIOACTIVE" Value="3.0" />
+
+  <!-- Growth thresholds -->
+  <Property Name="TARGET_GROWTH_MEDIUM" Value="0.6" />
+  <Property Name="TARGET_GROWTH_LARGE" Value="1.0" />
+
+  <!-- Spawn acceleration thresholds (time remaining) -->
+  <Property Name="SPAWN_ACCEL_THRESHOLD_1" Value="45.0" />
+  <Property Name="SPAWN_ACCEL_THRESHOLD_2" Value="30.0" />
+  <Property Name="SPAWN_ACCEL_THRESHOLD_3" Value="15.0" />
+
+  <!-- Spawn acceleration multipliers -->
+  <Property Name="SPAWN_ACCEL_MULTIPLIER_1" Value="0.6" />
+  <Property Name="SPAWN_ACCEL_MULTIPLIER_2" Value="0.5" />
+  <Property Name="SPAWN_ACCEL_MULTIPLIER_3" Value="0.4" />
+</GameConfig>
