@@ -1,8 +1,8 @@
 using System;
 using System.Globalization;
-using System.IO;
 using System.Reflection;
 using System.Xml.Linq;
+using CoreEssentials.Assets;
 
 namespace ShootingGallery.Core
 {
@@ -79,21 +79,23 @@ namespace ShootingGallery.Core
         }
 
         /// <summary>
-        /// Loads balance values from Content/game_config.xml, overriding the defaults.
-        /// Safe to call multiple times; a missing file or malformed entry keeps the default.
+        /// Loads balance values from Content/game_config.xml (via CE's XMLAsset/AssetManager),
+        /// overriding the defaults. Safe to call multiple times; a missing file or malformed
+        /// entry keeps the default.
         /// </summary>
         public static void Load()
         {
             try
             {
-                string path = Path.Combine(AppContext.BaseDirectory, "Content", "game_config.xml");
-                if (!File.Exists(path))
+                var xmlAsset = AssetManager.LoadAsset<XMLAsset>("game_config.xml");
+                string xml = xmlAsset.XMLContent;
+                if (string.IsNullOrWhiteSpace(xml))
                 {
                     _loaded = true;
                     return;
                 }
 
-                var root = XDocument.Load(path).Root;
+                var root = XDocument.Parse(xml).Root;
                 if (root == null || root.Name.LocalName != "GameConfig")
                     return;
 
