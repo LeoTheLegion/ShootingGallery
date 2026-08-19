@@ -77,6 +77,9 @@
 #begin start_menu.xml
 /copy:start_menu.xml
 
+#begin game_scene.xml
+/copy:game_scene.xml
+
 #begin target.png
 /importer:TextureImporter
 /processor:TextureProcessor

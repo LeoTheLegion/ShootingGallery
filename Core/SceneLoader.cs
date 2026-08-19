@@ -18,13 +18,14 @@ namespace ShootingGallery.Core;
 public static class SceneLoader
 {
     /// <summary>
-    /// Loads the named scene (e.g. "start_menu") from the Scenes folder and adds its
+    /// Loads the named scene (e.g. "start_menu") from the Content folder and adds its
     /// entities to the given system.
     /// </summary>
     /// <param name="system">The EntitySystem to add entities to.</param>
     /// <param name="sceneName">Scene file name without extension (e.g. "start_menu").</param>
     /// <param name="commands">Map of Command names (from XML) to the delegates that handle them.</param>
-    public static void LoadScene(EntitySystem system, string sceneName, Dictionary<string, Action> commands)
+    /// <returns>A lookup of each entity's <c>Id</c> attribute to the created entity, for wiring typed references.</returns>
+    public static Dictionary<string, Entity> LoadScene(EntitySystem system, string sceneName, Dictionary<string, Action> commands)
     {
         string path = Path.Combine(AppContext.BaseDirectory, "Content", sceneName + ".xml");
         if (!File.Exists(path))
@@ -34,16 +35,21 @@ public static class SceneLoader
         if (root == null || root.Name.LocalName != "Scene")
             throw new FormatException($"'{path}' must have a <Scene> root element.");
 
+        var byId = new Dictionary<string, Entity>(StringComparer.Ordinal);
         foreach (var entityElem in root.Elements("Entity"))
         {
             string type = entityElem.Attribute("Type")?.Value ?? throw new FormatException("Entity missing 'Type' attribute.");
+            string id = entityElem.Attribute("Id")?.Value;
             var position = ResolvePosition(entityElem);
             var props = ParseProperties(entityElem);
-            CreateEntity(system, type, position, props, commands);
+            var entity = CreateEntity(system, type, position, props, commands);
+            if (entity != null && !string.IsNullOrWhiteSpace(id))
+                byId[id] = entity;
         }
+        return byId;
     }
 
-    private static void CreateEntity(EntitySystem system, string type, Vector2 position, Dictionary<string, string> props, Dictionary<string, Action> commands)
+    private static Entity CreateEntity(EntitySystem system, string type, Vector2 position, Dictionary<string, string> props, Dictionary<string, Action> commands)
     {
         switch (type)
         {
@@ -52,23 +58,21 @@ public static class SceneLoader
                 var entity = system.CreateEntity<TextEntity>(position, props.GetValueOrDefault("Text", string.Empty));
                 if (props.TryGetValue("Color", out var color)) entity.SetColor(ParseColor(color));
                 if (props.TryGetValue("Scale", out var scale)) entity.SetScale(ParseFloat(scale));
-                break;
+                return entity;
             }
             case "ButtonEntity":
             {
                 Action onClick = null;
                 if (props.TryGetValue("Command", out var cmd) && commands.TryGetValue(cmd, out var action))
                     onClick = action;
-                system.CreateEntity<ButtonEntity>(position, props.GetValueOrDefault("Text", string.Empty), onClick);
-                break;
+                return system.CreateEntity<ButtonEntity>(position, props.GetValueOrDefault("Text", string.Empty), onClick);
             }
             case "FloatingPopUpText":
             {
                 float time = ParseFloat(props.GetValueOrDefault("Time", "5"));
                 Color color = props.TryGetValue("Color", out var c) ? ParseColor(c) : Color.White;
                 float scale = ParseFloat(props.GetValueOrDefault("Scale", "1.0"));
-                system.CreateEntity<FloatingPopUpText>(position, time, props.GetValueOrDefault("Text", string.Empty), color, scale);
-                break;
+                return system.CreateEntity<FloatingPopUpText>(position, time, props.GetValueOrDefault("Text", string.Empty), color, scale);
             }
             default:
                 throw new NotSupportedException($"SceneLoader: unknown entity type '{type}'.");

@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using CoreEssentials.Debugging;
 using CoreEssentials.GameSystems;
 using CoreEssentials.GameSystems.EntitySystems.EntityOOPSystem;
@@ -23,51 +24,16 @@ public class GameScene : Scene
         Debug.StickyLog.IsVisible = false;
 
         var entitySystem = GetGameSystem<EntitySystem>();
-        var screen_size = ScreenManager.ScreenSize;
         var screenCenter = ScreenManager.ScreenCenter;
 
-        // Create UI elements
-        // Title UI
-        var titleText = entitySystem.CreateEntity<TextEntity>(
-            new Vector2(screenCenter.X, 30),
-            "URANIUM REVOLVER");
-        titleText.SetColor(Color.LimeGreen);
-        titleText.SetScale(1.5f);
-
-        // Score UI
-        var scoreText = entitySystem.CreateEntity<TextEntity>(
-            new Vector2(20, 20),
-            "Score: 0");
-        scoreText.SetColor(Color.White);
-        scoreText.SetScale(1.2f);
-
-        // Timer UI
-        var timerText = entitySystem.CreateEntity<TextEntity>(
-            new Vector2(screen_size.X - 150, 20),
-            "Time: 300");
-        timerText.SetColor(Color.Yellow);
-        timerText.SetScale(1.2f);
-
-        // Multiplier UI
-        var multiplierText = entitySystem.CreateEntity<TextEntity>(
-            new Vector2(20, 50),
-            "Multiplier: x10.0");
-        multiplierText.SetColor(Color.Orange);
-        multiplierText.SetScale(1.0f);
-
-        // Radiation UI
-        var radiationText = entitySystem.CreateEntity<TextEntity>(
-            new Vector2(screen_size.X - 150, 50),
-            "Radiation: 0%");
-        radiationText.SetColor(Color.LimeGreen);
-        radiationText.SetScale(1.0f);
-
-        // Arm count UI
-        var mutationText = entitySystem.CreateEntity<TextEntity>(
-            new Vector2(20, 80),
-            "Arms: 1");
-        mutationText.SetColor(Color.LimeGreen);
-        mutationText.SetScale(1.0f);
+        // HUD labels are data-driven in Content/game_scene.xml; grab typed references
+        // by Id so we can wire live updates below. No buttons in this scene, so no commands.
+        var hud = SceneLoader.LoadScene(entitySystem, "game_scene", new Dictionary<string, Action>());
+        var scoreText = (TextEntity)hud["score"];
+        var timerText = (TextEntity)hud["timer"];
+        var multiplierText = (TextEntity)hud["multiplier"];
+        var radiationText = (TextEntity)hud["radiation"];
+        var mutationText = (TextEntity)hud["mutation"];
 
         // Create the player's crosshair
         var crosshair = entitySystem.CreateEntity<Crosshair>();

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Game HUD layout. Only the static labels are data-driven here; the crosshair,
+  radiation manager, and game manager are gameplay entities created in code
+  (see GameScene). Each label carries an Id so code can grab a typed reference
+  to wire up live updates (score, timer, etc.).
+  Anchors: HAnchor Center|Left|Right, VAnchor Top|Bottom|Middle.
+-->
+<Scene Name="GameScene">
+  <Entity Id="title" Type="TextEntity" HAnchor="Center" VAnchor="Top" Y="30">
+    <Property Name="Text" Value="URANIUM REVOLVER" />
+    <Property Name="Color" Value="LimeGreen" />
+    <Property Name="Scale" Value="1.5" />
+  </Entity>
+
+  <Entity Id="score" Type="TextEntity" HAnchor="Left" VAnchor="Top" X="20" Y="20">
+    <Property Name="Text" Value="Score: 0" />
+    <Property Name="Color" Value="White" />
+    <Property Name="Scale" Value="1.2" />
+  </Entity>
+
+  <Entity Id="timer" Type="TextEntity" HAnchor="Right" VAnchor="Top" X="150" Y="20">
+    <Property Name="Text" Value="Time: 300" />
+    <Property Name="Color" Value="Yellow" />
+    <Property Name="Scale" Value="1.2" />
+  </Entity>
+
+  <Entity Id="multiplier" Type="TextEntity" HAnchor="Left" VAnchor="Top" X="20" Y="50">
+    <Property Name="Text" Value="Multiplier: x10.0" />
+    <Property Name="Color" Value="Orange" />
+  </Entity>
+
+  <Entity Id="radiation" Type="TextEntity" HAnchor="Right" VAnchor="Top" X="150" Y="50">
+    <Property Name="Text" Value="Radiation: 0%" />
+    <Property Name="Color" Value="LimeGreen" />
+  </Entity>
+
+  <Entity Id="mutation" Type="TextEntity" HAnchor="Left" VAnchor="Top" X="20" Y="80">
+    <Property Name="Text" Value="Arms: 1" />
+    <Property Name="Color" Value="LimeGreen" />
+  </Entity>
+</Scene>
