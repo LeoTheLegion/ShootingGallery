@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Game over screen layout. The title and both buttons are fully static.
+  The cause / score / mutation labels carry placeholder text here; GameOverScene
+  overrides them at runtime from its constructor state (final score, mutation
+  level, bomb hit). Buttons use Command names resolved in code.
+  Anchors: HAnchor Center|Left|Right, VAnchor Top|Bottom|Middle.
+-->
+<Scene Name="GameOver">
+  <Entity Id="gameOver" Type="TextEntity" HAnchor="Center" VAnchor="Top" Y="100">
+    <Property Name="Text" Value="GAME OVER" />
+    <Property Name="Color" Value="Red" />
+    <Property Name="Scale" Value="2" />
+  </Entity>
+
+  <Entity Id="cause" Type="TextEntity" HAnchor="Center" VAnchor="Top" Y="200">
+    <Property Name="Text" Value="Your 1 minute of shooting is up!" />
+    <Property Name="Color" Value="White" />
+  </Entity>
+
+  <Entity Id="score" Type="TextEntity" HAnchor="Center" VAnchor="Top" Y="280">
+    <Property Name="Text" Value="Final Score: 0" />
+    <Property Name="Color" Value="Yellow" />
+    <Property Name="Scale" Value="1.5" />
+  </Entity>
+
+  <Entity Id="mutation" Type="TextEntity" HAnchor="Center" VAnchor="Top" Y="360">
+    <Property Name="Text" Value="You escaped without mutations!" />
+    <Property Name="Color" Value="White" />
+  </Entity>
+
+  <Entity Id="restart" Type="ButtonEntity" HAnchor="Center" VAnchor="Top" Y="460">
+    <Property Name="Text" Value="Play Again" />
+    <Property Name="Command" Value="RestartGame" />
+  </Entity>
+
+  <Entity Id="menu" Type="ButtonEntity" HAnchor="Center" VAnchor="Top" Y="530">
+    <Property Name="Text" Value="Main Menu" />
+    <Property Name="Command" Value="MainMenu" />
+  </Entity>
+</Scene>

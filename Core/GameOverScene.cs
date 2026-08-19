@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using CoreEssentials.GameSystems;
 using CoreEssentials.GameSystems.EntitySystems.EntityOOPSystem;
 using CoreEssentials.Scenes;
@@ -37,75 +38,35 @@ public class GameOverScene : Scene
     {
         var entitySystem = GetGameSystem<EntitySystem>();
 
-        var screen_size = ScreenManager.ScreenSize;
-        var screenCenter = ScreenManager.ScreenCenter;        // Create a text entity for the game over message - centered at the top
-        var gameOverText = entitySystem.CreateEntity<TextEntity>(
-            UIConstants.GetCenteredPosition(UIConstants.TITLE_Y),
-            "GAME OVER");
-        gameOverText.SetColor(Color.Red);
-        gameOverText.SetScale(2f);        // Create a text entity for the cause of game over
-        string causeMessage = _bombHit
+        // Layout and buttons come from Content/game_over.xml. Button clicks are
+        // resolved by Command name; the cause/score/mutation labels are then
+        // overridden below from this run's state.
+        var commands = new Dictionary<string, Action>
+        {
+            ["RestartGame"] = () => SceneManager.LoadScene(new GameScene()),
+            ["MainMenu"] = () => SceneManager.LoadScene(new StartMenuScene()),
+        };
+        var ui = SceneLoader.LoadScene(entitySystem, "game_over", commands);
+
+        // Cause of game over
+        ((TextEntity)ui["cause"]).SetText(_bombHit
             ? "You hit a radioactive bomb!"
-            : "Your 1 minute of shooting is up!";
+            : "Your 1 minute of shooting is up!");
 
-        var causeText = entitySystem.CreateEntity<TextEntity>(
-            UIConstants.GetCenteredPosition(UIConstants.CAUSE_Y),
-            causeMessage);
-        causeText.SetColor(Color.White);
+        // Final score
+        ((TextEntity)ui["score"]).SetText($"Final Score: {_finalScore}");
 
-        // Create a text entity for the score - centered below game over text
-        var scoreText = entitySystem.CreateEntity<TextEntity>(
-            UIConstants.GetCenteredPosition(UIConstants.SCORE_Y),
-            $"Final Score: {_finalScore}");
-        scoreText.SetColor(Color.Yellow);
-        scoreText.SetScale(1.5f);
-
-        // Add a radiation poisoning message
-        string mutationMessage;
-        Color mutationColor;
-
-        if (_mutationLevel <= 0)
+        // Mutation summary (message + color depend on mutation level)
+        (string mutationMessage, Color mutationColor) = _mutationLevel switch
         {
-            mutationMessage = "You escaped without mutations!";
-            mutationColor = Color.White;
-        }
-        else if (_mutationLevel == 1)
-        {
-            mutationMessage = "You grew one extra arm from radiation exposure!";
-            mutationColor = Color.LightGreen;
-        }
-        else if (_mutationLevel == 2)
-        {
-            mutationMessage = "You mutated with two extra arms!";
-            mutationColor = Color.Green;
-        }
-        else
-        {
-            mutationMessage = "Your mutations have rendered you unrecognizable!";
-            mutationColor = Color.LimeGreen;
-        }
-        var radiationText = entitySystem.CreateEntity<TextEntity>(
-          UIConstants.GetCenteredPosition(UIConstants.MUTATION_Y),
-          mutationMessage);
-        radiationText.SetColor(mutationColor);
-
-        // Create a button to restart the game - centered below score
-        var restartButton = entitySystem.CreateEntity<ButtonEntity>(
-            UIConstants.GetCenteredPosition(UIConstants.RESTART_BUTTON_Y),
-            "Play Again", () =>
-            {
-                // Load the game scene (not start menu)
-                SceneManager.LoadScene(new GameScene());
-            });
-
-        // Create a button to go to the main menu
-        var menuButton = entitySystem.CreateEntity<ButtonEntity>(
-            UIConstants.GetCenteredPosition(UIConstants.MENU_BUTTON_Y),
-            "Main Menu", () =>
-            {
-                // Load the start menu scene
-                SceneManager.LoadScene(new StartMenuScene());
-            });
+            <= 0 => ("You escaped without mutations!", Color.White),
+            1 => ("You grew one extra arm from radiation exposure!", Color.LightGreen),
+            2 => ("You mutated with two extra arms!", Color.Green),
+            _ => ("Your mutations have rendered you unrecognizable!", Color.LimeGreen),
+        };
+        var mutationText = (TextEntity)ui["mutation"];
+        mutationText.SetText(mutationMessage);
+        mutationText.SetColor(mutationColor);
 
         yield return null;
     }

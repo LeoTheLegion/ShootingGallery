@@ -80,6 +80,9 @@
 #begin game_scene.xml
 /copy:game_scene.xml
 
+#begin game_over.xml
+/copy:game_over.xml
+
 #begin target.png
 /importer:TextureImporter
 /processor:TextureProcessor
