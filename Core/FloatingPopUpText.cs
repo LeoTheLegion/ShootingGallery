@@ -3,6 +3,7 @@ using CoreEssentials.GameSystems.EntitySystems.EntityOOPSystem;
 using CoreEssentials.GUI;
 using CoreEssentials.GUI.Factory;
 using CoreEssentials.GUI.Types;
+using CoreEssentials.Tweening;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
@@ -11,9 +12,7 @@ namespace ShootingGallery
 {
     public class FloatingPopUpText : Entity
     {
-        private Vector2 _velocity;
         private float _timeLeft, _totalTime;
-        private float _transparencyChangeRate;
         private float _transparency;
         private float _scale = 1.0f;
         private bool _isRadiationEffect = false;
@@ -21,6 +20,8 @@ namespace ShootingGallery
 
         private Canvas _canvas;
         private ILabel _label;
+        private TweenComponent _tweenComponent;
+        private TweenVector2 _driftTween;
 
         private const float Distance = 10f;
         private string _text;
@@ -31,13 +32,9 @@ namespace ShootingGallery
             this._position = position;
             this._text = text;
 
-            Vector2 end = position + new Vector2(0, -Distance);
-            this._velocity = (end - position) / time;
             this._timeLeft = this._totalTime = time;
-
             this._transparency = 1f;
-            this._transparencyChangeRate = this._transparency / time;
-            
+
             _canvas = new Canvas();
 
             // v0.14.0: entity system handles lifetime instead of manual countdown
@@ -81,13 +78,20 @@ namespace ShootingGallery
             _label = label;
 
             _canvas.AddWidget(label);
+
+            // v0.14.0: the upward drift is a linear motion, so drive it with a TweenComponent
+            // (advanced by base.Update) instead of a hand-rolled velocity.
+            _tweenComponent = AddComponent(new TweenComponent());
+            _driftTween = _tweenComponent.TweenToVector2(_position, _position + new Vector2(0, -Distance), _totalTime);
         }
 
         public override void Update(GameTime gameTime) 
         {
+            base.Update(gameTime); // advances the drift tween
             float deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
-            this._position += _velocity * deltaTime;
+            // Position comes from the tween (linear drift over the lifetime)
+            this._position = _driftTween.GetValue();
 
             // Apply standard fade or pulsing effect for radiation
             if (_isRadiationEffect)
