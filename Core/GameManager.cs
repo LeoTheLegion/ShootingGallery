@@ -90,6 +90,11 @@ namespace ShootingGallery
         {
             base.OnStart();
 
+            // Register target templates once (Ball.cs pattern — definitions live in Content/*.xml)
+            EntitySystem.RegisterTemplate("Regular", "target_regular.xml");
+            EntitySystem.RegisterTemplate("Radioactive", "target_radioactive.xml");
+            EntitySystem.RegisterTemplate("Bomb", "target_bomb.xml");
+
             // Populate the entire grid with targets at startup
             for (int row = 0; row < GRID_ROWS; row++)
             {
@@ -107,30 +112,29 @@ namespace ShootingGallery
                     // Mark cell as occupied
                     _occupiedCells[row, col] = true;
 
-                    // Create a target (mostly regular targets with some special ones)
-                    BaseTarget newTarget;
-                    double roll = _random.NextDouble();
-
-                    if (roll < BOMB_CHANCE)
-                    {
-                        newTarget = EntitySystem.CreateEntity<BombTarget>(position);
-                        Console.WriteLine($"Created BOMB at grid ({row},{col}): {position}");
-                    }
-                    else if (roll < BOMB_CHANCE + RADIOACTIVE_CHANCE)
-                    {
-                        newTarget = EntitySystem.CreateEntity<RadioactiveTarget>(position);
-                        Console.WriteLine($"Created RADIOACTIVE at grid ({row},{col}): {position}");
-                    }
-                    else
-                    {
-                        newTarget = EntitySystem.CreateEntity<RegularTarget>(position);
-                        Console.WriteLine($"Created REGULAR at grid ({row},{col}): {position}");
-                    }
-
+                    // Create a target from its registered template (mostly regular, some special)
+                    BaseTarget newTarget = CreateTargetAt(position);
                     WireTargetEvents(newTarget, position, row, col);
                 }
             }
         }
+        // v0.14.0: spawn a target from its registered entity template (Ball.cs pattern).
+        // The template XML defines the type, tags, and SpriteComponent Color/Origin; the
+        // sprite asset itself is assigned in the target's OnStart.
+        private BaseTarget CreateTargetAt(Vector2 position)
+        {
+            double roll = _random.NextDouble();
+            string templateName;
+            if (roll < BOMB_CHANCE)
+                templateName = "Bomb";
+            else if (roll < BOMB_CHANCE + RADIOACTIVE_CHANCE)
+                templateName = "Radioactive";
+            else
+                templateName = "Regular";
+
+            return (BaseTarget)EntitySystem.Instantiate(templateName, position);
+        }
+
         private void WireTargetEvents(BaseTarget target, Vector2 position, int row, int col)
         {
             _targetPositionToCell[position] = (row, col);
@@ -309,25 +313,8 @@ namespace ShootingGallery
 
             var (position, row, col) = cellInfo.Value;
 
-            BaseTarget newTarget;
-            double roll = _random.NextDouble();
-
-            if (roll < BOMB_CHANCE)
-            {
-                newTarget = EntitySystem.CreateEntity<BombTarget>(position);
-                Console.WriteLine($"Created BOMB at position {position}");
-            }
-            else if (roll < BOMB_CHANCE + RADIOACTIVE_CHANCE)
-            {
-                newTarget = EntitySystem.CreateEntity<RadioactiveTarget>(position);
-                Console.WriteLine($"Created RADIOACTIVE at position {position}");
-            }
-            else
-            {
-                newTarget = EntitySystem.CreateEntity<RegularTarget>(position);
-                Console.WriteLine($"Created REGULAR at position {position}");
-            }
-
+            BaseTarget newTarget = CreateTargetAt(position);
+            Console.WriteLine($"Created target at position {position}");
             WireTargetEvents(newTarget, position, row, col);
         }
         public void RestartRound()
@@ -375,23 +362,8 @@ namespace ShootingGallery
                     // Mark cell as occupied
                     _occupiedCells[row, col] = true;
 
-                    // Create a target (mostly regular targets with some special ones)
-                    BaseTarget newTarget;
-                    double roll = _random.NextDouble();
-
-                    if (roll < BOMB_CHANCE)
-                    {
-                        newTarget = EntitySystem.CreateEntity<BombTarget>(position);
-                    }
-                    else if (roll < BOMB_CHANCE + RADIOACTIVE_CHANCE)
-                    {
-                        newTarget = EntitySystem.CreateEntity<RadioactiveTarget>(position);
-                    }
-                    else
-                    {
-                        newTarget = EntitySystem.CreateEntity<RegularTarget>(position);
-                    }
-
+                    // Create a target from its registered template (mostly regular, some special)
+                    BaseTarget newTarget = CreateTargetAt(position);
                     WireTargetEvents(newTarget, position, row, col);
                 }
             }

@@ -1,0 +1,14 @@
+<EntityTemplate Type="ShootingGallery.RegularTarget" Rotation="0" Sort="0" Active="true">
+    <Tags>
+        <Tag Name="Target" />
+        <Tag Name="Regular" />
+    </Tags>
+    <Components>
+        <Component Type="SpriteComponent">
+            <Properties>
+                <Property Name="Color" Value="255,255,255,255" />
+                <Property Name="Origin" Value="0.5,0.5" />
+            </Properties>
+        </Component>
+    </Components>
+</EntityTemplate>

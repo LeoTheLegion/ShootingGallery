@@ -80,6 +80,11 @@ namespace ShootingGallery
         // Add a public getter for the position
         public new Vector2 Position => _position;
 
+        // Parameterless constructor for entity templates (Ball.cs pattern).
+        protected BaseTarget() : this(Vector2.Zero, "target")
+        {
+        }
+
         protected BaseTarget(Vector2 targetPosition, string spriteName) : base()
         {
             this._position = targetPosition;
@@ -93,20 +98,34 @@ namespace ShootingGallery
         public override void OnStart()
         {
             base.OnStart();
-            this._sprite = AssetManager.LoadAsset<Sprite>("target_sprite.xml");
 
-            // v0.14.0: render via SpriteComponent so targets join z-layer texture batching.
-            // The base Entity.Render() draws the component using Owner.Position/Rotation/Scale,
-            // so no custom Render override is needed. Tint lives on the component's Color.
-            _spriteComponent = AddComponent(new SpriteComponent(_sprite));
-            _spriteComponent.Color = _tintColor;
+            // Entity-template pattern (Ball.cs): a template may pre-create the SpriteComponent
+            // with XML-defined Color/Origin/LayerDepth. The sprite is always assigned in code;
+            // the template re-applies its properties after OnStart, so XML values win.
+            _spriteComponent = GetComponent<SpriteComponent>();
+            if (_spriteComponent == null)
+            {
+                _sprite = AssetManager.LoadAsset<Sprite>("target_sprite.xml");
+                // v0.14.0: render via SpriteComponent so targets join z-layer texture batching.
+                // The base Entity.Render() draws the component using Owner.Position/Rotation/Scale,
+                // so no custom Render override is needed. Tint lives on the component's Color.
+                _spriteComponent = AddComponent(new SpriteComponent(_sprite));
+                _spriteComponent.Color = _tintColor;
+            }
+            else if (_spriteComponent.Sprite == null)
+            {
+                _sprite = AssetManager.LoadAsset<Sprite>("target_sprite.xml");
+                _spriteComponent.Sprite = _sprite;
+            }
             RegisterForInstancedRendering(_sprite);
             SetZLayer(0);
             Scale = new Vector2(_scale);
 
             // v0.14.0: drive growth with a TweenComponent (linear 0 -> 1 over TimeToFullSize,
             // matching the previous _time-based formula). base.Update() advances the tween.
-            _tweenComponent = AddComponent(new TweenComponent());
+            _tweenComponent = GetComponent<TweenComponent>();
+            if (_tweenComponent == null)
+                _tweenComponent = AddComponent(new TweenComponent());
             _growthTween = _tweenComponent.TweenToFloat(0f, 1f, (float)TimeToFullSize);
 
             // No longer move randomly on start - use the position provided in constructor
@@ -193,6 +212,11 @@ namespace ShootingGallery
     // Standard Target (regular points)
     public class RegularTarget : BaseTarget
     {
+        // Parameterless constructor for entity templates.
+        public RegularTarget() : this(Vector2.Zero)
+        {
+        }
+
         public RegularTarget(Vector2 targetPosition) : base(targetPosition, "target")
         {
             Type = TargetType.Standard;
@@ -219,6 +243,11 @@ namespace ShootingGallery
     // Radioactive Target (higher radiation, higher score)
     public class RadioactiveTarget : BaseTarget
     {
+        // Parameterless constructor for entity templates.
+        public RadioactiveTarget() : this(Vector2.Zero)
+        {
+        }
+
         public RadioactiveTarget(Vector2 targetPosition) : base(targetPosition, "target")
         {
             Type = TargetType.Radioactive;
@@ -253,6 +282,11 @@ namespace ShootingGallery
         private double _lifeTime = 0; // How long this bomb has existed
         private float _alpha = 1.0f; // Transparency (1.0f = fully visible, 0.0f = invisible)
         
+        // Parameterless constructor for entity templates.
+        public BombTarget() : this(Vector2.Zero)
+        {
+        }
+
         public BombTarget(Vector2 targetPosition) : base(targetPosition, "target")
         {
             Type = TargetType.Bomb;

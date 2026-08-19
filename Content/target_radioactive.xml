@@ -1,0 +1,14 @@
+<EntityTemplate Type="ShootingGallery.RadioactiveTarget" Rotation="0" Sort="0" Active="true">
+    <Tags>
+        <Tag Name="Target" />
+        <Tag Name="Radioactive" />
+    </Tags>
+    <Components>
+        <Component Type="SpriteComponent">
+            <Properties>
+                <Property Name="Color" Value="0,255,0,255" />
+                <Property Name="Origin" Value="0.5,0.5" />
+            </Properties>
+        </Component>
+    </Components>
+</EntityTemplate>
