@@ -96,27 +96,7 @@ namespace ShootingGallery
             EntitySystem.RegisterTemplate("Bomb", "target_bomb.xml");
 
             // Populate the entire grid with targets at startup
-            for (int row = 0; row < GRID_ROWS; row++)
-            {
-                for (int col = 0; col < GRID_COLS; col++)
-                {
-                    // Calculate position for this cell
-                    float cellWidth = ScreenManager.ScreenWidth / (float)GRID_COLS;
-                    float cellHeight = ScreenManager.ScreenHeight / (float)GRID_ROWS;
-
-                    Vector2 position = new Vector2(
-                        col * cellWidth + (cellWidth / 2),
-                        row * cellHeight + (cellHeight / 2)
-                    );
-
-                    // Mark cell as occupied
-                    _occupiedCells[row, col] = true;
-
-                    // Create a target from its registered template (mostly regular, some special)
-                    BaseTarget newTarget = CreateTargetAt(position);
-                    WireTargetEvents(newTarget, position, row, col);
-                }
-            }
+            PopulateGrid();
         }
         // v0.14.0: spawn a target from its registered entity template (Ball.cs pattern).
         // The template XML defines the type, tags, and SpriteComponent Color/Origin; the
@@ -346,23 +326,27 @@ namespace ShootingGallery
             }
 
             // Repopulate the entire grid
+            PopulateGrid();
+        }
+
+        // Fills the whole GRID_ROWS x GRID_COLS grid with targets, marking each cell occupied.
+        // Shared by OnStart (initial fill) and RestartRound (refill) so the two can't drift apart.
+        private void PopulateGrid()
+        {
+            float cellWidth = ScreenManager.ScreenWidth / (float)GRID_COLS;
+            float cellHeight = ScreenManager.ScreenHeight / (float)GRID_ROWS;
+
             for (int row = 0; row < GRID_ROWS; row++)
             {
                 for (int col = 0; col < GRID_COLS; col++)
                 {
-                    // Calculate position for this cell
-                    float cellWidth = ScreenManager.ScreenWidth / (float)GRID_COLS;
-                    float cellHeight = ScreenManager.ScreenHeight / (float)GRID_ROWS;
-
                     Vector2 position = new Vector2(
                         col * cellWidth + (cellWidth / 2),
                         row * cellHeight + (cellHeight / 2)
                     );
 
-                    // Mark cell as occupied
                     _occupiedCells[row, col] = true;
 
-                    // Create a target from its registered template (mostly regular, some special)
                     BaseTarget newTarget = CreateTargetAt(position);
                     WireTargetEvents(newTarget, position, row, col);
                 }

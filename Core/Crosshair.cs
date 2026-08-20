@@ -73,13 +73,11 @@ namespace ShootingGallery
         private Random _random;
         private List<CrosshairArm> _arms = new List<CrosshairArm>();
         private bool _canShoot = true;
-        private MouseState _lastMouseState;
 
         public Crosshair() : base()
         {
             this._sprite = AssetManager.LoadAsset<Sprite>("crosshair_sprite.xml");
             _random = new Random();
-            _lastMouseState = Mouse.GetState();
         }
 
         public override void OnStart()
@@ -90,6 +88,19 @@ namespace ShootingGallery
             var spriteComponent = AddComponent(new SpriteComponent(_sprite));
             RegisterForInstancedRendering(_sprite);
             SetZLayer(10);
+
+            // Input is component-driven (auto-updated by base.Update).
+            AddComponent(new MouseFollowComponent(new Vector2(crosshairRadius, crosshairRadius)));
+
+            var click = AddComponent(new MouseClickComponent());
+            click.Clicked += position =>
+            {
+                if (_canShoot)
+                {
+                    Console.WriteLine("Shot fired at: " + position);
+                    OnShoot?.Invoke(this, new ShootEventArgs(position));
+                }
+            };
         }
 
         public void SetMutationLevel(int level)
@@ -124,24 +135,8 @@ namespace ShootingGallery
                 _arms.Add(arm);
             }
         }
-        public override void Update(GameTime gameTime)
-        {
-            // Update the position of the crosshair to follow the mouse
-            MouseState currentMouseState = Mouse.GetState();
-            Vector2 mousePosition = currentMouseState.Position.ToVector2();
-            this._position = mousePosition - new Vector2(crosshairRadius, crosshairRadius);
-
-            // Handle shooting with the main crosshair
-            if (currentMouseState.LeftButton == ButtonState.Pressed &&
-                _lastMouseState.LeftButton == ButtonState.Released &&
-                _canShoot)
-            {
-                Console.WriteLine("Shot fired at: " + mousePosition);
-                OnShoot?.Invoke(this, new ShootEventArgs(mousePosition));
-            }
-
-            _lastMouseState = currentMouseState;
-        }
+        // Mouse-follow and click handling live in MouseFollowComponent / MouseClickComponent,
+        // auto-updated by the base Entity.Update component iteration.
 
         // Method to trigger a random shot from a mutated arm
         // This will be called by GameManager when the player hits a target
