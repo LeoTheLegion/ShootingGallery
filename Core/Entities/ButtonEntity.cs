@@ -11,12 +11,21 @@ namespace ShootingGallery.Core;
 /// </summary>
 public class ButtonEntity : Entity
 {
+    private readonly string _text;
+    private readonly Action _onClick;
+
     public ButtonEntity(Vector2 position, string text, Action onClick)
     {
         this._position = position;
+        _text = text;
+        _onClick = onClick;
+    }
 
-        var button = AddComponent(new ButtonComponent(text));
-        button.Clicked += () => onClick?.Invoke();
+    public override void OnStart()
+    {
+        base.OnStart();
+        var button = AddComponent(new ButtonComponent(_text));
+        button.Clicked += () => _onClick?.Invoke();
     }
 
     public override void Render(SpriteBatch _spriteBatch)

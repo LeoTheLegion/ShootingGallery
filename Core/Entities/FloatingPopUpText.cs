@@ -18,8 +18,11 @@ namespace ShootingGallery
         private LabelComponent _label;
         private TweenVector2 _drift;
 
-        private float _timeLeft;
+        private readonly string _text;
+        private readonly Color _color;
+        private readonly float _scale;
         private readonly float _totalTime;
+        private float _timeLeft;
         private readonly bool _isRadiationEffect;
 
         // Standard floating text
@@ -32,17 +35,13 @@ namespace ShootingGallery
         public FloatingPopUpText(Vector2 position, float time, string text, Color color, float scale = 1.0f)
         {
             this._position = position;
+            _text = text;
+            _color = color;
+            _scale = scale;
             _totalTime = _timeLeft = time;
 
             // Set radiation effect if it's green
             _isRadiationEffect = color.G > 200 && color.R < 100 && color.B < 100;
-
-            _label = AddComponent(new LabelComponent(text));
-            _label.TextColor = color;
-            _label.Scale = scale;
-
-            // Entity system handles lifetime instead of a manual countdown
-            DestroyAfter(TimeSpan.FromSeconds(time));
         }
 
         // Floating text with radiation effect
@@ -54,9 +53,18 @@ namespace ShootingGallery
         public override void OnStart()
         {
             base.OnStart();
+
+            // Components are added in OnStart (CE lifecycle: Awake -> Start)
+            _label = AddComponent(new LabelComponent(_text));
+            _label.TextColor = _color;
+            _label.Scale = _scale;
+
             var tween = AddComponent(new TweenComponent());
             // Linear upward drift over the lifetime
             _drift = tween.TweenToVector2(_position, _position + new Vector2(0, -Distance), _totalTime);
+
+            // Entity system handles lifetime instead of a manual countdown
+            DestroyAfter(TimeSpan.FromSeconds(_totalTime));
         }
 
         public override void Update(GameTime gameTime)
