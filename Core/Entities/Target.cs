@@ -10,11 +10,11 @@ using System;
 
 namespace ShootingGallery
 {    // Base Target class with common functionality
-    public abstract class BaseTarget : Entity, IDisposable
+    public abstract class BaseTarget : Entity
     {
         // Events
         public event EventHandler<ScoreEventArgs> OnScore;
-        public event EventHandler<GameOverEventArgs> OnGameOver;
+        public event EventHandler OnGameOver;
         public event EventHandler<RadiationEventArgs> OnRadiationChange;
         public event EventHandler<Vector2> OnDestroyed;
 
@@ -30,8 +30,6 @@ namespace ShootingGallery
                 Position = position;
             }
         }
-
-        public class GameOverEventArgs : EventArgs { }
 
         public class RadiationEventArgs : EventArgs
         {
@@ -161,7 +159,7 @@ namespace ShootingGallery
         protected void ReportGameOver()
         {
             // Trigger game over
-            OnGameOver?.Invoke(this, new GameOverEventArgs());
+            OnGameOver?.Invoke(this, EventArgs.Empty);
         }
         
         protected void ReportRadiationChange(float amount)
@@ -195,17 +193,21 @@ namespace ShootingGallery
             _time = 0;
         }
         
-        public virtual void Dispose()
-        {
-            AssetManager.UnloadAsset<Sprite>(_sprite.Name);
-        }
-        
         public new void Destroy()
         {
             base.Destroy();
             _isDestroyed = true;
             OnDestroyed?.Invoke(this, this._position);
-            Dispose();
+        }
+
+        public override void OnDestroy()
+        {
+            base.OnDestroy();
+            if (_sprite != null)
+            {
+                AssetManager.UnloadAsset<Sprite>(_sprite.Name);
+                _sprite = null;
+            }
         }
     }
 
@@ -278,9 +280,8 @@ namespace ShootingGallery
         private static readonly double FadeStartTime = GameConstants.BOMB_FADE_START_TIME;
         private static readonly double FadeDuration = GameConstants.BOMB_FADE_DURATION;
         
-        // State for tracking lifetime and alpha
+        // State for tracking lifetime
         private double _lifeTime = 0; // How long this bomb has existed
-        private float _alpha = 1.0f; // Transparency (1.0f = fully visible, 0.0f = invisible)
         
         // Parameterless constructor for entity templates.
         public BombTarget() : this(Vector2.Zero)
@@ -306,17 +307,17 @@ namespace ShootingGallery
             {
                 // Calculate how far through the fade we are (0.0 to 1.0)
                 float fadeProgress = (float)((_lifeTime - FadeStartTime) / FadeDuration);
-                
-                // Update alpha value (clamped between 0 and 1)
-                _alpha = Math.Max(0, 1.0f - fadeProgress);
-                
+
+                // Alpha (clamped between 0 and 1)
+                float alpha = Math.Max(0, 1.0f - fadeProgress);
+
                 // Update tint color with new alpha (explicitly using byte for all parameters)
-                byte alpha = (byte)Math.Round(_alpha * 255);
-                _tintColor = new Color((byte)255, (byte)0, (byte)0, alpha);
+                byte alphaByte = (byte)Math.Round(alpha * 255);
+                _tintColor = new Color((byte)255, (byte)0, (byte)0, alphaByte);
                 _spriteComponent.Color = _tintColor;
 
                 // When fully faded out, destroy the bomb
-                if (_alpha <= 0)
+                if (alpha <= 0)
                 {
                     Console.WriteLine("Bomb has faded away completely and will be destroyed");
                     Destroy();

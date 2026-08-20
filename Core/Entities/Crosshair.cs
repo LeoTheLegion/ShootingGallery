@@ -45,7 +45,7 @@ namespace ShootingGallery
         }
     }
 
-    public class Crosshair : Entity, IDisposable
+    public class Crosshair : Entity
     {
         // Event for shooting
         public event EventHandler<ShootEventArgs> OnShoot;
@@ -68,11 +68,11 @@ namespace ShootingGallery
         private const int crosshairRadius = 25;
         private const float ArmDistanceFromCenter = 40f;
 
-        private Sprite _sprite;
+        private readonly Sprite _sprite;
         private int _mutationLevel = 0;
-        private Random _random;
-        private List<CrosshairArm> _arms = new List<CrosshairArm>();
-        private bool _canShoot = true;
+        private readonly Random _random;
+        private readonly List<CrosshairArm> _arms = new List<CrosshairArm>();
+        private readonly bool _canShoot = true;
 
         public Crosshair() : base()
         {
@@ -85,7 +85,7 @@ namespace ShootingGallery
             base.OnStart();
 
             // v0.14.0: main crosshair renders via SpriteComponent; arms are child entities.
-            var spriteComponent = AddComponent(new SpriteComponent(_sprite));
+            AddComponent(new SpriteComponent(_sprite));
             RegisterForInstancedRendering(_sprite);
             SetZLayer(10);
 
@@ -185,11 +185,6 @@ namespace ShootingGallery
             // No fully grown targets available, so return null indicator position
             // This will be handled in TriggerRandomShot to prevent shooting
             return new Vector2(-1, -1);
-        }
-
-        public void Dispose()
-        {
-            AssetManager.UnloadAsset<Sprite>(_sprite.Name);
         }
     }
 }

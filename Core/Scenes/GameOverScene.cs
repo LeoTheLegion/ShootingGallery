@@ -10,9 +10,9 @@ namespace ShootingGallery.Core;
 
 public class GameOverScene : Scene
 {
-    private int _finalScore;
-    private bool _bombHit;
-    private int _mutationLevel;
+    private readonly int _finalScore;
+    private readonly bool _bombHit;
+    private readonly int _mutationLevel;
 
     public GameOverScene()
     {

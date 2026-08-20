@@ -33,9 +33,8 @@ namespace ShootingGallery
         // Target grid configuration
         private static readonly int GRID_ROWS = GameConstants.GRID_ROWS;
         private static readonly int GRID_COLS = GameConstants.GRID_COLS;
-        private const int TARGET_SIZE = 64; // Size of target sprite
-        private bool[,] _occupiedCells; // true = occupied, false = free
-        private Dictionary<Vector2, (int Row, int Col)> _targetPositionToCell; // Maps positions to grid cells
+        private readonly bool[,] _occupiedCells; // true = occupied, false = free
+        private readonly Dictionary<Vector2, (int Row, int Col)> _targetPositionToCell; // Maps positions to grid cells
 
         // Game state
         private double _timer;
@@ -51,7 +50,7 @@ namespace ShootingGallery
         private RadiationManager _radiationManager;
         private Crosshair _crosshair;
 
-        private Random _random = new Random();
+        private readonly Random _random = new Random();
 
         // Getters
         public double GetGameTime() => _timer;
@@ -203,57 +202,27 @@ namespace ShootingGallery
 
         private (Vector2 Position, int Row, int Col)? GetAvailableGridCell()
         {
+            // If no cells available, return null
+            if (!HasAvailableCell())
+            {
+                Console.WriteLine("No grid cells available");
+                return null;
+            }
+
             // Calculate grid cell size based on screen dimensions
             float cellWidth = ScreenManager.ScreenWidth / (float)GRID_COLS;
             float cellHeight = ScreenManager.ScreenHeight / (float)GRID_ROWS;
 
             Console.WriteLine($"Grid cell size: {cellWidth}x{cellHeight}");
 
-            // Check if any cells are available
-            bool anyAvailable = false;
-            for (int row = 0; row < GRID_ROWS; row++)
-            {
-                for (int col = 0; col < GRID_COLS; col++)
-                {
-                    if (!_occupiedCells[row, col])
-                    {
-                        anyAvailable = true;
-                        break;
-                    }
-                }
-                if (anyAvailable) break;
-            }
-
-            // If no cells available, return null
-            if (!anyAvailable)
-            {
-                Console.WriteLine("No grid cells available");
-                return null;
-            }
-
             // Find a random unoccupied cell
-            int attempts = 0;
-            while (attempts < 100) // Prevent infinite loop
+            for (int attempts = 0; attempts < 100; attempts++)
             {
                 int row = _random.Next(0, GRID_ROWS);
                 int col = _random.Next(0, GRID_COLS);
 
                 if (!_occupiedCells[row, col])
-                {
-                    // Mark cell as occupied
-                    _occupiedCells[row, col] = true;
-
-                    // Calculate position (center of cell with offset for target center)
-                    Vector2 position = new Vector2(
-                        col * cellWidth + (cellWidth / 2),
-                        row * cellHeight + (cellHeight / 2)
-                    );
-
-                    Console.WriteLine($"Target positioned at grid ({row},{col}) -> screen position {position}");
-                    return (position, row, col);
-                }
-
-                attempts++;
+                    return OccupyCell(row, col, cellWidth, cellHeight);
             }
 
             // If we tried 100 times and couldn't find a spot, do a direct search
@@ -262,23 +231,40 @@ namespace ShootingGallery
                 for (int col = 0; col < GRID_COLS; col++)
                 {
                     if (!_occupiedCells[row, col])
-                    {
-                        _occupiedCells[row, col] = true;
-
-                        // Calculate position (center of cell with offset for target center)
-                        Vector2 position = new Vector2(
-                            col * cellWidth + (cellWidth / 2),
-                            row * cellHeight + (cellHeight / 2)
-                        );
-
-                        Console.WriteLine($"Target positioned at grid ({row},{col}) -> screen position {position}");
-                        return (position, row, col);
-                    }
+                        return OccupyCell(row, col, cellWidth, cellHeight);
                 }
             }
 
-            // Should never get here if anyAvailable was true
+            // Should never get here if HasAvailableCell was true
             return null;
+        }
+
+        private bool HasAvailableCell()
+        {
+            for (int row = 0; row < GRID_ROWS; row++)
+            {
+                for (int col = 0; col < GRID_COLS; col++)
+                {
+                    if (!_occupiedCells[row, col])
+                        return true;
+                }
+            }
+            return false;
+        }
+
+        private (Vector2 Position, int Row, int Col) OccupyCell(int row, int col, float cellWidth, float cellHeight)
+        {
+            // Mark cell as occupied
+            _occupiedCells[row, col] = true;
+
+            // Calculate position (center of cell with offset for target center)
+            Vector2 position = new Vector2(
+                col * cellWidth + (cellWidth / 2),
+                row * cellHeight + (cellHeight / 2)
+            );
+
+            Console.WriteLine($"Target positioned at grid ({row},{col}) -> screen position {position}");
+            return (position, row, col);
         }
         private void SpawnRandomTarget()
         {
