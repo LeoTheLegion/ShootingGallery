@@ -62,7 +62,8 @@ public class GameScene : Scene
                     3f,
                     message,
                     messageColor,
-                    1.5f
+                    1.5f,
+                    true
                 );
 
                 // Create a smaller floating text with details
@@ -72,7 +73,8 @@ public class GameScene : Scene
                     4f,
                     detailMessage,
                     messageColor,
-                    1.2f
+                    1.2f,
+                    true
                 );
             }
         };
@@ -90,13 +92,14 @@ public class GameScene : Scene
         // Subscribe to crosshair shoot events
         crosshair.OnShoot += (sender, args) =>
         {
-            // Add a visual effect for shots
+            // Add a visual effect for shots (random shots pulse like radiation)
             entitySystem.CreateEntity<FloatingPopUpText>(
                 args.Position,
                 0.5f,
                 "×",
                 args.IsRandomShot ? Color.LimeGreen : Color.White,
-                args.IsRandomShot ? 1.5f : 1.0f
+                args.IsRandomShot ? 1.5f : 1.0f,
+                args.IsRandomShot
             );
         };
 

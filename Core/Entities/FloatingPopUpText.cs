@@ -31,17 +31,15 @@ namespace ShootingGallery
         {
         }
 
-        // Floating text with custom color and scale
-        public FloatingPopUpText(Vector2 position, float time, string text, Color color, float scale = 1.0f)
+        // Floating text with custom color and scale; radiationEffect enables the pulsing style
+        public FloatingPopUpText(Vector2 position, float time, string text, Color color, float scale = 1.0f, bool radiationEffect = false)
         {
             this._position = position;
             _text = text;
             _color = color;
             _scale = scale;
             _totalTime = _timeLeft = time;
-
-            // Set radiation effect if it's green
-            _isRadiationEffect = color.G > 200 && color.R < 100 && color.B < 100;
+            _isRadiationEffect = radiationEffect;
         }
 
         // Floating text with radiation effect

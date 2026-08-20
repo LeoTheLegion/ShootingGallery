@@ -55,6 +55,7 @@
     <Property Name="Time" Value="5" />
     <Property Name="Color" Value="LimeGreen" />
     <Property Name="Scale" Value="1.5" />
+    <Property Name="RadiationEffect" Value="true" />
   </Entity>
 
   <Entity Type="FloatingPopUpText" HAnchor="Center" X="300" VAnchor="Middle">
@@ -62,5 +63,6 @@
     <Property Name="Time" Value="5" />
     <Property Name="Color" Value="LimeGreen" />
     <Property Name="Scale" Value="1.5" />
+    <Property Name="RadiationEffect" Value="true" />
   </Entity>
 </Scene>

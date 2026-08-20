@@ -76,7 +76,8 @@ public static class SceneLoader
                 float time = ParseFloat(props.GetValueOrDefault("Time", "5"));
                 Color color = props.TryGetValue("Color", out var c) ? ParseColor(c) : Color.White;
                 float scale = ParseFloat(props.GetValueOrDefault("Scale", "1.0"));
-                return system.CreateEntity<FloatingPopUpText>(position, time, props.GetValueOrDefault("Text", string.Empty), color, scale);
+                bool radiation = props.TryGetValue("RadiationEffect", out var r) && bool.Parse(r);
+                return system.CreateEntity<FloatingPopUpText>(position, time, props.GetValueOrDefault("Text", string.Empty), color, scale, radiation);
             }
             default:
                 throw new NotSupportedException($"SceneLoader: unknown entity type '{type}'.");
