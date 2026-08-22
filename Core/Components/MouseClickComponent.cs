@@ -2,8 +2,6 @@ using System;
 using CoreEssentials.GameSystems.EntitySystems.EntityOOPSystem.Components;
 using CoreEssentials.Inputs;
 using Microsoft.Xna.Framework;
-using MonoGame.Extended.Input;
-using MonoGame.Extended.Input.InputListeners;
 
 namespace ShootingGallery.Core
 {
@@ -19,7 +17,7 @@ namespace ShootingGallery.Core
         private void OnMouseDown(object sender, MouseEventArgs e)
         {
             if (e.Button == MouseButton.Left)
-                Clicked?.Invoke(new Vector2(e.Position.X, e.Position.Y));
+                Clicked?.Invoke(e.Position);
         }
 
         public override void OnAttach()
