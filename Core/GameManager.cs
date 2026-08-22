@@ -1,5 +1,6 @@
 ﻿using CoreEssentials.GameSystems.EntitySystems.EntityOOPSystem;
 using CoreEssentials.Scenes;
+using CoreEssentials.Utils;
 using Microsoft.Xna.Framework;
 using ShootingGallery.Core;
 using System;
@@ -49,8 +50,6 @@ namespace ShootingGallery
         // Linked entities
         private RadiationManager _radiationManager;
         private Crosshair _crosshair;
-
-        private readonly Random _random = new Random();
 
         // Getters
         public double GetGameTime() => _timer;
@@ -102,7 +101,7 @@ namespace ShootingGallery
         // sprite asset itself is assigned in the target's OnStart.
         private BaseTarget CreateTargetAt(Vector2 position)
         {
-            double roll = _random.NextDouble();
+            float roll = GameRandom.NextFloat();
             string templateName;
             if (roll < BOMB_CHANCE)
                 templateName = "Bomb";
@@ -218,8 +217,8 @@ namespace ShootingGallery
             // Find a random unoccupied cell
             for (int attempts = 0; attempts < 100; attempts++)
             {
-                int row = _random.Next(0, GRID_ROWS);
-                int col = _random.Next(0, GRID_COLS);
+                int row = GameRandom.Next(GRID_ROWS);
+                int col = GameRandom.Next(GRID_COLS);
 
                 if (!_occupiedCells[row, col])
                     return OccupyCell(row, col, cellWidth, cellHeight);
@@ -344,7 +343,7 @@ namespace ShootingGallery
             _targetSpawnTimer -= gameTime.ElapsedGameTime.TotalSeconds; if (_targetSpawnTimer <= 0)
             {                SpawnRandomTarget();
                 // Faster spawning - extremely aggressive spawn rates for shorter game
-                _targetSpawnTimer = (TARGET_SPAWN_DELAY / 2.0) + (_random.NextDouble() * GameConstants.TARGET_SPAWN_RANDOM_FACTOR);
+                _targetSpawnTimer = (TARGET_SPAWN_DELAY / 2.0) + (GameRandom.NextFloat() * GameConstants.TARGET_SPAWN_RANDOM_FACTOR);
 
                 // Spawn more targets as time goes on (increased spawn rate with shorter thresholds)
                 if (_timer < GameConstants.SPAWN_ACCEL_THRESHOLD_1) _targetSpawnTimer *= GameConstants.SPAWN_ACCEL_MULTIPLIER_1;  // After 15 seconds

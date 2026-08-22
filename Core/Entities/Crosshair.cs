@@ -4,6 +4,7 @@ using System.Linq;
 using CoreEssentials.Assets;
 using CoreEssentials.GameSystems.EntitySystems.EntityOOPSystem;
 using CoreEssentials.GameSystems.EntitySystems.EntityOOPSystem.Components.BuiltIn;
+using CoreEssentials.Utils;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -70,14 +71,12 @@ namespace ShootingGallery
 
         private readonly Sprite _sprite;
         private int _mutationLevel = 0;
-        private readonly Random _random;
         private readonly List<CrosshairArm> _arms = new List<CrosshairArm>();
         private readonly bool _canShoot = true;
 
         public Crosshair() : base()
         {
             this._sprite = AssetManager.LoadAsset<Sprite>("crosshair_sprite.xml");
-            _random = new Random();
         }
 
         public override void OnStart()
@@ -149,7 +148,7 @@ namespace ShootingGallery
                 int mutatedArmCount = _arms.Count;
                 if (mutatedArmCount > 0)
                 {
-                    int randomMutatedArm = _random.Next(1, mutatedArmCount + 1); // 1..N
+                    int randomMutatedArm = GameRandom.Next(1, mutatedArmCount + 1); // 1..N
                     Vector2 randomShotPosition = GetRandomShotPosition();
                     
                     // Only shoot if we found a valid target (not the indicator position)
@@ -178,7 +177,7 @@ namespace ShootingGallery
 
             if (fullyGrownRegularTargets.Count > 0)
             {
-                int idx = _random.Next(fullyGrownRegularTargets.Count);
+                int idx = GameRandom.Next(fullyGrownRegularTargets.Count);
                 return fullyGrownRegularTargets[idx].Position;
             }
 

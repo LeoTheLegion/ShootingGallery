@@ -3,6 +3,7 @@ using CoreEssentials.GameSystems.EntitySystems.EntityOOPSystem;
 using CoreEssentials.GameSystems.EntitySystems.EntityOOPSystem.Components.BuiltIn;
 using CoreEssentials.Scenes;
 using CoreEssentials.Tweening;
+using CoreEssentials.Utils;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ShootingGallery.Core;
@@ -48,7 +49,6 @@ namespace ShootingGallery
         // State
         protected float _scale;
         protected double _time;
-        protected Random _random;
         protected Sprite _sprite;
         protected SpriteComponent _spriteComponent;
         protected TweenComponent _tweenComponent;
@@ -88,7 +88,7 @@ namespace ShootingGallery
             this._position = targetPosition;
             this._scale = DefaultScale;
             this._time = 0f;
-            this._random = new Random();            this._spriteName = spriteName;
+            this._spriteName = spriteName;
             
             Type = TargetType.Standard; // Default
         }
@@ -184,8 +184,8 @@ namespace ShootingGallery
 
         protected void MoveRandomly()
         {
-            _position.X = _random.Next(targetRadius, ScreenManager.ScreenWidth - targetRadius);
-            _position.Y = _random.Next(targetRadius, ScreenManager.ScreenHeight - targetRadius);
+            _position.X = GameRandom.Next(targetRadius, ScreenManager.ScreenWidth - targetRadius);
+            _position.Y = GameRandom.Next(targetRadius, ScreenManager.ScreenHeight - targetRadius);
         }
         protected void Reset()
         {

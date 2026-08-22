@@ -1,30 +1,37 @@
 using System;
 using CoreEssentials.GameSystems.EntitySystems.EntityOOPSystem.Components;
+using CoreEssentials.Inputs;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Input;
+using MonoGame.Extended.Input;
+using MonoGame.Extended.Input.InputListeners;
 
 namespace ShootingGallery.Core
 {
     /// <summary>
-    /// Raises <see cref="Clicked"/> on the left-mouse-button press edge (release -> press),
-    /// with the click position in screen space.
+    /// Raises <see cref="Clicked"/> on the left-mouse-button press edge, with the click
+    /// position in screen space. Rides on CE's Input system (updated by MainGame each frame),
+    /// so no per-frame MouseState polling is needed here.
     /// </summary>
     public class MouseClickComponent : EntityComponent
     {
         public event Action<Vector2> Clicked;
 
-        private MouseState _lastMouseState = Mouse.GetState();
-
-        public override void Update(GameTime gameTime)
+        private void OnMouseDown(object sender, MouseEventArgs e)
         {
-            MouseState current = Mouse.GetState();
-            if (current.LeftButton == ButtonState.Pressed &&
-                _lastMouseState.LeftButton == ButtonState.Released)
-            {
-                Clicked?.Invoke(current.Position.ToVector2());
-            }
+            if (e.Button == MouseButton.Left)
+                Clicked?.Invoke(new Vector2(e.Position.X, e.Position.Y));
+        }
 
-            _lastMouseState = current;
+        public override void OnAttach()
+        {
+            base.OnAttach();
+            Input.Mouse.MouseDown += OnMouseDown;
+        }
+
+        public override void OnDetach()
+        {
+            Input.Mouse.MouseDown -= OnMouseDown;
+            base.OnDetach();
         }
     }
 }
