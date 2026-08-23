@@ -26,14 +26,14 @@ public class GameScene : Scene
         var entitySystem = GetGameSystem<EntitySystem>();
         var screenCenter = ScreenManager.ScreenCenter;
 
-        // HUD labels are data-driven in Content/game_scene.xml; grab typed references
-        // by Id so we can wire live updates below. No buttons in this scene, so no commands.
+        // HUD labels are data-driven GameObjects in Content/game_scene.xml; grab their
+        // LabelComponents by Id so we can wire live updates below. No buttons, so no commands.
         var hud = SceneLoader.LoadScene(entitySystem, "game_scene", new Dictionary<string, Action>());
-        var scoreText = (TextEntity)hud["score"];
-        var timerText = (TextEntity)hud["timer"];
-        var multiplierText = (TextEntity)hud["multiplier"];
-        var radiationText = (TextEntity)hud["radiation"];
-        var mutationText = (TextEntity)hud["mutation"];
+        var scoreText = hud["score"].GetComponent<LabelComponent>();
+        var timerText = hud["timer"].GetComponent<LabelComponent>();
+        var multiplierText = hud["multiplier"].GetComponent<LabelComponent>();
+        var radiationText = hud["radiation"].GetComponent<LabelComponent>();
+        var mutationText = hud["mutation"].GetComponent<LabelComponent>();
 
         // Create the player's crosshair
         var crosshair = entitySystem.CreateEntity<Crosshair>();
@@ -49,7 +49,7 @@ public class GameScene : Scene
             crosshair.SetMutationLevel(args.MutationLevel);
 
             // Update mutation text
-            mutationText.SetText($"Arms: {args.MutationLevel + 1}");
+            mutationText.Text = $"Arms: {args.MutationLevel + 1}";
 
             // Display mutation message
             if (args.MutationLevel > 0)
@@ -106,13 +106,15 @@ public class GameScene : Scene
         // Subscribe to the game over event
         gameManager.OnGameOver += (sender, args) =>
         {
-            // Display game over message
+            // Display game over message (pass all ctor args explicitly — CE's CreateEntity<T>
+            // forwards this array to Activator.CreateInstance, which cannot fill optional params)
             entitySystem.CreateEntity<FloatingPopUpText>(
                 new Vector2(screenCenter.X, screenCenter.Y - 50),
                 5f,
                 "GAME OVER!",
                 Color.Red,
-                2.0f
+                2.0f,
+                false
             );
 
             // Switch to GameOverScene and pass the final score and mutation level

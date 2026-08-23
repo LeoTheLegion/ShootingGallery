@@ -35,12 +35,12 @@ namespace ShootingGallery
           // Current state
         private float _currentRadiation = 0f;
         private int _currentMutationLevel = 0;
-        private ShootingGallery.Core.TextEntity _radiationUI;
+        private ShootingGallery.Core.LabelComponent _radiationUI;
         
         public int GetMutationLevel() => _currentMutationLevel;
         public float GetRadiationPercentage() => _currentRadiation / MAX_RADIATION;
         
-        public void SetRadiationUI(ShootingGallery.Core.TextEntity radiationUI) => _radiationUI = radiationUI;
+        public void SetRadiationUI(ShootingGallery.Core.LabelComponent radiationUI) => _radiationUI = radiationUI;
         
         public RadiationManager()
         {
@@ -52,7 +52,7 @@ namespace ShootingGallery
         {
             if (_radiationUI != null)
             {
-                _radiationUI.SetText($"Radiation: {(int)(_currentRadiation / MAX_RADIATION * 100)}%");
+                _radiationUI.Text = $"Radiation: {(int)(_currentRadiation / MAX_RADIATION * 100)}%";
             }
             
             // Check if we need to mutate

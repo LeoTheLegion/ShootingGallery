@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -14,8 +13,9 @@ namespace ShootingGallery.Core;
 /// <summary>
 /// Loads a scene from an XML definition file and instantiates its entities.
 /// Positions use resolution-independent anchors so layouts stay centered at any window size.
-/// Entity configuration is applied through the existing entity constructors/methods, and
-/// <see cref="ButtonEntity"/> clicks are resolved to delegates via a Command-name lookup.
+/// GUI is fully data-driven: a GameObject declares its components (Canvas/Label/Button) via
+/// &lt;Property Name="Component" /&gt; entries, and button clicks are resolved from a Command-name
+/// lookup to the component's Clicked event.
 /// </summary>
 public static class SceneLoader
 {
@@ -41,86 +41,114 @@ public static class SceneLoader
             throw new FormatException($"'{sceneName}.xml' must have a <Scene> root element.");
 
         var byId = new Dictionary<string, Entity>(StringComparer.Ordinal);
-        var entities = root.Elements("Entity").ToList();
 
-        // Pass 1: create structural roots first. A <Entity Type="GameObject"> carries a
-        // screen-space canvas (its CanvasComponent) that static GUI is parented under. Creating
-        // it with the started CreateEntity attaches the canvas immediately, before any children.
-        foreach (var entityElem in entities.Where(e => GetEntityType(e) == "GameObject"))
-        {
-            var createdRoot = system.CreateEntity<GameObject>(IsScreenSpace(entityElem));
-            string id = entityElem.Attribute("Id")?.Value ?? "canvas_root";
-            byId[id] = createdRoot;
-        }
+        // The XML hierarchy maps directly onto the entity hierarchy: entities nested under a
+        // parent element become its children (e.g. GUI nested under a GameObject canvas root).
+        foreach (var entityElem in root.Elements("Entity"))
+            RegisterEntity(system, entityElem, null, commands, byId);
 
-        // The first GameObject is the shared canvas root that static GUI is parented under.
-        Entity canvasRoot = byId.Values.FirstOrDefault(e => e is GameObject);
-
-        // Pass 2: create the remaining (GUI / gameplay) entities.
-        foreach (var entityElem in entities.Where(e => GetEntityType(e) != "GameObject"))
-        {
-            string id = entityElem.Attribute("Id")?.Value;
-            var position = ResolvePosition(entityElem);
-            var props = ParseProperties(entityElem);
-            var entity = CreateEntity(system, GetEntityType(entityElem), position, props, commands, canvasRoot);
-            if (entity != null && !string.IsNullOrWhiteSpace(id))
-                byId[id] = entity;
-        }
         return byId;
+    }
+
+    /// <summary>Creates the entity for an &lt;Entity&gt; element and recursively creates its nested children.</summary>
+    private static void RegisterEntity(EntitySystem system, XElement entityElem, Entity parent, Dictionary<string, Action> commands, Dictionary<string, Entity> byId)
+    {
+        var position = ResolvePosition(entityElem);
+        var props = ParseProperties(entityElem);
+        string type = GetEntityType(entityElem);
+        Entity entity = parent == null
+            ? CreateEntity(system, type, position, props)
+            : CreateEntity(system, type, position, props, commands, parent);
+
+        string id = entityElem.Attribute("Id")?.Value;
+        if (!string.IsNullOrWhiteSpace(id))
+            byId[id] = entity;
+
+        foreach (var childElem in entityElem.Elements("Entity"))
+            RegisterEntity(system, childElem, entity, commands, byId);
+    }
+
+    /// <summary>Creates a top-level (parentless) entity.</summary>
+    private static Entity CreateEntity(EntitySystem system, string type, Vector2 position, Dictionary<string, string> props)
+    {
+        switch (type)
+        {
+            case "GameObject":
+                // Top-level GameObjects are structural (e.g. a canvas root); no click wiring.
+                return system.CreateEntity<GameObject>(ResolveComponents(props), props, null);
+            case "FloatingPopUpText":
+                // Transient popups carry their own screen-space canvas (they are also spawned at
+                // runtime far from the scene), so they are started standalone and not parented.
+                return CreateFloatingPopUp(system, position, props);
+            default:
+                throw new NotSupportedException($"SceneLoader: unknown entity type '{type}'.");
+        }
+    }
+
+    /// <summary>Creates an entity nested under a parent in the XML.</summary>
+    private static Entity CreateEntity(EntitySystem system, string type, Vector2 position, Dictionary<string, string> props, Dictionary<string, Action> commands, Entity parent)
+    {
+        switch (type)
+        {
+            case "GameObject":
+                // Data-driven container, label, or button: create unstarted, position it, parent it
+                // under the canvas root, then start so widget components can resolve the ancestor
+                // CanvasComponent when they attach. A Command property is resolved to the click
+                // handler wired into any attached component's Clicked event.
+                var gameObj = (GameObject)system.CreateEntityUnstarted(typeof(GameObject), ResolveComponents(props), props, ResolveCommand(props, commands));
+                gameObj.LocalPosition = position;
+                parent.AddChild(gameObj);
+                gameObj.OnStart();
+                return gameObj;
+            default:
+                throw new NotSupportedException($"SceneLoader: unknown entity type '{type}' under a parent.");
+        }
+    }
+
+    /// <summary>Resolves an XML Command name to its registered delegate, or null when absent/unknown.</summary>
+    private static Action ResolveCommand(Dictionary<string, string> props, Dictionary<string, Action> commands)
+    {
+        if (props.TryGetValue("Command", out var cmd) && commands.TryGetValue(cmd, out var action))
+            return action;
+        return null;
+    }
+
+    private static Entity CreateFloatingPopUp(EntitySystem system, Vector2 position, Dictionary<string, string> props)
+    {
+        float time = PropParsers.ParseFloat(props.GetValueOrDefault("Time", "5"));
+        Color color = props.TryGetValue("Color", out var c) ? PropParsers.ParseColor(c) : Color.White;
+        float scale = PropParsers.ParseFloat(props.GetValueOrDefault("Scale", "1.0"));
+        bool radiation = props.TryGetValue("RadiationEffect", out var r) && bool.Parse(r);
+        return system.CreateEntity<FloatingPopUpText>(position, time, props.GetValueOrDefault("Text", string.Empty), color, scale, radiation);
     }
 
     /// <summary>Reads the required Type attribute of an &lt;Entity&gt; element.</summary>
     private static string GetEntityType(XElement element)
         => element.Attribute("Type")?.Value ?? throw new FormatException("Entity missing 'Type' attribute.");
 
-    /// <summary>Reads the optional ScreenSpace flag (defaults to true).</summary>
-    private static bool IsScreenSpace(XElement element)
-        => (element.Attribute("ScreenSpace")?.Value ?? "true").ToLowerInvariant() != "false";
-
-    private static Entity CreateEntity(EntitySystem system, string type, Vector2 position, Dictionary<string, string> props, Dictionary<string, Action> commands, Entity canvasRoot)
+    /// <summary>
+    /// Resolves the component types declared on a GameObject via its
+    /// <c>&lt;Property Name="Component" Value="..." /&gt;</c> entries (e.g. "CanvasComponent").
+    /// </summary>
+    private static Type[] ResolveComponents(Dictionary<string, string> props)
     {
-        switch (type)
-        {
-            case "TextEntity":
-            {
-                // Static GUI: create unstarted, parent under the shared canvas root, then start so
-                // the label's widget component can resolve the ancestor canvas on attach.
-                if (canvasRoot == null)
-                    throw new FormatException("SceneLoader: a TextEntity requires a GameObject canvas root in the scene.");
-                var entity = (TextEntity)system.CreateEntityUnstarted(typeof(TextEntity), position, props.GetValueOrDefault("Text", string.Empty));
-                entity.LocalPosition = position;
-                canvasRoot.AddChild(entity);
-                entity.OnStart();
-                if (props.TryGetValue("Color", out var color)) entity.SetColor(ParseColor(color));
-                if (props.TryGetValue("Scale", out var scale)) entity.SetScale(ParseFloat(scale));
-                return entity;
-            }
-            case "ButtonEntity":
-            {
-                if (canvasRoot == null)
-                    throw new FormatException("SceneLoader: a ButtonEntity requires a GameObject canvas root in the scene.");
-                Action onClick = null;
-                if (props.TryGetValue("Command", out var cmd) && commands.TryGetValue(cmd, out var action))
-                    onClick = action;
-                var entity = (ButtonEntity)system.CreateEntityUnstarted(typeof(ButtonEntity), position, props.GetValueOrDefault("Text", string.Empty), onClick);
-                entity.LocalPosition = position;
-                canvasRoot.AddChild(entity);
-                entity.OnStart();
-                return entity;
-            }
-            case "FloatingPopUpText":
-            {
-                // Transient popups carry their own screen-space canvas (they are also spawned at
-                // runtime far from the scene), so they are started standalone and not parented.
-                float time = ParseFloat(props.GetValueOrDefault("Time", "5"));
-                Color color = props.TryGetValue("Color", out var c) ? ParseColor(c) : Color.White;
-                float scale = ParseFloat(props.GetValueOrDefault("Scale", "1.0"));
-                bool radiation = props.TryGetValue("RadiationEffect", out var r) && bool.Parse(r);
-                return system.CreateEntity<FloatingPopUpText>(position, time, props.GetValueOrDefault("Text", string.Empty), color, scale, radiation);
-            }
-            default:
-                throw new NotSupportedException($"SceneLoader: unknown entity type '{type}'.");
-        }
+        var names = props.Where(p => string.Equals(p.Key, "Component", StringComparison.OrdinalIgnoreCase))
+            .Select(p => p.Value)
+            .ToList();
+
+        return names.Select(ResolveComponentType).ToArray();
+    }
+
+    private static Type ResolveComponentType(string name)
+    {
+        // Local (game-specific) components win first so, e.g., "LabelComponent" resolves to our
+        // live-updating wrapper rather than CE's attach-only built-in of the same name.
+        var local = Assembly.GetExecutingAssembly().GetType($"ShootingGallery.Core.{name}");
+        if (local != null) return local;
+
+        // Fall back to CE's built-in components (CanvasComponent, ButtonComponent, ...).
+        var builtIn = typeof(Entity).Assembly.GetType($"CoreEssentials.GameSystems.EntitySystems.EntityOOPSystem.Components.BuiltIn.{name}");
+        return builtIn ?? throw new NotSupportedException($"SceneLoader: unknown component '{name}' on GameObject.");
     }
 
     /// <summary>
@@ -131,8 +159,8 @@ public static class SceneLoader
     {
         string hAnchor = (element.Attribute("HAnchor")?.Value ?? "Center").ToLowerInvariant();
         string vAnchor = (element.Attribute("VAnchor")?.Value ?? "Top").ToLowerInvariant();
-        float x = ParseFloat(element.Attribute("X")?.Value ?? "0");
-        float y = ParseFloat(element.Attribute("Y")?.Value ?? "0");
+        float x = PropParsers.ParseFloat(element.Attribute("X")?.Value ?? "0");
+        float y = PropParsers.ParseFloat(element.Attribute("Y")?.Value ?? "0");
 
         float px = hAnchor switch
         {
@@ -162,25 +190,4 @@ public static class SceneLoader
         return props;
     }
 
-    private static float ParseFloat(string value)
-        => float.Parse(value, NumberStyles.Any, CultureInfo.InvariantCulture);
-
-    /// <summary>Parses a named color (e.g. "LimeGreen") or an "R,G,B[,A]" string.</summary>
-    private static Color ParseColor(string value)
-    {
-        var field = typeof(Color).GetField(value, BindingFlags.Static | BindingFlags.Public);
-        if (field != null)
-            return (Color)field.GetValue(null)!;
-
-        var parts = value.Split(',');
-        if (parts.Length >= 3)
-        {
-            int r = int.Parse(parts[0].Trim(), CultureInfo.InvariantCulture);
-            int g = int.Parse(parts[1].Trim(), CultureInfo.InvariantCulture);
-            int b = int.Parse(parts[2].Trim(), CultureInfo.InvariantCulture);
-            int a = parts.Length >= 4 ? int.Parse(parts[3].Trim(), CultureInfo.InvariantCulture) : 255;
-            return new Color(r, g, b, a);
-        }
-        return Color.White;
-    }
 }

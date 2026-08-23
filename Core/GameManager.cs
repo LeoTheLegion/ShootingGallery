@@ -42,10 +42,10 @@ namespace ShootingGallery
         private int _score = 0;
         private float _timeMultiplier;
         private double _targetSpawnTimer;
-        public bool isGameOver => _timer <= 0;        // UI elements
-        private ShootingGallery.Core.TextEntity _scoreUI;
-        private ShootingGallery.Core.TextEntity _timerUI;
-        private ShootingGallery.Core.TextEntity _multiplierUI;
+        public bool isGameOver => _timer <= 0;        // UI elements (live label components on data-driven GameObjects)
+        private ShootingGallery.Core.LabelComponent _scoreUI;
+        private ShootingGallery.Core.LabelComponent _timerUI;
+        private ShootingGallery.Core.LabelComponent _multiplierUI;
 
         // Linked entities
         private RadiationManager _radiationManager;
@@ -58,9 +58,9 @@ namespace ShootingGallery
 
         // Setters
         public void AddScore(int points) => _score += (int)(points * _timeMultiplier);
-        public void SetScoreUI(ShootingGallery.Core.TextEntity scoreUI) => _scoreUI = scoreUI;
-        public void SetTimerUI(ShootingGallery.Core.TextEntity timerUI) => _timerUI = timerUI;
-        public void SetMultiplierUI(ShootingGallery.Core.TextEntity multiplierUI) => _multiplierUI = multiplierUI;
+        public void SetScoreUI(ShootingGallery.Core.LabelComponent scoreUI) => _scoreUI = scoreUI;
+        public void SetTimerUI(ShootingGallery.Core.LabelComponent timerUI) => _timerUI = timerUI;
+        public void SetMultiplierUI(ShootingGallery.Core.LabelComponent multiplierUI) => _multiplierUI = multiplierUI;
         public void SetRadiationManager(RadiationManager radiationManager) => _radiationManager = radiationManager;
         public void SetCrosshair(Crosshair crosshair)
         {
@@ -187,9 +187,9 @@ namespace ShootingGallery
             );
 
             // Update UI
-            _scoreUI.SetText("Score: " + _score.ToString());
-            _timerUI.SetText("Time: " + Math.Ceiling(_timer).ToString());
-            _multiplierUI.SetText($"Multiplier: x{_timeMultiplier:F1}");
+            _scoreUI.Text = "Score: " + _score.ToString();
+            _timerUI.Text = "Time: " + Math.Ceiling(_timer).ToString();
+            _multiplierUI.Text = $"Multiplier: x{_timeMultiplier:F1}";
 
             if (_timer <= 0)
             {

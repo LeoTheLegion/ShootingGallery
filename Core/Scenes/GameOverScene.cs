@@ -48,13 +48,13 @@ public class GameOverScene : Scene
         };
         var ui = SceneLoader.LoadScene(entitySystem, "game_over", commands);
 
-        // Cause of game over
-        ((TextEntity)ui["cause"]).SetText(_bombHit
+        // Cause of game over (labels are data-driven GameObjects; drive them via their component)
+        ui["cause"].GetComponent<LabelComponent>().Text = _bombHit
             ? "You hit a radioactive bomb!"
-            : "Your 1 minute of shooting is up!");
+            : "Your 1 minute of shooting is up!";
 
         // Final score
-        ((TextEntity)ui["score"]).SetText($"Final Score: {_finalScore}");
+        ui["score"].GetComponent<LabelComponent>().Text = $"Final Score: {_finalScore}";
 
         // Mutation summary (message + color depend on mutation level)
         (string mutationMessage, Color mutationColor) = _mutationLevel switch
@@ -64,9 +64,9 @@ public class GameOverScene : Scene
             2 => ("You mutated with two extra arms!", Color.Green),
             _ => ("Your mutations have rendered you unrecognizable!", Color.LimeGreen),
         };
-        var mutationText = (TextEntity)ui["mutation"];
-        mutationText.SetText(mutationMessage);
-        mutationText.SetColor(mutationColor);
+        var mutationText = ui["mutation"].GetComponent<LabelComponent>();
+        mutationText.Text = mutationMessage;
+        mutationText.TextColor = mutationColor;
 
         yield return null;
     }

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using CoreEssentials.GameSystems.EntitySystems.EntityOOPSystem.Components;
 using CoreEssentials.GameSystems.EntitySystems.EntityOOPSystem.Components.BuiltIn;
 using CoreEssentials.GUI.Factory;
@@ -15,10 +16,19 @@ namespace ShootingGallery.Core
     /// It never owns a canvas: it borrows the nearest <see cref="CanvasComponent"/> in the entity
     /// hierarchy (via <see cref="CanvasComponent.RequireCanvas"/>) and adds its widget to that canvas.
     /// </summary>
-    public class LabelComponent : EntityComponent
+    public class LabelComponent : EntityComponent, IConfigurableComponent
     {
+        // Scene XML property names this component understands.
+        internal const string TextProp = "Text";
+        internal const string ColorProp = "Color";
+        internal const string ScaleProp = "Scale";
+
         private ILabel _label;
         private CanvasComponent _canvasComponent;
+
+        public LabelComponent() : this(string.Empty)
+        {
+        }
 
         public LabelComponent(string text)
         {
@@ -75,6 +85,17 @@ namespace ShootingGallery.Core
                 if (_label != null)
                     _label.Opacity = _opacity;
             }
+        }
+
+        /// <summary>Applies scene XML properties (Text/Color/Scale) before the component attaches.</summary>
+        public void Configure(Dictionary<string, string> props)
+        {
+            if (props == null)
+                return;
+
+            if (props.TryGetValue(TextProp, out var text)) _text = text;
+            if (props.TryGetValue(ColorProp, out var color)) _color = PropParsers.ParseColor(color);
+            if (props.TryGetValue(ScaleProp, out var scale)) _scale = PropParsers.ParseFloat(scale);
         }
 
         public override void OnAttach()

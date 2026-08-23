@@ -1,44 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  Game over screen layout. The title and both buttons are fully static.
-  The cause / score / mutation labels carry placeholder text here; GameOverScene
-  overrides them at runtime from its constructor state (final score, mutation
-  level, bomb hit). Buttons use Command names resolved in code.
+  Game over screen layout. All GUI is data-driven: each widget is a GameObject that declares
+  its component (LabelComponent / ButtonComponent) plus its properties. The cause / score /
+  mutation labels carry placeholder text here; GameOverScene overrides them at runtime from its
+  constructor state (final score, mutation level, bomb hit). Buttons use Command names resolved
+  in code and wired to the ButtonComponent's Clicked event.
   Anchors: HAnchor Center|Left|Right, VAnchor Top|Bottom|Middle.
 -->
 <Scene Name="GameOver">
-  <!-- Screen-space canvas root: all static GUI below is parented under this. -->
-  <Entity Type="GameObject" />
+  <!-- GameObject carrying a CanvasComponent; its nested GUI entities become its children. -->
+  <Entity Type="GameObject">
+    <Property Name="Component" Value="CanvasComponent" />
 
-  <Entity Id="gameOver" Type="TextEntity" HAnchor="Center" VAnchor="Top" Y="100">
-    <Property Name="Text" Value="GAME OVER" />
-    <Property Name="Color" Value="Red" />
-    <Property Name="Scale" Value="2" />
-  </Entity>
+    <Entity Id="gameOver" Type="GameObject" HAnchor="Center" VAnchor="Top" Y="100">
+      <Property Name="Component" Value="LabelComponent" />
+      <Property Name="Text" Value="GAME OVER" />
+      <Property Name="Color" Value="Red" />
+      <Property Name="Scale" Value="2" />
+    </Entity>
 
-  <Entity Id="cause" Type="TextEntity" HAnchor="Center" VAnchor="Top" Y="200">
-    <Property Name="Text" Value="Your 1 minute of shooting is up!" />
-    <Property Name="Color" Value="White" />
-  </Entity>
+    <Entity Id="cause" Type="GameObject" HAnchor="Center" VAnchor="Top" Y="200">
+      <Property Name="Component" Value="LabelComponent" />
+      <Property Name="Text" Value="Your 1 minute of shooting is up!" />
+      <Property Name="Color" Value="White" />
+    </Entity>
 
-  <Entity Id="score" Type="TextEntity" HAnchor="Center" VAnchor="Top" Y="280">
-    <Property Name="Text" Value="Final Score: 0" />
-    <Property Name="Color" Value="Yellow" />
-    <Property Name="Scale" Value="1.5" />
-  </Entity>
+    <Entity Id="score" Type="GameObject" HAnchor="Center" VAnchor="Top" Y="280">
+      <Property Name="Component" Value="LabelComponent" />
+      <Property Name="Text" Value="Final Score: 0" />
+      <Property Name="Color" Value="Yellow" />
+      <Property Name="Scale" Value="1.5" />
+    </Entity>
 
-  <Entity Id="mutation" Type="TextEntity" HAnchor="Center" VAnchor="Top" Y="360">
-    <Property Name="Text" Value="You escaped without mutations!" />
-    <Property Name="Color" Value="White" />
-  </Entity>
+    <Entity Id="mutation" Type="GameObject" HAnchor="Center" VAnchor="Top" Y="360">
+      <Property Name="Component" Value="LabelComponent" />
+      <Property Name="Text" Value="You escaped without mutations!" />
+      <Property Name="Color" Value="White" />
+    </Entity>
 
-  <Entity Id="restart" Type="ButtonEntity" HAnchor="Center" VAnchor="Top" Y="460">
-    <Property Name="Text" Value="Play Again" />
-    <Property Name="Command" Value="RestartGame" />
-  </Entity>
+    <Entity Id="restart" Type="GameObject" HAnchor="Center" VAnchor="Top" Y="460">
+      <Property Name="Component" Value="ButtonComponent" />
+      <Property Name="Text" Value="Play Again" />
+      <Property Name="Command" Value="RestartGame" />
+    </Entity>
 
-  <Entity Id="menu" Type="ButtonEntity" HAnchor="Center" VAnchor="Top" Y="530">
-    <Property Name="Text" Value="Main Menu" />
-    <Property Name="Command" Value="MainMenu" />
+    <Entity Id="menu" Type="GameObject" HAnchor="Center" VAnchor="Top" Y="530">
+      <Property Name="Component" Value="ButtonComponent" />
+      <Property Name="Text" Value="Main Menu" />
+      <Property Name="Command" Value="MainMenu" />
+    </Entity>
   </Entity>
 </Scene>
