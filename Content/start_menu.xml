@@ -7,6 +7,9 @@
   ButtonEntity uses a Command name resolved to a delegate in code (see StartMenuScene).
 -->
 <Scene Name="StartMenu">
+  <!-- Screen-space canvas root: all static GUI below is parented under this. -->
+  <Entity Type="GameObject" />
+
   <Entity Type="TextEntity" HAnchor="Center" VAnchor="Top" Y="100">
     <Property Name="Text" Value="URANIUM REVOLVER" />
     <Property Name="Color" Value="LimeGreen" />

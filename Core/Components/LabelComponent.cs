@@ -1,7 +1,6 @@
 using System;
-using CoreEssentials.Assets;
 using CoreEssentials.GameSystems.EntitySystems.EntityOOPSystem.Components;
-using CoreEssentials.GUI;
+using CoreEssentials.GameSystems.EntitySystems.EntityOOPSystem.Components.BuiltIn;
 using CoreEssentials.GUI.Factory;
 using CoreEssentials.GUI.Types;
 using Microsoft.Xna.Framework;
@@ -9,61 +8,106 @@ using Microsoft.Xna.Framework;
 namespace ShootingGallery.Core
 {
     /// <summary>
-    /// Renders a Myra label that follows the owning entity. Owns the Canvas lifecycle:
-    /// per-frame SetPosition/Update and CleanUp on detach.
+    /// Renders a Myra label that follows the owning entity, reusing a shared parent canvas.
+    /// Unlike CE's built-in LabelComponent (which only applies its properties in OnAttach), this
+    /// thin wrapper exposes live setters — Text / TextColor / Scale / Opacity write straight to the
+    /// underlying widget — so HUD values that change every frame (score, timer, radiation) keep updating.
+    /// It never owns a canvas: it borrows the nearest <see cref="CanvasComponent"/> in the entity
+    /// hierarchy (via <see cref="CanvasComponent.RequireCanvas"/>) and adds its widget to that canvas.
     /// </summary>
     public class LabelComponent : EntityComponent
     {
-        private readonly Canvas _canvas;
-        private readonly ILabel _label;
-        private readonly FontAsset _fontAsset;
+        private ILabel _label;
+        private CanvasComponent _canvasComponent;
 
-        public LabelComponent(string text, string fontAssetName = "galleryFont")
+        public LabelComponent(string text)
         {
-            _fontAsset = AssetManager.LoadAsset<FontAsset>(fontAssetName);
-            _canvas = new Canvas();
-
-            _label = WidgetFactory.CreateLabel(text);
-            // Position label at canvas origin via IWidget.Position instead of alignment properties
-            ((IWidget)_label).Position = Vector2.Zero;
-            _canvas.AddWidget(_label);
+            _text = text;
         }
+
+        // Backing fields so properties can be set before the component attaches; applied in OnAttach.
+        private string _text;
+        private Color _color = Color.White;
+        private float _scale = 1f;
+        private float _opacity = 1f;
 
         public string Text
         {
-            get => _label.Text;
-            set => _label.Text = value;
+            get => _label != null ? _label.Text : _text;
+            set
+            {
+                _text = value;
+                if (_label != null)
+                    _label.Text = value;
+            }
         }
 
         public Color TextColor
         {
-            get => _label.TextColor;
-            set => _label.TextColor = value;
+            get => _color;
+            set
+            {
+                _color = value;
+                if (_label != null)
+                    _label.TextColor = value;
+            }
         }
 
         public float Scale
         {
-            get => _label.Scale.X;
-            set => _label.Scale = new Vector2(value);
+            get => _scale;
+            // Myra's Scale setter is a Vector2; keep a uniform scalar for callers.
+            set
+            {
+                _scale = value;
+                if (_label != null)
+                    _label.Scale = new Vector2(value);
+            }
         }
 
         public float Opacity
         {
-            get => _label.Opacity;
+            get => _opacity;
             // Myra's Opacity setter throws on out-of-range values
-            set => _label.Opacity = Math.Clamp(value, 0f, 1f);
+            set
+            {
+                _opacity = Math.Clamp(value, 0f, 1f);
+                if (_label != null)
+                    _label.Opacity = _opacity;
+            }
         }
 
-        public override void Update(GameTime gameTime)
+        public override void OnAttach()
         {
-            _canvas.SetPosition(Owner.Position);
-            _canvas.Update(gameTime);
+            // Resolve the nearest canvas in this entity's hierarchy (this entity or an ancestor).
+            _canvasComponent = CanvasComponent.RequireCanvas(Owner);
+
+            _label = WidgetFactory.CreateLabel(_text);
+            _label.TextColor = _color;
+            _label.Scale = new Vector2(_scale);
+            _label.Opacity = _opacity;
+
+            _canvasComponent.Canvas.AddWidget(_label);
         }
 
         public override void OnDetach()
         {
-            _canvas.CleanUp();
-            AssetManager.UnloadAsset<FontAsset>(_fontAsset.Name);
+            if (_label != null && _canvasComponent != null)
+                _canvasComponent.Canvas.RemoveWidget(_label);
+
+            _label = null;
+            _canvasComponent = null;
+        }
+
+        public override void Update(GameTime gameTime)
+        {
+            if (_label == null || _canvasComponent == null || Owner == null)
+                return;
+
+            // Keep the label at the entity's position relative to the canvas entity, mirroring CE.
+            var canvasEntity = _canvasComponent.Owner;
+            if (canvasEntity != null)
+                _label.Position = Owner.Position - canvasEntity.Position;
         }
     }
 }

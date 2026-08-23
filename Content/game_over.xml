@@ -7,6 +7,9 @@
   Anchors: HAnchor Center|Left|Right, VAnchor Top|Bottom|Middle.
 -->
 <Scene Name="GameOver">
+  <!-- Screen-space canvas root: all static GUI below is parented under this. -->
+  <Entity Type="GameObject" />
+
   <Entity Id="gameOver" Type="TextEntity" HAnchor="Center" VAnchor="Top" Y="100">
     <Property Name="Text" Value="GAME OVER" />
     <Property Name="Color" Value="Red" />

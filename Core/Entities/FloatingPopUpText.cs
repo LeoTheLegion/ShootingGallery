@@ -52,7 +52,10 @@ namespace ShootingGallery
         {
             base.OnStart();
 
-            // Components are added in OnStart (CE lifecycle: Awake -> Start)
+            // Components are added in OnStart (CE lifecycle: Awake -> Start).
+            // Popups are standalone (no parent), so each carries its own screen-space canvas;
+            // the label below resolves this entity's canvas on attach.
+            AddComponent(new CoreEssentials.GameSystems.EntitySystems.EntityOOPSystem.Components.BuiltIn.CanvasComponent(true));
             _label = AddComponent(new LabelComponent(_text));
             _label.TextColor = _color;
             _label.Scale = _scale;

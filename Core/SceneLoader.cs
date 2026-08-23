@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Xml.Linq;
 using CoreEssentials.Assets;
@@ -40,39 +41,77 @@ public static class SceneLoader
             throw new FormatException($"'{sceneName}.xml' must have a <Scene> root element.");
 
         var byId = new Dictionary<string, Entity>(StringComparer.Ordinal);
-        foreach (var entityElem in root.Elements("Entity"))
+        var entities = root.Elements("Entity").ToList();
+
+        // Pass 1: create structural roots first. A <Entity Type="GameObject"> carries a
+        // screen-space canvas (its CanvasComponent) that static GUI is parented under. Creating
+        // it with the started CreateEntity attaches the canvas immediately, before any children.
+        foreach (var entityElem in entities.Where(e => GetEntityType(e) == "GameObject"))
         {
-            string type = entityElem.Attribute("Type")?.Value ?? throw new FormatException("Entity missing 'Type' attribute.");
+            var createdRoot = system.CreateEntity<GameObject>(IsScreenSpace(entityElem));
+            string id = entityElem.Attribute("Id")?.Value ?? "canvas_root";
+            byId[id] = createdRoot;
+        }
+
+        // The first GameObject is the shared canvas root that static GUI is parented under.
+        Entity canvasRoot = byId.Values.FirstOrDefault(e => e is GameObject);
+
+        // Pass 2: create the remaining (GUI / gameplay) entities.
+        foreach (var entityElem in entities.Where(e => GetEntityType(e) != "GameObject"))
+        {
             string id = entityElem.Attribute("Id")?.Value;
             var position = ResolvePosition(entityElem);
             var props = ParseProperties(entityElem);
-            var entity = CreateEntity(system, type, position, props, commands);
+            var entity = CreateEntity(system, GetEntityType(entityElem), position, props, commands, canvasRoot);
             if (entity != null && !string.IsNullOrWhiteSpace(id))
                 byId[id] = entity;
         }
         return byId;
     }
 
-    private static Entity CreateEntity(EntitySystem system, string type, Vector2 position, Dictionary<string, string> props, Dictionary<string, Action> commands)
+    /// <summary>Reads the required Type attribute of an &lt;Entity&gt; element.</summary>
+    private static string GetEntityType(XElement element)
+        => element.Attribute("Type")?.Value ?? throw new FormatException("Entity missing 'Type' attribute.");
+
+    /// <summary>Reads the optional ScreenSpace flag (defaults to true).</summary>
+    private static bool IsScreenSpace(XElement element)
+        => (element.Attribute("ScreenSpace")?.Value ?? "true").ToLowerInvariant() != "false";
+
+    private static Entity CreateEntity(EntitySystem system, string type, Vector2 position, Dictionary<string, string> props, Dictionary<string, Action> commands, Entity canvasRoot)
     {
         switch (type)
         {
             case "TextEntity":
             {
-                var entity = system.CreateEntity<TextEntity>(position, props.GetValueOrDefault("Text", string.Empty));
+                // Static GUI: create unstarted, parent under the shared canvas root, then start so
+                // the label's widget component can resolve the ancestor canvas on attach.
+                if (canvasRoot == null)
+                    throw new FormatException("SceneLoader: a TextEntity requires a GameObject canvas root in the scene.");
+                var entity = (TextEntity)system.CreateEntityUnstarted(typeof(TextEntity), position, props.GetValueOrDefault("Text", string.Empty));
+                entity.LocalPosition = position;
+                canvasRoot.AddChild(entity);
+                entity.OnStart();
                 if (props.TryGetValue("Color", out var color)) entity.SetColor(ParseColor(color));
                 if (props.TryGetValue("Scale", out var scale)) entity.SetScale(ParseFloat(scale));
                 return entity;
             }
             case "ButtonEntity":
             {
+                if (canvasRoot == null)
+                    throw new FormatException("SceneLoader: a ButtonEntity requires a GameObject canvas root in the scene.");
                 Action onClick = null;
                 if (props.TryGetValue("Command", out var cmd) && commands.TryGetValue(cmd, out var action))
                     onClick = action;
-                return system.CreateEntity<ButtonEntity>(position, props.GetValueOrDefault("Text", string.Empty), onClick);
+                var entity = (ButtonEntity)system.CreateEntityUnstarted(typeof(ButtonEntity), position, props.GetValueOrDefault("Text", string.Empty), onClick);
+                entity.LocalPosition = position;
+                canvasRoot.AddChild(entity);
+                entity.OnStart();
+                return entity;
             }
             case "FloatingPopUpText":
             {
+                // Transient popups carry their own screen-space canvas (they are also spawned at
+                // runtime far from the scene), so they are started standalone and not parented.
                 float time = ParseFloat(props.GetValueOrDefault("Time", "5"));
                 Color color = props.TryGetValue("Color", out var c) ? ParseColor(c) : Color.White;
                 float scale = ParseFloat(props.GetValueOrDefault("Scale", "1.0"));

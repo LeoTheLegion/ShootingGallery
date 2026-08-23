@@ -7,6 +7,9 @@
   Anchors: HAnchor Center|Left|Right, VAnchor Top|Bottom|Middle.
 -->
 <Scene Name="GameScene">
+  <!-- Screen-space canvas root: all static GUI below is parented under this. -->
+  <Entity Type="GameObject" />
+
   <Entity Id="title" Type="TextEntity" HAnchor="Center" VAnchor="Top" Y="30">
     <Property Name="Text" Value="URANIUM REVOLVER" />
     <Property Name="Color" Value="LimeGreen" />

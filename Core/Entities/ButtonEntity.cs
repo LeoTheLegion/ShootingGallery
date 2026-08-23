@@ -1,13 +1,15 @@
 using System;
 using CoreEssentials.Debugging;
 using CoreEssentials.GameSystems.EntitySystems.EntityOOPSystem;
+using CoreEssentials.GameSystems.EntitySystems.EntityOOPSystem.Components.BuiltIn;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace ShootingGallery.Core;
 
 /// <summary>
-/// A positioned button. All Canvas/Myra plumbing lives in ButtonComponent.
+/// A positioned button. Rendering and input are handled by CE's built-in ButtonComponent,
+/// which resolves the nearest CanvasComponent in the entity hierarchy on attach.
 /// </summary>
 public class ButtonEntity : Entity
 {
