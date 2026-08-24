@@ -25,7 +25,7 @@ public class GameScene : Scene
         Debug.StickyLog.IsVisible = false;
 
         var entitySystem = GetGameSystem<EntitySystem>();
-        var screenCenter = ScreenManager.ScreenCenter;
+        var worldCenter = World.Center;
 
         // HUD labels are data-driven in Content/game_scene.xml (CE GameObjectEntity +
         // AnchorComponent + LabelComponent); grab them by Id to wire live updates below.
@@ -59,7 +59,7 @@ public class GameScene : Scene
                 Color messageColor = new Color(0, 255, 0);
 
                 entitySystem.CreateEntity<FloatingPopUpText>(
-                    new Vector2(screenCenter.X, 150),
+                    new Vector2(worldCenter.X, 150),
                     3f,
                     message,
                     messageColor,
@@ -70,7 +70,7 @@ public class GameScene : Scene
                 // Create a smaller floating text with details
                 string detailMessage = $"You've grown {args.MutationLevel} extra arm{(args.MutationLevel > 1 ? "s" : "")}!";
                 entitySystem.CreateEntity<FloatingPopUpText>(
-                    new Vector2(screenCenter.X, 200),
+                    new Vector2(worldCenter.X, 200),
                     4f,
                     detailMessage,
                     messageColor,
@@ -110,7 +110,7 @@ public class GameScene : Scene
             // Display game over message (pass all ctor args explicitly — CE's CreateEntity<T>
             // forwards this array to Activator.CreateInstance, which cannot fill optional params)
             entitySystem.CreateEntity<FloatingPopUpText>(
-                new Vector2(screenCenter.X, screenCenter.Y - 50),
+                new Vector2(worldCenter.X, worldCenter.Y - 50),
                 5f,
                 "GAME OVER!",
                 Color.Red,

@@ -24,7 +24,7 @@ public class StartMenuScene : Scene
         // click behavior is wired here, plus two decorative radiation popups.
         LoadEntitiesFromXml("start_menu.xml", entitySystem);
 
-        var center = ScreenManager.ScreenCenter;
+        var center = World.Center;
         entitySystem.CreateEntity<FloatingPopUpText>(new Vector2(center.X - 300, center.Y), 5f, "☢️ RADIATION ☢️", Color.LimeGreen, 1.5f, true);
         entitySystem.CreateEntity<FloatingPopUpText>(new Vector2(center.X + 300, center.Y), 5f, "☢️ RADIATION ☢️", Color.LimeGreen, 1.5f, true);
 

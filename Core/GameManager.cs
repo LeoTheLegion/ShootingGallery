@@ -209,9 +209,9 @@ namespace ShootingGallery
                 return null;
             }
 
-            // Calculate grid cell size based on screen dimensions
-            float cellWidth = ScreenManager.ScreenWidth / (float)GRID_COLS;
-            float cellHeight = ScreenManager.ScreenHeight / (float)GRID_ROWS;
+            // Calculate grid cell size from the world borders
+            float cellWidth = World.Width / (float)GRID_COLS;
+            float cellHeight = World.Height / (float)GRID_ROWS;
 
             Console.WriteLine($"Grid cell size: {cellWidth}x{cellHeight}");
 
@@ -319,8 +319,8 @@ namespace ShootingGallery
         // Shared by OnStart (initial fill) and RestartRound (refill) so the two can't drift apart.
         private void PopulateGrid()
         {
-            float cellWidth = ScreenManager.ScreenWidth / (float)GRID_COLS;
-            float cellHeight = ScreenManager.ScreenHeight / (float)GRID_ROWS;
+            float cellWidth = World.Width / (float)GRID_COLS;
+            float cellHeight = World.Height / (float)GRID_ROWS;
 
             for (int row = 0; row < GRID_ROWS; row++)
             {

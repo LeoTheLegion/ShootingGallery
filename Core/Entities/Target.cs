@@ -184,8 +184,8 @@ namespace ShootingGallery
 
         protected void MoveRandomly()
         {
-            _position.X = GameRandom.Next(targetRadius, ScreenManager.ScreenWidth - targetRadius);
-            _position.Y = GameRandom.Next(targetRadius, ScreenManager.ScreenHeight - targetRadius);
+            _position.X = GameRandom.Next(targetRadius, World.Width - targetRadius);
+            _position.Y = GameRandom.Next(targetRadius, World.Height - targetRadius);
         }
         protected void Reset()
         {

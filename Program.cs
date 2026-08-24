@@ -11,10 +11,10 @@ game.Graphics.PreferredBackBufferWidth = 1280;
 game.Graphics.PreferredBackBufferHeight = 720;
 game.Graphics.ApplyChanges();
 
-// Initialize ScreenManager
-ScreenManager.Initialize(game);
+// The world is 1:1 with the window (no camera); gameplay only ever asks World.
+World.Initialize(game.Graphics.PreferredBackBufferWidth, game.Graphics.PreferredBackBufferHeight);
 
-// Create a loading screen with custom colors
+// Create a loading scene with custom colors
 LoadingScene loadingScene = new LoadingScene(
     "Loading Character Demo...", 
     Color.Black, 
