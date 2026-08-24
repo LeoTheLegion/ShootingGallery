@@ -147,18 +147,22 @@ namespace ShootingGallery
             // v0.14.0: spatial query — a target is only hittable if its center is within
             // targetRadius * _scale (<= TARGET_RADIUS) of the shot, so this radius is the exact
             // candidate set. FindNearby uses the spatial grid (O(1) avg) and excludes destroyed targets.
+            // A single shot resolves to ONE target — the closest one. Hitting every candidate in
+            // range meant a bomb within 45px of the aim point could end the game even when you
+            // were shooting a regular target next to it.
             bool targetHit = false;
             float maxHitRadius = GameConstants.TARGET_RADIUS;
-            foreach (var target in EntitySystem.FindNearby<BaseTarget>(e.Position, maxHitRadius))
+            var candidates = EntitySystem.FindNearby<BaseTarget>(e.Position, maxHitRadius)
+                .OrderBy(t => Vector2.DistanceSquared(t.Position, e.Position))
+                .ToList();
+
+            if (candidates.Count > 0)
             {
-                Console.WriteLine($"Checking target at position: {target.Position}, distance: {Vector2.Distance(target.Position, e.Position)}");
+                var target = candidates[0];
+                Console.WriteLine($"Shot resolves to nearest target at {target.Position} ({candidates.Count} in range)");
 
                 target.HandleShot(e.Position);
-
-                if (target.IsDestroyed)
-                {
-                    targetHit = true;
-                }
+                targetHit = target.IsDestroyed;
             }
 
             // If any target was hit and this was a player shot (not a random shot),
