@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using CoreEssentials.Debugging;
 using CoreEssentials.GameSystems;
 using CoreEssentials.GameSystems.EntitySystems.EntityOOPSystem;
+using CoreEssentials.GameSystems.EntitySystems.EntityOOPSystem.Components.BuiltIn;
 using CoreEssentials.Scenes;
 using Microsoft.Xna.Framework;
 using ShootingGallery;
@@ -26,14 +27,14 @@ public class GameScene : Scene
         var entitySystem = GetGameSystem<EntitySystem>();
         var screenCenter = ScreenManager.ScreenCenter;
 
-        // HUD labels are data-driven GameObjects in Content/game_scene.xml; grab their
-        // LabelComponents by Id so we can wire live updates below. No buttons, so no commands.
-        var hud = SceneLoader.LoadScene(entitySystem, "game_scene", new Dictionary<string, Action>());
-        var scoreText = hud["score"].GetComponent<LabelComponent>();
-        var timerText = hud["timer"].GetComponent<LabelComponent>();
-        var multiplierText = hud["multiplier"].GetComponent<LabelComponent>();
-        var radiationText = hud["radiation"].GetComponent<LabelComponent>();
-        var mutationText = hud["mutation"].GetComponent<LabelComponent>();
+        // HUD labels are data-driven in Content/game_scene.xml (CE GameObjectEntity +
+        // AnchorComponent + LabelComponent); grab them by Id to wire live updates below.
+        LoadEntitiesFromXml("game_scene.xml", entitySystem);
+        var scoreText = entitySystem.FindById("score")?.GetComponent<LabelComponent>();
+        var timerText = entitySystem.FindById("timer")?.GetComponent<LabelComponent>();
+        var multiplierText = entitySystem.FindById("multiplier")?.GetComponent<LabelComponent>();
+        var radiationText = entitySystem.FindById("radiation")?.GetComponent<LabelComponent>();
+        var mutationText = entitySystem.FindById("mutation")?.GetComponent<LabelComponent>();
 
         // Create the player's crosshair
         var crosshair = entitySystem.CreateEntity<Crosshair>();

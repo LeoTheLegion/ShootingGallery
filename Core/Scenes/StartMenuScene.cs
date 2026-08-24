@@ -1,8 +1,7 @@
-using System;
 using System.Collections;
-using System.Collections.Generic;
 using CoreEssentials.GameSystems;
 using CoreEssentials.GameSystems.EntitySystems.EntityOOPSystem;
+using CoreEssentials.GameSystems.EntitySystems.EntityOOPSystem.Components.BuiltIn;
 using CoreEssentials.Scenes;
 using Microsoft.Xna.Framework;
 
@@ -20,14 +19,18 @@ public class StartMenuScene : Scene
     {
         var entitySystem = GetGameSystem<EntitySystem>();
 
-        // Layout, text, and colors live in Scenes/start_menu.xml. Only the click
-        // behavior is wired in code, selected by the Command name in the XML.
-        var commands = new Dictionary<string, Action>
-        {
-            ["StartGame"] = () => SceneManager.LoadScene(new GameScene()),
-        };
+        // Layout, text, colors and the button are all data in Content/start_menu.xml
+        // (CE GameObjectEntity + AnchorComponent + Label/Button components). Only the
+        // click behavior is wired here, plus two decorative radiation popups.
+        LoadEntitiesFromXml("start_menu.xml", entitySystem);
 
-        SceneLoader.LoadScene(entitySystem, "start_menu", commands);
+        var center = ScreenManager.ScreenCenter;
+        entitySystem.CreateEntity<FloatingPopUpText>(new Vector2(center.X - 300, center.Y), 5f, "☢️ RADIATION ☢️", Color.LimeGreen, 1.5f, true);
+        entitySystem.CreateEntity<FloatingPopUpText>(new Vector2(center.X + 300, center.Y), 5f, "☢️ RADIATION ☢️", Color.LimeGreen, 1.5f, true);
+
+        var startButton = entitySystem.FindById("startButton")?.GetComponent<ButtonComponent>();
+        if (startButton != null)
+            startButton.Clicked += () => SceneManager.LoadScene(new GameScene());
 
         yield return null;
     }

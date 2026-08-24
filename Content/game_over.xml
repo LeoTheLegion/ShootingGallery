@@ -1,53 +1,125 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  Game over screen layout. All GUI is data-driven: each widget is a GameObject that declares
-  its component (LabelComponent / ButtonComponent) plus its properties. The cause / score /
-  mutation labels carry placeholder text here; GameOverScene overrides them at runtime from its
-  constructor state (final score, mutation level, bomb hit). Buttons use Command names resolved
-  in code and wired to the ButtonComponent's Clicked event.
-  Anchors: HAnchor Center|Left|Right, VAnchor Top|Bottom|Middle.
+  Game over screen, fully data-driven with CE's anchored GUI: a root GameObjectEntity carries
+  the CanvasComponent; each label/button is a child of AnchorComponent + Label/Button component.
+  The cause / score / mutation labels carry placeholder text here; GameOverScene overrides them
+  at runtime. Button clicks are wired in code by Id (restartButton / menuButton).
 -->
-<Scene Name="GameOver">
-  <!-- GameObject carrying a CanvasComponent; its nested GUI entities become its children. -->
-  <Entity Type="GameObject">
-    <Property Name="Component" Value="CanvasComponent" />
+<Scene>
+  <EntityDefinition Type="CoreEssentials.GameSystems.EntitySystems.EntityOOPSystem.GameObjectEntity" Id="hud">
+    <Position X="0" Y="0" />
+    <Components>
+      <Component Type="CanvasComponent" />
+      <Component Type="AnchorComponent">
+        <Properties>
+          <Property Name="Preset" Value="TopLeft" />
+          <Property Name="Offset" Value="0,0" />
+        </Properties>
+      </Component>
+    </Components>
 
-    <Entity Id="gameOver" Type="GameObject" HAnchor="Center" VAnchor="Top" Y="100">
-      <Property Name="Component" Value="LabelComponent" />
-      <Property Name="Text" Value="GAME OVER" />
-      <Property Name="Color" Value="Red" />
-      <Property Name="Scale" Value="2" />
-    </Entity>
+    <Children>
+      <EntityDefinition Type="CoreEssentials.GameSystems.EntitySystems.EntityOOPSystem.GameObjectEntity" Id="gameOver">
+        <Components>
+          <Component Type="AnchorComponent">
+            <Properties>
+              <Property Name="Preset" Value="TopCenter" />
+              <Property Name="Offset" Value="0,100" />
+            </Properties>
+          </Component>
+          <Component Type="LabelComponent">
+            <Properties>
+              <Property Name="Text" Value="GAME OVER" />
+              <Property Name="TextColor" Value="Red" />
+              <Property Name="Scale" Value="2,2" />
+            </Properties>
+          </Component>
+        </Components>
+      </EntityDefinition>
 
-    <Entity Id="cause" Type="GameObject" HAnchor="Center" VAnchor="Top" Y="200">
-      <Property Name="Component" Value="LabelComponent" />
-      <Property Name="Text" Value="Your 1 minute of shooting is up!" />
-      <Property Name="Color" Value="White" />
-    </Entity>
+      <EntityDefinition Type="CoreEssentials.GameSystems.EntitySystems.EntityOOPSystem.GameObjectEntity" Id="cause">
+        <Components>
+          <Component Type="AnchorComponent">
+            <Properties>
+              <Property Name="Preset" Value="TopCenter" />
+              <Property Name="Offset" Value="0,200" />
+            </Properties>
+          </Component>
+          <Component Type="LabelComponent">
+            <Properties>
+              <Property Name="Text" Value="Your 1 minute of shooting is up!" />
+              <Property Name="TextColor" Value="White" />
+            </Properties>
+          </Component>
+        </Components>
+      </EntityDefinition>
 
-    <Entity Id="score" Type="GameObject" HAnchor="Center" VAnchor="Top" Y="280">
-      <Property Name="Component" Value="LabelComponent" />
-      <Property Name="Text" Value="Final Score: 0" />
-      <Property Name="Color" Value="Yellow" />
-      <Property Name="Scale" Value="1.5" />
-    </Entity>
+      <EntityDefinition Type="CoreEssentials.GameSystems.EntitySystems.EntityOOPSystem.GameObjectEntity" Id="score">
+        <Components>
+          <Component Type="AnchorComponent">
+            <Properties>
+              <Property Name="Preset" Value="TopCenter" />
+              <Property Name="Offset" Value="0,280" />
+            </Properties>
+          </Component>
+          <Component Type="LabelComponent">
+            <Properties>
+              <Property Name="Text" Value="Final Score: 0" />
+              <Property Name="TextColor" Value="Yellow" />
+              <Property Name="Scale" Value="1.5,1.5" />
+            </Properties>
+          </Component>
+        </Components>
+      </EntityDefinition>
 
-    <Entity Id="mutation" Type="GameObject" HAnchor="Center" VAnchor="Top" Y="360">
-      <Property Name="Component" Value="LabelComponent" />
-      <Property Name="Text" Value="You escaped without mutations!" />
-      <Property Name="Color" Value="White" />
-    </Entity>
+      <EntityDefinition Type="CoreEssentials.GameSystems.EntitySystems.EntityOOPSystem.GameObjectEntity" Id="mutation">
+        <Components>
+          <Component Type="AnchorComponent">
+            <Properties>
+              <Property Name="Preset" Value="TopCenter" />
+              <Property Name="Offset" Value="0,360" />
+            </Properties>
+          </Component>
+          <Component Type="LabelComponent">
+            <Properties>
+              <Property Name="Text" Value="You escaped without mutations!" />
+              <Property Name="TextColor" Value="White" />
+            </Properties>
+          </Component>
+        </Components>
+      </EntityDefinition>
 
-    <Entity Id="restart" Type="GameObject" HAnchor="Center" VAnchor="Top" Y="460">
-      <Property Name="Component" Value="ButtonComponent" />
-      <Property Name="Text" Value="Play Again" />
-      <Property Name="Command" Value="RestartGame" />
-    </Entity>
+      <EntityDefinition Type="CoreEssentials.GameSystems.EntitySystems.EntityOOPSystem.GameObjectEntity" Id="restartButton">
+        <Components>
+          <Component Type="AnchorComponent">
+            <Properties>
+              <Property Name="Preset" Value="TopCenter" />
+              <Property Name="Offset" Value="0,460" />
+            </Properties>
+          </Component>
+          <Component Type="ButtonComponent">
+            <Properties>
+              <Property Name="Text" Value="Play Again" />
+            </Properties>
+          </Component>
+        </Components>
+      </EntityDefinition>
 
-    <Entity Id="menu" Type="GameObject" HAnchor="Center" VAnchor="Top" Y="530">
-      <Property Name="Component" Value="ButtonComponent" />
-      <Property Name="Text" Value="Main Menu" />
-      <Property Name="Command" Value="MainMenu" />
-    </Entity>
-  </Entity>
+      <EntityDefinition Type="CoreEssentials.GameSystems.EntitySystems.EntityOOPSystem.GameObjectEntity" Id="menuButton">
+        <Components>
+          <Component Type="AnchorComponent">
+            <Properties>
+              <Property Name="Preset" Value="TopCenter" />
+              <Property Name="Offset" Value="0,530" />
+            </Properties>
+          </Component>
+          <Component Type="ButtonComponent">
+            <Properties>
+              <Property Name="Text" Value="Main Menu" />
+            </Properties>
+          </Component>
+        </Components>
+      </EntityDefinition>
+    </Children>
+  </EntityDefinition>
 </Scene>

@@ -1,4 +1,5 @@
 ﻿using CoreEssentials.GameSystems.EntitySystems.EntityOOPSystem;
+using CoreEssentials.GameSystems.EntitySystems.EntityOOPSystem.Components.BuiltIn;
 using CoreEssentials.Scenes;
 using CoreEssentials.Utils;
 using Microsoft.Xna.Framework;
@@ -42,10 +43,10 @@ namespace ShootingGallery
         private int _score = 0;
         private float _timeMultiplier;
         private double _targetSpawnTimer;
-        public bool isGameOver => _timer <= 0;        // UI elements (live label components on data-driven GameObjects)
-        private ShootingGallery.Core.LabelComponent _scoreUI;
-        private ShootingGallery.Core.LabelComponent _timerUI;
-        private ShootingGallery.Core.LabelComponent _multiplierUI;
+        public bool isGameOver => _timer <= 0;        // UI elements (CE's built-in live label components on data-driven GameObjects)
+        private LabelComponent _scoreUI;
+        private LabelComponent _timerUI;
+        private LabelComponent _multiplierUI;
 
         // Linked entities
         private RadiationManager _radiationManager;
@@ -58,9 +59,9 @@ namespace ShootingGallery
 
         // Setters
         public void AddScore(int points) => _score += (int)(points * _timeMultiplier);
-        public void SetScoreUI(ShootingGallery.Core.LabelComponent scoreUI) => _scoreUI = scoreUI;
-        public void SetTimerUI(ShootingGallery.Core.LabelComponent timerUI) => _timerUI = timerUI;
-        public void SetMultiplierUI(ShootingGallery.Core.LabelComponent multiplierUI) => _multiplierUI = multiplierUI;
+        public void SetScoreUI(LabelComponent scoreUI) => _scoreUI = scoreUI;
+        public void SetTimerUI(LabelComponent timerUI) => _timerUI = timerUI;
+        public void SetMultiplierUI(LabelComponent multiplierUI) => _multiplierUI = multiplierUI;
         public void SetRadiationManager(RadiationManager radiationManager) => _radiationManager = radiationManager;
         public void SetCrosshair(Crosshair crosshair)
         {

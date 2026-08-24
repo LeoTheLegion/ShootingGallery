@@ -1,4 +1,5 @@
 using CoreEssentials.GameSystems.EntitySystems.EntityOOPSystem;
+using CoreEssentials.GameSystems.EntitySystems.EntityOOPSystem.Components.BuiltIn;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
@@ -35,12 +36,12 @@ namespace ShootingGallery
           // Current state
         private float _currentRadiation = 0f;
         private int _currentMutationLevel = 0;
-        private ShootingGallery.Core.LabelComponent _radiationUI;
+        private LabelComponent _radiationUI;
         
         public int GetMutationLevel() => _currentMutationLevel;
         public float GetRadiationPercentage() => _currentRadiation / MAX_RADIATION;
         
-        public void SetRadiationUI(ShootingGallery.Core.LabelComponent radiationUI) => _radiationUI = radiationUI;
+        public void SetRadiationUI(LabelComponent radiationUI) => _radiationUI = radiationUI;
         
         public RadiationManager()
         {

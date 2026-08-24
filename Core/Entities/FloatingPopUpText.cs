@@ -1,5 +1,6 @@
 ﻿using System;
 using CoreEssentials.GameSystems.EntitySystems.EntityOOPSystem;
+using CoreEssentials.GameSystems.EntitySystems.EntityOOPSystem.Components.BuiltIn;
 using CoreEssentials.Tweening;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -55,10 +56,10 @@ namespace ShootingGallery
             // Components are added in OnStart (CE lifecycle: Awake -> Start).
             // Popups are standalone (no parent), so each carries its own screen-space canvas;
             // the label below resolves this entity's canvas on attach.
-            AddComponent(new CoreEssentials.GameSystems.EntitySystems.EntityOOPSystem.Components.BuiltIn.CanvasComponent(true));
+            AddComponent(new CanvasComponent(true));
             _label = AddComponent(new LabelComponent(_text));
             _label.TextColor = _color;
-            _label.Scale = _scale;
+            _label.Scale = new Vector2(_scale);
 
             var tween = AddComponent(new TweenComponent());
             // Linear upward drift over the lifetime
@@ -79,7 +80,7 @@ namespace ShootingGallery
             {
                 float pulse = (float)Math.Sin(_timeLeft * 10) * 0.2f + 0.8f;
                 _label.Opacity = pulse * Smooth(_totalTime - _timeLeft, _totalTime, 4f);
-                _label.Scale = pulse;
+                _label.Scale = new Vector2(pulse);
             }
             else
             {
@@ -89,12 +90,16 @@ namespace ShootingGallery
             _timeLeft -= (float)gameTime.ElapsedGameTime.TotalSeconds;
         }
 
-        // Eased fade curve; can drift slightly outside [0,1] (LabelComponent clamps)
+        // Eased fade-out over the popup's life. Returns a value guaranteed to be within [0,1]:
+        // CE's LabelComponent passes opacity straight to Myra, which throws on out-of-range.
         private static float Smooth(float currentTime, float totalTime, float strength)
         {
-            double num = Math.Pow(-totalTime + 2 * currentTime, strength);
-            double dom = Math.Pow(totalTime, strength);
-            return (float)(-(num / dom) + 1);
+            if (totalTime <= 0f)
+                return 0f;
+
+            float t = Math.Clamp(currentTime / totalTime, 0f, 1f); // 0 at spawn -> 1 at end of life
+            float eased = (float)Math.Pow(1f - t, strength);        // 1 (visible) -> 0 (gone), never NaN
+            return Math.Clamp(eased, 0f, 1f);
         }
     }
 }

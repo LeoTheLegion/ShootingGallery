@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using CoreEssentials.GameSystems;
 using CoreEssentials.GameSystems.EntitySystems.EntityOOPSystem;
+using CoreEssentials.GameSystems.EntitySystems.EntityOOPSystem.Components.BuiltIn;
 using CoreEssentials.Scenes;
 using Microsoft.Xna.Framework;
 
@@ -41,20 +42,18 @@ public class GameOverScene : Scene
         // Layout and buttons come from Content/game_over.xml. Button clicks are
         // resolved by Command name; the cause/score/mutation labels are then
         // overridden below from this run's state.
-        var commands = new Dictionary<string, Action>
-        {
-            ["RestartGame"] = () => SceneManager.LoadScene(new GameScene()),
-            ["MainMenu"] = () => SceneManager.LoadScene(new StartMenuScene()),
-        };
-        var ui = SceneLoader.LoadScene(entitySystem, "game_over", commands);
+        // Layout, text and buttons are all data in Content/game_over.xml (CE GameObjectEntity +
+        // AnchorComponent + Label/Button components). We override the cause/score/mutation labels
+        // from this run's state and wire the two button commands by Id.
+        LoadEntitiesFromXml("game_over.xml", entitySystem);
 
-        // Cause of game over (labels are data-driven GameObjects; drive them via their component)
-        ui["cause"].GetComponent<LabelComponent>().Text = _bombHit
-            ? "You hit a radioactive bomb!"
-            : "Your 1 minute of shooting is up!";
+        var causeText = entitySystem.FindById("cause")?.GetComponent<LabelComponent>();
+        if (causeText != null)
+            causeText.Text = _bombHit ? "You hit a radioactive bomb!" : "Your 1 minute of shooting is up!";
 
-        // Final score
-        ui["score"].GetComponent<LabelComponent>().Text = $"Final Score: {_finalScore}";
+        var scoreText = entitySystem.FindById("score")?.GetComponent<LabelComponent>();
+        if (scoreText != null)
+            scoreText.Text = $"Final Score: {_finalScore}";
 
         // Mutation summary (message + color depend on mutation level)
         (string mutationMessage, Color mutationColor) = _mutationLevel switch
@@ -64,9 +63,20 @@ public class GameOverScene : Scene
             2 => ("You mutated with two extra arms!", Color.Green),
             _ => ("Your mutations have rendered you unrecognizable!", Color.LimeGreen),
         };
-        var mutationText = ui["mutation"].GetComponent<LabelComponent>();
-        mutationText.Text = mutationMessage;
-        mutationText.TextColor = mutationColor;
+        var mutationText = entitySystem.FindById("mutation")?.GetComponent<LabelComponent>();
+        if (mutationText != null)
+        {
+            mutationText.Text = mutationMessage;
+            mutationText.TextColor = mutationColor;
+        }
+
+        var restartButton = entitySystem.FindById("restartButton")?.GetComponent<ButtonComponent>();
+        if (restartButton != null)
+            restartButton.Clicked += () => SceneManager.LoadScene(new GameScene());
+
+        var menuButton = entitySystem.FindById("menuButton")?.GetComponent<ButtonComponent>();
+        if (menuButton != null)
+            menuButton.Clicked += () => SceneManager.LoadScene(new StartMenuScene());
 
         yield return null;
     }
