@@ -1,5 +1,5 @@
 <!-- Target template: plain GameObjectEntity + TargetComponent (Radioactive behavior). -->
-<EntityTemplate Type="CoreEssentials.GameSystems.EntitySystems.EntityOOPSystem.GameObjectEntity" Rotation="0" Sort="0" Active="true">
+<EntityTemplate Type="GameObjectEntity" Rotation="0" Sort="0" Active="true">
     <Tags>
         <Tag Name="Target" />
         <Tag Name="Radioactive" />

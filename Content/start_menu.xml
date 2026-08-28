@@ -6,7 +6,7 @@
   the two decorative radiation popups are created in StartMenuScene because they are gameplay entities, not GUI.
 -->
 <Scene>
-  <EntityDefinition Type="CoreEssentials.GameSystems.EntitySystems.EntityOOPSystem.GameObjectEntity" Id="hud">
+  <EntityDefinition Type="GameObjectEntity" Id="hud">
     <Position X="0" Y="0" />
     <Components>
       <Component Type="CanvasComponent" />
@@ -21,7 +21,7 @@
     </Components>
 
     <Children>
-      <EntityDefinition Type="CoreEssentials.GameSystems.EntitySystems.EntityOOPSystem.GameObjectEntity" Id="title">
+      <EntityDefinition Type="GameObjectEntity" Id="title">
         <Components>
           <Component Type="AnchorComponent">
             <Properties>
@@ -39,7 +39,7 @@
         </Components>
       </EntityDefinition>
 
-      <EntityDefinition Type="CoreEssentials.GameSystems.EntitySystems.EntityOOPSystem.GameObjectEntity" Id="subtitle">
+      <EntityDefinition Type="GameObjectEntity" Id="subtitle">
         <Components>
           <Component Type="AnchorComponent">
             <Properties>
@@ -57,7 +57,7 @@
         </Components>
       </EntityDefinition>
 
-      <EntityDefinition Type="CoreEssentials.GameSystems.EntitySystems.EntityOOPSystem.GameObjectEntity" Id="line1">
+      <EntityDefinition Type="GameObjectEntity" Id="line1">
         <Components>
           <Component Type="AnchorComponent">
             <Properties>
@@ -74,7 +74,7 @@
         </Components>
       </EntityDefinition>
 
-      <EntityDefinition Type="CoreEssentials.GameSystems.EntitySystems.EntityOOPSystem.GameObjectEntity" Id="line2">
+      <EntityDefinition Type="GameObjectEntity" Id="line2">
         <Components>
           <Component Type="AnchorComponent">
             <Properties>
@@ -91,7 +91,7 @@
         </Components>
       </EntityDefinition>
 
-      <EntityDefinition Type="CoreEssentials.GameSystems.EntitySystems.EntityOOPSystem.GameObjectEntity" Id="line3">
+      <EntityDefinition Type="GameObjectEntity" Id="line3">
         <Components>
           <Component Type="AnchorComponent">
             <Properties>
@@ -108,7 +108,7 @@
         </Components>
       </EntityDefinition>
 
-      <EntityDefinition Type="CoreEssentials.GameSystems.EntitySystems.EntityOOPSystem.GameObjectEntity" Id="warning">
+      <EntityDefinition Type="GameObjectEntity" Id="warning">
         <Components>
           <Component Type="AnchorComponent">
             <Properties>
@@ -126,7 +126,7 @@
         </Components>
       </EntityDefinition>
 
-      <EntityDefinition Type="CoreEssentials.GameSystems.EntitySystems.EntityOOPSystem.GameObjectEntity" Id="startButton">
+      <EntityDefinition Type="GameObjectEntity" Id="startButton">
         <Components>
           <Component Type="AnchorComponent">
             <Properties>
@@ -143,7 +143,7 @@
         </Components>
       </EntityDefinition>
 
-      <EntityDefinition Type="CoreEssentials.GameSystems.EntitySystems.EntityOOPSystem.GameObjectEntity" Id="footer">
+      <EntityDefinition Type="GameObjectEntity" Id="footer">
         <Components>
           <Component Type="AnchorComponent">
             <Properties>
