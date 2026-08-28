@@ -14,6 +14,9 @@ game.Graphics.ApplyChanges();
 // The world is 1:1 with the window (no camera); gameplay only ever asks World.
 World.Initialize(game.Graphics.PreferredBackBufferWidth, game.Graphics.PreferredBackBufferHeight);
 
+// XML-declared <Bind> commands in the menu scenes resolve through this reference.
+MenuCommandsComponent.Initialize(game);
+
 // Create a loading scene with custom colors
 LoadingScene loadingScene = new LoadingScene(
     "Loading Character Demo...", 

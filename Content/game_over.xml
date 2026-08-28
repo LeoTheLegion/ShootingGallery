@@ -3,7 +3,7 @@
   Game over screen, fully data-driven with CE's anchored GUI: a root GameObjectEntity carries
   the CanvasComponent; each label/button is a child of AnchorComponent + Label/Button component.
   The cause / score / mutation labels carry placeholder text here; GameOverScene overrides them
-  at runtime. Button clicks are wired in code by Id (restartButton / menuButton).
+  at runtime. Button clicks are bound declaratively (<Bind> to MenuCommandsComponent).
 -->
 <Scene>
   <EntityDefinition Type="CoreEssentials.GameSystems.EntitySystems.EntityOOPSystem.GameObjectEntity" Id="hud">
@@ -16,6 +16,8 @@
           <Property Name="Offset" Value="0,0" />
         </Properties>
       </Component>
+      <!-- Command target for the <Bind>-wired buttons below (no FindById + subscribe code). -->
+      <Component Type="MenuCommandsComponent" />
     </Components>
 
     <Children>
@@ -31,7 +33,7 @@
             <Properties>
               <Property Name="Text" Value="GAME OVER" />
               <Property Name="TextColor" Value="Red" />
-              <Property Name="Scale" Value="2,2" />
+              <Property Name="Scale" Value="2" />
             </Properties>
           </Component>
         </Components>
@@ -66,7 +68,7 @@
             <Properties>
               <Property Name="Text" Value="Final Score: 0" />
               <Property Name="TextColor" Value="Yellow" />
-              <Property Name="Scale" Value="1.5,1.5" />
+              <Property Name="Scale" Value="1.5" />
             </Properties>
           </Component>
         </Components>
@@ -102,6 +104,7 @@
               <Property Name="Text" Value="Play Again" />
             </Properties>
           </Component>
+          <Bind Event="Clicked" Command="StartGame" />
         </Components>
       </EntityDefinition>
 
@@ -118,6 +121,7 @@
               <Property Name="Text" Value="Main Menu" />
             </Properties>
           </Component>
+          <Bind Event="Clicked" Command="BackToMenu" />
         </Components>
       </EntityDefinition>
     </Children>

@@ -39,12 +39,10 @@ public class GameOverScene : Scene
     {
         var entitySystem = GetGameSystem<EntitySystem>();
 
-        // Layout and buttons come from Content/game_over.xml. Button clicks are
-        // resolved by Command name; the cause/score/mutation labels are then
-        // overridden below from this run's state.
         // Layout, text and buttons are all data in Content/game_over.xml (CE GameObjectEntity +
-        // AnchorComponent + Label/Button components). We override the cause/score/mutation labels
-        // from this run's state and wire the two button commands by Id.
+        // AnchorComponent + Label/Button components). The two button clicks are bound
+        // declaratively in XML (<Bind> to MenuCommandsComponent); we only override the
+        // cause/score/mutation labels from this run's state below.
         LoadEntitiesFromXml("game_over.xml", entitySystem);
 
         var causeText = entitySystem.FindById("cause")?.GetComponent<LabelComponent>();
@@ -69,14 +67,6 @@ public class GameOverScene : Scene
             mutationText.Text = mutationMessage;
             mutationText.TextColor = mutationColor;
         }
-
-        var restartButton = entitySystem.FindById("restartButton")?.GetComponent<ButtonComponent>();
-        if (restartButton != null)
-            restartButton.Clicked += () => SceneManager.LoadScene(new GameScene());
-
-        var menuButton = entitySystem.FindById("menuButton")?.GetComponent<ButtonComponent>();
-        if (menuButton != null)
-            menuButton.Clicked += () => SceneManager.LoadScene(new StartMenuScene());
 
         yield return null;
     }

@@ -1,7 +1,6 @@
 using System.Collections;
 using CoreEssentials.GameSystems;
 using CoreEssentials.GameSystems.EntitySystems.EntityOOPSystem;
-using CoreEssentials.GameSystems.EntitySystems.EntityOOPSystem.Components.BuiltIn;
 using CoreEssentials.Scenes;
 using Microsoft.Xna.Framework;
 
@@ -20,17 +19,14 @@ public class StartMenuScene : Scene
         var entitySystem = GetGameSystem<EntitySystem>();
 
         // Layout, text, colors and the button are all data in Content/start_menu.xml
-        // (CE GameObjectEntity + AnchorComponent + Label/Button components). Only the
-        // click behavior is wired here, plus two decorative radiation popups.
+        // (CE GameObjectEntity + AnchorComponent + Label/Button components). The START
+        // click is bound declaratively in XML (<Bind> to MenuCommandsComponent.StartGame);
+        // here we only add two decorative radiation popups.
         LoadEntitiesFromXml("start_menu.xml", entitySystem);
 
         var center = World.Center;
         entitySystem.CreateEntity<FloatingPopUpText>(new Vector2(center.X - 300, center.Y), 5f, "☢️ RADIATION ☢️", Color.LimeGreen, 1.5f, true);
         entitySystem.CreateEntity<FloatingPopUpText>(new Vector2(center.X + 300, center.Y), 5f, "☢️ RADIATION ☢️", Color.LimeGreen, 1.5f, true);
-
-        var startButton = entitySystem.FindById("startButton")?.GetComponent<ButtonComponent>();
-        if (startButton != null)
-            startButton.Clicked += () => SceneManager.LoadScene(new GameScene());
 
         yield return null;
     }

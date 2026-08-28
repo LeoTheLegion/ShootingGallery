@@ -2,8 +2,8 @@
 <!--
   Start menu, fully data-driven with CE's anchored GUI: a root GameObjectEntity carries the
   CanvasComponent; each label/button is a child of AnchorComponent + Label/Button component.
-  The START MUTATION button click is wired in code by Id (startButton); the two decorative
-  radiation popups are created in StartMenuScene because they are gameplay entities, not GUI.
+  The START MUTATION button click is bound declaratively (<Bind> to MenuCommandsComponent.StartGame);
+  the two decorative radiation popups are created in StartMenuScene because they are gameplay entities, not GUI.
 -->
 <Scene>
   <EntityDefinition Type="CoreEssentials.GameSystems.EntitySystems.EntityOOPSystem.GameObjectEntity" Id="hud">
@@ -16,6 +16,8 @@
           <Property Name="Offset" Value="0,0" />
         </Properties>
       </Component>
+      <!-- Command target for the <Bind>-wired button below (no FindById + subscribe code). -->
+      <Component Type="MenuCommandsComponent" />
     </Components>
 
     <Children>
@@ -31,7 +33,7 @@
             <Properties>
               <Property Name="Text" Value="URANIUM REVOLVER" />
               <Property Name="TextColor" Value="LimeGreen" />
-              <Property Name="Scale" Value="2.5,2.5" />
+              <Property Name="Scale" Value="2.5" />
             </Properties>
           </Component>
         </Components>
@@ -49,7 +51,7 @@
             <Properties>
               <Property Name="Text" Value="A Radioactive Shooting Gallery" />
               <Property Name="TextColor" Value="Yellow" />
-              <Property Name="Scale" Value="1.5,1.5" />
+              <Property Name="Scale" Value="1.5" />
             </Properties>
           </Component>
         </Components>
@@ -118,7 +120,7 @@
             <Properties>
               <Property Name="Text" Value="WARNING: Extreme Radiation Exposure!" />
               <Property Name="TextColor" Value="Orange" />
-              <Property Name="Scale" Value="1.2,1.2" />
+              <Property Name="Scale" Value="1.2" />
             </Properties>
           </Component>
         </Components>
@@ -137,6 +139,7 @@
               <Property Name="Text" Value="START MUTATION" />
             </Properties>
           </Component>
+          <Bind Event="Clicked" Command="StartGame" />
         </Components>
       </EntityDefinition>
 
