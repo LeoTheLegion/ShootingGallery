@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  Game HUD layout, fully data-driven with CE's anchored GUI (PR #70): a root
-  GameObjectEntity carries the CanvasComponent; every label is a child composed of an
-  AnchorComponent (preset + pixel offset) plus a LabelComponent. The crosshair, radiation
-  manager and game manager are gameplay entities created in code (see GameScene). Each label
-  carries an Id so code can grab its component to drive live updates (score, timer, etc.).
+  Fully data-driven game scene: a root GameObjectEntity carries the CanvasComponent; every
+  label is a child composed of an AnchorComponent (preset + pixel offset) plus a LabelComponent.
+  The crosshair and round director are also declared here as plain GameObjectEntities whose
+  entire behavior lives in components (CrosshairComponent / GameDirectorComponent). Each label
+  carries an Id so the director can resolve it by id on its first Update.
 -->
 <Scene>
   <EntityDefinition Type="CoreEssentials.GameSystems.EntitySystems.EntityOOPSystem.GameObjectEntity" Id="hud">
@@ -125,5 +125,31 @@
         </Components>
       </EntityDefinition>
     </Children>
+  </EntityDefinition>
+
+  <!-- Player crosshair: a plain GameObjectEntity whose behavior is entirely components.
+       The main sprite is owned by CrosshairComponent (scene XML can't assign a Sprite
+       object); MouseFollow/MouseClick are declared before it so they exist at OnAttach. -->
+  <EntityDefinition Type="CoreEssentials.GameSystems.EntitySystems.EntityOOPSystem.GameObjectEntity" Id="crosshair">
+    <Tags>
+      <Tag Name="Crosshair" />
+    </Tags>
+    <Components>
+      <Component Type="MouseFollowComponent">
+        <Properties>
+          <Property Name="Offset" Value="25,25" />
+        </Properties>
+      </Component>
+      <Component Type="MouseClickComponent" />
+      <Component Type="CrosshairComponent" />
+    </Components>
+  </EntityDefinition>
+
+  <!-- Round director: a hidden GameObjectEntity (no sprite) whose GameDirectorComponent owns
+       the timer, score, multiplier, target grid, spawning, radiation/mutation and game-over. -->
+  <EntityDefinition Type="CoreEssentials.GameSystems.EntitySystems.EntityOOPSystem.GameObjectEntity" Id="director">
+    <Components>
+      <Component Type="GameDirectorComponent" />
+    </Components>
   </EntityDefinition>
 </Scene>

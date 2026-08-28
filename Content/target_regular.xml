@@ -1,13 +1,18 @@
-<EntityTemplate Type="ShootingGallery.RegularTarget" Rotation="0" Sort="0" Active="true">
+<!--
+  Target template: a plain GameObjectEntity whose entire behavior is the TargetComponent.
+  The sprite (asset + tint) is owned by the component at runtime; no SpriteComponent is
+  declared here because template instantiation re-applies XML component properties after
+  OnStart, which would clobber the component's sprite assignment.
+-->
+<EntityTemplate Type="CoreEssentials.GameSystems.EntitySystems.EntityOOPSystem.GameObjectEntity" Rotation="0" Sort="0" Active="true">
     <Tags>
         <Tag Name="Target" />
         <Tag Name="Regular" />
     </Tags>
     <Components>
-        <Component Type="SpriteComponent">
+        <Component Type="TargetComponent">
             <Properties>
-                <Property Name="Color" Value="255,255,255,255" />
-                <Property Name="Origin" Value="0.5,0.5" />
+                <Property Name="Type" Value="Standard" />
             </Properties>
         </Component>
     </Components>

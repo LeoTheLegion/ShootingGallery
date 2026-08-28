@@ -10,16 +10,25 @@ namespace ShootingGallery.Core
     /// </summary>
     public class MouseFollowComponent : EntityComponent
     {
-        private readonly Vector2 _offset;
+        /// <summary>
+        /// The offset subtracted from the mouse position. Exposed as a settable property so it
+        /// can be configured from XML (<c>&lt;Property Name="Offset" Value="25,25" /&gt;</c>).
+        /// </summary>
+        public Vector2 Offset { get; set; }
 
-        public MouseFollowComponent(Vector2 offset = default)
+        /// <summary>Parameterless constructor required for XML component creation.</summary>
+        public MouseFollowComponent()
         {
-            _offset = offset;
+        }
+
+        public MouseFollowComponent(Vector2 offset)
+        {
+            Offset = offset;
         }
 
         public override void Update(GameTime gameTime)
         {
-            Owner.Position = Mouse.GetState().Position.ToVector2() - _offset;
+            Owner.Position = Mouse.GetState().Position.ToVector2() - Offset;
         }
     }
 }

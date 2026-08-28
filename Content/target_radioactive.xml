@@ -1,13 +1,13 @@
-<EntityTemplate Type="ShootingGallery.RadioactiveTarget" Rotation="0" Sort="0" Active="true">
+<!-- Target template: plain GameObjectEntity + TargetComponent (Radioactive behavior). -->
+<EntityTemplate Type="CoreEssentials.GameSystems.EntitySystems.EntityOOPSystem.GameObjectEntity" Rotation="0" Sort="0" Active="true">
     <Tags>
         <Tag Name="Target" />
         <Tag Name="Radioactive" />
     </Tags>
     <Components>
-        <Component Type="SpriteComponent">
+        <Component Type="TargetComponent">
             <Properties>
-                <Property Name="Color" Value="0,255,0,255" />
-                <Property Name="Origin" Value="0.5,0.5" />
+                <Property Name="Type" Value="Radioactive" />
             </Properties>
         </Component>
     </Components>
