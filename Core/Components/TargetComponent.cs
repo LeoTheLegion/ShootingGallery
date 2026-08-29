@@ -204,15 +204,7 @@ public class TargetComponent : EntityComponent
 
     private void ReportScore(int score)
     {
-        var es = GameRefs.EntitySystem;
-        if (es != null)
-        {
-            FloatingPopUpComponent.Spawn(
-                Owner.Position,
-                2f,
-                score.ToString()
-            );
-        }
+        PopupSpawner.Spawn(Owner.Position, 2f, score.ToString());
 
         OnScore?.Invoke(this, new TargetScoreEventArgs(score, Owner.Position));
     }

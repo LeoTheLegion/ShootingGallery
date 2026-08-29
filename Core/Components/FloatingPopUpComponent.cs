@@ -1,5 +1,4 @@
 using System;
-using CoreEssentials.GameSystems.EntitySystems.EntityOOPSystem;
 using CoreEssentials.GameSystems.EntitySystems.EntityOOPSystem.Components;
 using CoreEssentials.GameSystems.EntitySystems.EntityOOPSystem.Components.BuiltIn;
 using CoreEssentials.Tweening;
@@ -9,22 +8,16 @@ namespace ShootingGallery.Core
 {
     /// <summary>
     /// Drifting, fading score popup. The entity is a plain GameObjectEntity declared in the
-    /// "popup" template (Content/popup.xml), which also declares the CanvasComponent and
-    /// LabelComponent; this component just drives them with per-popup values (text, color,
-    /// scale, duration) set by <see cref="Spawn"/> right after instantiation — before the
-    /// first Update — so the deferred setup in <see cref="EnsureInitialized"/> always sees them.
+    /// "popup" template (Content/popup.xml); this component just drives its CanvasComponent
+    /// and LabelComponent with per-popup values (text, color, scale, duration) set by
+    /// <see cref="PopupSpawner.Spawn"/> right after instantiation — before the first Update —
+    /// so the deferred setup in <see cref="EnsureInitialized"/> always sees them.
     /// </summary>
     public class FloatingPopUpComponent : EntityComponent
     {
-        private const string TemplateName = "Popup";
-        private const string TemplateAsset = "popup.xml";
         private const float Distance = 10f;
 
-        // CE has no HasTemplate API; each scene gets a fresh EntitySystem, so track which
-        // system instance already knows the template and (re)register when it changes.
-        private static EntitySystem _registeredFor;
-
-        // Per-popup values (set by Spawn after instantiation)
+        // Per-popup values (set by PopupSpawner after instantiation)
         public string Text { get; set; } = "";
         public Color TextColor { get; set; } = Color.White;
         public float Scale { get; set; } = 1.0f;
@@ -35,41 +28,6 @@ namespace ShootingGallery.Core
         private TweenVector2 _drift;
         private float _timeLeft;
         private bool _initialized;
-
-        /// <summary>
-        /// Spawns a popup from the shared "popup" template. Callers never touch the entity
-        /// system for popups — this is the single entry point.
-        /// </summary>
-        /// <summary>Spawns a standard white popup at normal scale.</summary>
-        public static FloatingPopUpComponent Spawn(Vector2 position, float time, string text)
-            => Spawn(position, time, text, Color.White, 1.0f, false);
-
-        public static FloatingPopUpComponent Spawn(Vector2 position, float time, string text,
-            Color color, float scale, bool radiationEffect)
-        {
-            var es = GameRefs.EntitySystem;
-            if (es == null)
-                return null;
-
-            if (!ReferenceEquals(_registeredFor, es))
-            {
-                es.RegisterTemplate(TemplateName, TemplateAsset);
-                _registeredFor = es;
-            }
-
-            var entity = es.Instantiate(TemplateName, position);
-            var component = entity.GetComponent<FloatingPopUpComponent>();
-            if (component != null)
-            {
-                component.Text = text;
-                component.TextColor = color;
-                component.Scale = scale;
-                component.Duration = time;
-                component.RadiationEffect = radiationEffect;
-            }
-
-            return component;
-        }
 
         /// <summary>
         /// Declared first in the template so this runs before LabelComponent attaches. Create

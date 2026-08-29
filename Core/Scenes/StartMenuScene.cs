@@ -28,8 +28,8 @@ public class StartMenuScene : Scene
         LoadEntitiesFromXml("start_menu.xml", entitySystem);
 
         var center = World.Center;
-        FloatingPopUpComponent.Spawn(new Vector2(center.X - 300, center.Y), 5f, "☢️ RADIATION ☢️", Color.LimeGreen, 1.5f, true);
-        FloatingPopUpComponent.Spawn(new Vector2(center.X + 300, center.Y), 5f, "☢️ RADIATION ☢️", Color.LimeGreen, 1.5f, true);
+        PopupSpawner.Spawn(new Vector2(center.X - 300, center.Y), 5f, "☢️ RADIATION ☢️", Color.LimeGreen, 1.5f, true);
+        PopupSpawner.Spawn(new Vector2(center.X + 300, center.Y), 5f, "☢️ RADIATION ☢️", Color.LimeGreen, 1.5f, true);
 
         yield return null;
     }
