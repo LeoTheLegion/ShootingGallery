@@ -135,9 +135,11 @@
       <Tag Name="Crosshair" />
     </Tags>
     <Components>
+      <!-- Offset is 0: the sprite data (crosshair_sprite.xml) already declares a centered
+           origin, and CE places the sprite's origin at the entity Position. -->
       <Component Type="MouseFollowComponent">
         <Properties>
-          <Property Name="Offset" Value="25,25" />
+          <Property Name="Offset" Value="0,0" />
         </Properties>
       </Component>
       <Component Type="MouseClickComponent" />
