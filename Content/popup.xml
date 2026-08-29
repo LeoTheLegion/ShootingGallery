@@ -6,8 +6,8 @@
 
   Unity-style prefab defaults: the values below are the baseline for every popup.
   Template properties are applied after OnAttach and before the first Update, so the
-  component's deferred init (EnsureInitialized) always sees them. Runtime code
-  (PopupSpawner.Spawn) only overrides what varies per spawn — mostly the text.
+  component's deferred init (EnsureInitialized) always sees them. Each spawn site
+  instantiates the template and pokes only what varies per spawn — mostly the text.
 -->
 <EntityTemplate Type="GameObjectEntity" Rotation="0" Sort="10" Active="true">
     <Tags>

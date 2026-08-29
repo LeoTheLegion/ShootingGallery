@@ -228,32 +228,33 @@ public class GameDirectorComponent : EntityComponent
         if (_mutationUI != null)
             _mutationUI.Text = $"Arms: {_currentMutationLevel + 1}";
 
-        // Celebrate with floating popups (purely presentational, spawned via the shared system)
-        if (EntitySystem != null && _currentMutationLevel > 0)
+        // Celebrate with floating popups (purely presentational). Unity-style: instantiate
+        // the "Popup" prefab and poke only the fields that differ from its XML defaults.
+        if (_currentMutationLevel > 0)
         {
             Vector2 worldCenter = World.Center;
             Color messageColor = new Color(0, 255, 0);
 
-            PopupSpawner.Spawn(
-                EntitySystem,
-                new Vector2(worldCenter.X, 150),
-                text: $"MUTATION LEVEL {_currentMutationLevel}!",
-                duration: 3f,
-                color: messageColor,
-                scale: 1.5f,
-                radiationEffect: true
-            );
+            var mainPopup = InstantiateTemplate("Popup", new Vector2(worldCenter.X, 150))?.GetComponent<FloatingPopUpComponent>();
+            if (mainPopup != null)
+            {
+                mainPopup.Text = $"MUTATION LEVEL {_currentMutationLevel}!";
+                mainPopup.Duration = 3f;
+                mainPopup.TextColor = messageColor;
+                mainPopup.Scale = 1.5f;
+                mainPopup.RadiationEffect = true;
+            }
 
             string detailMessage = $"You've grown {_currentMutationLevel} extra arm{(_currentMutationLevel > 1 ? "s" : "")}!";
-            PopupSpawner.Spawn(
-                EntitySystem,
-                new Vector2(worldCenter.X, 200),
-                text: detailMessage,
-                duration: 4f,
-                color: messageColor,
-                scale: 1.2f,
-                radiationEffect: true
-            );
+            var detailPopup = InstantiateTemplate("Popup", new Vector2(worldCenter.X, 200))?.GetComponent<FloatingPopUpComponent>();
+            if (detailPopup != null)
+            {
+                detailPopup.Text = detailMessage;
+                detailPopup.Duration = 4f;
+                detailPopup.TextColor = messageColor;
+                detailPopup.Scale = 1.2f;
+                detailPopup.RadiationEffect = true;
+            }
         }
     }
 
@@ -266,15 +267,15 @@ public class GameDirectorComponent : EntityComponent
             return;
 
         // Shot feedback popup (random shots pulse like radiation, player shots are white).
-        PopupSpawner.Spawn(
-            es,
-            e.Position,
-            text: "×",
-            duration: 0.5f,
-            color: e.IsRandomShot ? Color.LimeGreen : Color.White,
-            scale: e.IsRandomShot ? 1.5f : 1.0f,
-            radiationEffect: e.IsRandomShot
-        );
+        var shotPopup = InstantiateTemplate("Popup", e.Position)?.GetComponent<FloatingPopUpComponent>();
+        if (shotPopup != null)
+        {
+            shotPopup.Text = "×";
+            shotPopup.Duration = 0.5f;
+            shotPopup.TextColor = e.IsRandomShot ? Color.LimeGreen : Color.White;
+            shotPopup.Scale = e.IsRandomShot ? 1.5f : 1.0f;
+            shotPopup.RadiationEffect = e.IsRandomShot;
+        }
 
         // Spatial query: a target is only hittable within TARGET_RADIUS of the shot.
         // A single shot resolves to ONE target — the closest one (so a bomb near the aim

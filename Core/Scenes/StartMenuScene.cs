@@ -18,6 +18,9 @@ public class StartMenuScene : Scene
     {
         var entitySystem = GetGameSystem<EntitySystem>();
 
+        // One-time template registration (until CE auto-registers templates — upstream issue #84).
+        entitySystem.RegisterTemplate("Popup", "popup.xml");
+
         // Layout, text, colors and the button are all data in Content/start_menu.xml
         // (CE GameObjectEntity + AnchorComponent + Label/Button components). The START
         // click is bound declaratively in XML (<Bind> to MenuCommandsComponent.StartGame);
@@ -25,11 +28,23 @@ public class StartMenuScene : Scene
         LoadEntitiesFromXml("start_menu.xml", entitySystem);
 
         var center = World.Center;
-        PopupSpawner.Spawn(entitySystem, new Vector2(center.X - 300, center.Y),
-            text: "☢️ RADIATION ☢️", duration: 5f, color: Color.LimeGreen, scale: 1.5f, radiationEffect: true);
-        PopupSpawner.Spawn(entitySystem, new Vector2(center.X + 300, center.Y),
-            text: "☢️ RADIATION ☢️", duration: 5f, color: Color.LimeGreen, scale: 1.5f, radiationEffect: true);
+        SpawnRadiationPopup(entitySystem, new Vector2(center.X - 300, center.Y));
+        SpawnRadiationPopup(entitySystem, new Vector2(center.X + 300, center.Y));
 
         yield return null;
+    }
+
+    /// <summary>Decorative radiation popup — Unity-style prefab instantiate + field pokes.</summary>
+    private void SpawnRadiationPopup(EntitySystem entitySystem, Vector2 position)
+    {
+        var popup = entitySystem.Instantiate("Popup", position)?.GetComponent<FloatingPopUpComponent>();
+        if (popup == null)
+            return;
+
+        popup.Text = "☢️ RADIATION ☢️";
+        popup.Duration = 5f;
+        popup.TextColor = Color.LimeGreen;
+        popup.Scale = 1.5f;
+        popup.RadiationEffect = true;
     }
 }

@@ -204,8 +204,11 @@ public class TargetComponent : EntityComponent
 
     private void ReportScore(int score)
     {
-        // Prefab defaults (duration 2s) come from Content/popup.xml — only the text varies.
-        PopupSpawner.Spawn(EntitySystem, Owner.Position, text: score.ToString());
+        // Unity-style: instantiate the "Popup" prefab; its XML defaults (duration 2s, white,
+        // scale 1) apply — only the text varies per hit.
+        var popup = InstantiateTemplate("Popup", Owner.Position)?.GetComponent<FloatingPopUpComponent>();
+        if (popup != null)
+            popup.Text = score.ToString();
 
         OnScore?.Invoke(this, new TargetScoreEventArgs(score, Owner.Position));
     }

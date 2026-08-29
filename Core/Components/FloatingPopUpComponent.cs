@@ -9,15 +9,15 @@ namespace ShootingGallery.Core
     /// <summary>
     /// Drifting, fading score popup. The entity is a plain GameObjectEntity declared in the
     /// "popup" template (Content/popup.xml); this component just drives its CanvasComponent
-    /// and LabelComponent with per-popup values (text, color, scale, duration) set by
-    /// <see cref="PopupSpawner.Spawn"/> right after instantiation — before the first Update —
-    /// so the deferred setup in <see cref="EnsureInitialized"/> always sees them.
+    /// and LabelComponent with per-popup values (text, color, scale, duration) that each spawn
+    /// site pokes right after InstantiateTemplate — before the first Update — so the deferred
+    /// setup in <see cref="EnsureInitialized"/> always sees them.
     /// </summary>
     public class FloatingPopUpComponent : EntityComponent
     {
         private const float Distance = 10f;
 
-        // Per-popup values (set by PopupSpawner after instantiation)
+        // Per-popup values (poked by each spawn site right after InstantiateTemplate)
         public string Text { get; set; } = "";
         public Color TextColor { get; set; } = Color.White;
         public float Scale { get; set; } = 1.0f;

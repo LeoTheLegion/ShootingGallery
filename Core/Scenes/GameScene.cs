@@ -29,6 +29,9 @@ public class GameScene : Scene
 
         var entitySystem = GetGameSystem<EntitySystem>();
 
+        // One-time template registration (until CE auto-registers templates — upstream issue #84).
+        entitySystem.RegisterTemplate("Popup", "popup.xml");
+
         // Load the fully data-driven scene (HUD + crosshair + director).
         LoadEntitiesFromXml("game_scene.xml", entitySystem);
 
@@ -40,14 +43,16 @@ public class GameScene : Scene
         {
             director.OnGameOver += (sender, args) =>
             {
-                PopupSpawner.Spawn(
-                    entitySystem,
-                    new Vector2(worldCenter.X, worldCenter.Y - 50),
-                    text: "GAME OVER!",
-                    duration: 5f,
-                    color: Color.Red,
-                    scale: 2.0f
-                );
+                // Unity-style: instantiate the "Popup" prefab and poke the fields that differ.
+                var popup = entitySystem.Instantiate("Popup", new Vector2(worldCenter.X, worldCenter.Y - 50))
+                    .GetComponent<FloatingPopUpComponent>();
+                if (popup != null)
+                {
+                    popup.Text = "GAME OVER!";
+                    popup.Duration = 5f;
+                    popup.TextColor = Color.Red;
+                    popup.Scale = 2.0f;
+                }
 
                 SceneManager.LoadScene(new GameOverScene(args.FinalScore, args.MutationLevel));
             };
