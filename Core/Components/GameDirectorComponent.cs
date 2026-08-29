@@ -35,17 +35,17 @@ public class GameDirectorComponent : EntityComponent
     }
 
     // Round configuration (static readonly so it captures the XML-loaded values from GameConstants)
-    private static readonly double ROUND_TIME = GameConstants.ROUND_TIME;
-    private static readonly float TIME_MULTIPLIER_START = GameConstants.TIME_MULTIPLIER_START;
-    private static readonly float TIME_MULTIPLIER_MIN = GameConstants.TIME_MULTIPLIER_MIN;
-    private static readonly float TIME_MULTIPLIER_DECAY = GameConstants.TIME_MULTIPLIER_DECAY;
-    private static readonly double TARGET_SPAWN_DELAY = GameConstants.TARGET_SPAWN_DELAY;
-    private static readonly float BOMB_CHANCE = GameConstants.BOMB_CHANCE;
-    private static readonly float RADIOACTIVE_CHANCE = GameConstants.RADIOACTIVE_CHANCE;
+    private static readonly double ROUND_TIME = GameConstants.RoundTime;
+    private static readonly float TIME_MULTIPLIER_START = GameConstants.TimeMultiplierStart;
+    private static readonly float TIME_MULTIPLIER_MIN = GameConstants.TimeMultiplierMin;
+    private static readonly float TIME_MULTIPLIER_DECAY = GameConstants.TimeMultiplierDecay;
+    private static readonly double TARGET_SPAWN_DELAY = GameConstants.TargetSpawnDelay;
+    private static readonly float BOMB_CHANCE = GameConstants.BombChance;
+    private static readonly float RADIOACTIVE_CHANCE = GameConstants.RadioactiveChance;
 
     // Target grid configuration
-    private static readonly int GRID_ROWS = GameConstants.GRID_ROWS;
-    private static readonly int GRID_COLS = GameConstants.GRID_COLS;
+    private static readonly int GRID_ROWS = GameConstants.GridRows;
+    private static readonly int GRID_COLS = GameConstants.GridCols;
 
     // Radiation / mutation configuration
     private const float MAX_RADIATION = 100f;
@@ -185,10 +185,10 @@ public class GameDirectorComponent : EntityComponent
             SpawnRandomTarget();
 
             // Aggressive spawn rate, accelerating as the round progresses
-            _targetSpawnTimer = (TARGET_SPAWN_DELAY / 2.0) + (GameRandom.NextFloat() * GameConstants.TARGET_SPAWN_RANDOM_FACTOR);
-            if (_timer < GameConstants.SPAWN_ACCEL_THRESHOLD_1) _targetSpawnTimer *= GameConstants.SPAWN_ACCEL_MULTIPLIER_1;
-            if (_timer < GameConstants.SPAWN_ACCEL_THRESHOLD_2) _targetSpawnTimer *= GameConstants.SPAWN_ACCEL_MULTIPLIER_2;
-            if (_timer < GameConstants.SPAWN_ACCEL_THRESHOLD_3) _targetSpawnTimer *= GameConstants.SPAWN_ACCEL_MULTIPLIER_3;
+            _targetSpawnTimer = (TARGET_SPAWN_DELAY / 2.0) + (GameRandom.NextFloat() * GameConstants.TargetSpawnRandomFactor);
+            if (_timer < GameConstants.SpawnAccelThreshold1) _targetSpawnTimer *= GameConstants.SpawnAccelMultiplier1;
+            if (_timer < GameConstants.SpawnAccelThreshold2) _targetSpawnTimer *= GameConstants.SpawnAccelMultiplier2;
+            if (_timer < GameConstants.SpawnAccelThreshold3) _targetSpawnTimer *= GameConstants.SpawnAccelMultiplier3;
         }
     }
 
@@ -234,10 +234,10 @@ public class GameDirectorComponent : EntityComponent
             Vector2 worldCenter = World.Center;
             Color messageColor = new Color(0, 255, 0);
 
-            SpawnPopup(new Vector2(worldCenter.X, 150), $"MUTATION LEVEL {_currentMutationLevel}!", 3f, messageColor, 1.5f, true);
+            SpawnPopup(EntitySystem, new Vector2(worldCenter.X, 150), $"MUTATION LEVEL {_currentMutationLevel}!", 3f, messageColor, 1.5f, true);
 
             string detailMessage = $"You've grown {_currentMutationLevel} extra arm{(_currentMutationLevel > 1 ? "s" : "")}!";
-            SpawnPopup(new Vector2(worldCenter.X, 200), detailMessage, 4f, messageColor, 1.2f, true);
+            SpawnPopup(EntitySystem, new Vector2(worldCenter.X, 200), detailMessage, 4f, messageColor, 1.2f, true);
         }
     }
 
@@ -245,9 +245,12 @@ public class GameDirectorComponent : EntityComponent
     /// Spawns a floating popup: instantiates the "Popup" prefab and applies per-popup values.
     /// Values not passed here fall back to the prefab defaults in Content/popup.xml.
     /// </summary>
-    private void SpawnPopup(Vector2 position, string text, float duration, Color color, float scale, bool radiationEffect)
+    private static void SpawnPopup(EntitySystem es, Vector2 position, string text, float duration, Color color, float scale, bool radiationEffect)
     {
-        var popup = InstantiateTemplate("Popup", position)?.GetComponent<FloatingPopUpComponent>();
+        if (es == null)
+            return;
+
+        var popup = es.Instantiate("Popup", position)?.GetComponent<FloatingPopUpComponent>();
         if (popup == null)
             return;
 
@@ -267,7 +270,7 @@ public class GameDirectorComponent : EntityComponent
             return;
 
         // Shot feedback popup (random shots pulse like radiation, player shots are white).
-        SpawnPopup(e.Position, "×", 0.5f,
+        SpawnPopup(es, e.Position, "×", 0.5f,
             e.IsRandomShot ? Color.LimeGreen : Color.White,
             e.IsRandomShot ? 1.5f : 1.0f,
             e.IsRandomShot);
@@ -276,7 +279,7 @@ public class GameDirectorComponent : EntityComponent
         // A single shot resolves to ONE target — the closest one (so a bomb near the aim
         // point can't end the game when you're shooting a regular target beside it).
         bool targetHit = false;
-        float maxHitRadius = GameConstants.TARGET_RADIUS;
+        float maxHitRadius = GameConstants.TargetRadius;
 
         var candidates = es.FindNearby(e.Position, maxHitRadius)
             .Where(entity => entity.GetComponent<TargetComponent>() != null)
@@ -297,9 +300,8 @@ public class GameDirectorComponent : EntityComponent
 
     // ---- Spawning / grid ------------------------------------------------------
 
-    private Entity CreateTargetAt(Vector2 position)
+    private static Entity CreateTargetAt(EntitySystem es, Vector2 position)
     {
-        var es = EntitySystem;
         float roll = GameRandom.NextFloat();
         string templateName;
         if (roll < BOMB_CHANCE)
@@ -394,7 +396,7 @@ public class GameDirectorComponent : EntityComponent
             return;
 
         var (position, row, col) = cellInfo.Value;
-        Entity newTarget = CreateTargetAt(position);
+        Entity newTarget = CreateTargetAt(EntitySystem, position);
         WireTarget(newTarget, position, row, col);
     }
 
@@ -413,7 +415,7 @@ public class GameDirectorComponent : EntityComponent
                 );
 
                 _occupiedCells[row, col] = true;
-                Entity newTarget = CreateTargetAt(position);
+                Entity newTarget = CreateTargetAt(EntitySystem, position);
                 WireTarget(newTarget, position, row, col);
             }
         }

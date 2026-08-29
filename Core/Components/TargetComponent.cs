@@ -50,11 +50,11 @@ public class TargetComponent : EntityComponent
     }
 
     // Configuration (static readonly so it captures the XML-loaded values from GameConstants)
-    private static readonly int TargetRadius = GameConstants.TARGET_RADIUS;
-    private static readonly float DefaultScale = GameConstants.TARGET_DEFAULT_SCALE;
-    private static readonly double TimeToFullSize = GameConstants.TARGET_TIME_TO_FULL_SIZE;
-    private static readonly double BombFadeStartTime = GameConstants.BOMB_FADE_START_TIME;
-    private static readonly double BombFadeDuration = GameConstants.BOMB_FADE_DURATION;
+    private static readonly int TargetRadius = GameConstants.TargetRadius;
+    private static readonly float DefaultScale = GameConstants.TargetDefaultScale;
+    private static readonly double TimeToFullSize = GameConstants.TargetTimeToFullSize;
+    private static readonly double BombFadeStartTime = GameConstants.BombFadeStartTime;
+    private static readonly double BombFadeDuration = GameConstants.BombFadeDuration;
 
     // State
     private bool _initialized;
@@ -68,7 +68,7 @@ public class TargetComponent : EntityComponent
     public bool IsDestroyed => _isDestroyed;
 
     /// <summary>True once the growth tween has reached full size (scale >= large threshold).</summary>
-    public bool IsFullyGrown => _scale >= GameConstants.TARGET_GROWTH_LARGE;
+    public bool IsFullyGrown => _scale >= GameConstants.TargetGrowthLarge;
 
     /// <summary>
     /// Component creation (sprite + tween) happens here, outside the entity's per-frame
@@ -172,18 +172,18 @@ public class TargetComponent : EntityComponent
         switch (Type)
         {
             case TargetType.Standard:
-                ReportScore(CalculateScore(GameConstants.SCORE_REGULAR_LARGE,
-                                           GameConstants.SCORE_REGULAR_MEDIUM,
-                                           GameConstants.SCORE_REGULAR_SMALL));
-                OnRadiationChange?.Invoke(this, new TargetRadiationEventArgs(GameConstants.RADIATION_REGULAR));
+                ReportScore(CalculateScore(GameConstants.ScoreRegularLarge,
+                                           GameConstants.ScoreRegularMedium,
+                                           GameConstants.ScoreRegularSmall));
+                OnRadiationChange?.Invoke(this, new TargetRadiationEventArgs(GameConstants.RadiationRegular));
                 Destroy();
                 break;
 
             case TargetType.Radioactive:
-                ReportScore(CalculateScore(GameConstants.SCORE_RADIOACTIVE_LARGE,
-                                           GameConstants.SCORE_RADIOACTIVE_MEDIUM,
-                                           GameConstants.SCORE_RADIOACTIVE_SMALL));
-                OnRadiationChange?.Invoke(this, new TargetRadiationEventArgs(GameConstants.RADIATION_RADIOACTIVE));
+                ReportScore(CalculateScore(GameConstants.ScoreRadioactiveLarge,
+                                           GameConstants.ScoreRadioactiveMedium,
+                                           GameConstants.ScoreRadioactiveSmall));
+                OnRadiationChange?.Invoke(this, new TargetRadiationEventArgs(GameConstants.RadiationRadioactive));
                 Destroy();
                 break;
 
@@ -195,9 +195,9 @@ public class TargetComponent : EntityComponent
 
     private int CalculateScore(int large, int medium, int small)
     {
-        if (_scale >= GameConstants.TARGET_GROWTH_LARGE)
+        if (_scale >= GameConstants.TargetGrowthLarge)
             return large;
-        if (_scale >= GameConstants.TARGET_GROWTH_MEDIUM)
+        if (_scale >= GameConstants.TargetGrowthMedium)
             return medium;
         return small;
     }

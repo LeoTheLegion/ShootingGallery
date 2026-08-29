@@ -23,8 +23,8 @@ public class StartMenuScene : Scene
 
         // Layout, text, colors and the button are all data in Content/start_menu.xml
         // (CE GameObjectEntity + AnchorComponent + Label/Button components). The START
-        // click is bound declaratively in XML (<Bind> to MenuCommandsComponent.StartGame);
-        // here we only add two decorative radiation popups.
+        // click is bound declaratively in XML via a Bind element targeting
+        // MenuCommandsComponent.StartGame; here we only add two decorative radiation popups.
         LoadEntitiesFromXml("start_menu.xml", entitySystem);
 
         var center = World.Center;
@@ -35,7 +35,7 @@ public class StartMenuScene : Scene
     }
 
     /// <summary>Decorative radiation popup — Unity-style prefab instantiate + field pokes.</summary>
-    private void SpawnRadiationPopup(EntitySystem entitySystem, Vector2 position)
+    private static void SpawnRadiationPopup(EntitySystem entitySystem, Vector2 position)
     {
         var popup = entitySystem.Instantiate("Popup", position)?.GetComponent<FloatingPopUpComponent>();
         if (popup == null)

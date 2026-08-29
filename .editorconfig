@@ -1,0 +1,9 @@
+root = true
+
+# S1192 "Make this method static" — suppressed for MenuCommandsComponent:
+# CE's declarative <Bind> wiring (Content/start_menu.xml, Content/game_over.xml)
+# resolves command names against the component INSTANCE at runtime, so StartGame
+# and BackToMenu must stay public instance methods. Making them static would break
+# the menu buttons.
+[Core/Components/MenuCommandsComponent.cs]
+dotnet_diagnostic.S1192.severity = none

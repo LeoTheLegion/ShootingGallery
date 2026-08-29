@@ -106,7 +106,7 @@ public class CrosshairComponent : EntityComponent
             return;
 
         int randomArm = GameRandom.Next(1, _arms.Count + 1); // 1..N
-        Vector2 shotPosition = GetRandomShotPosition();
+        Vector2 shotPosition = GetRandomShotPosition(EntitySystem);
 
         if (shotPosition.X >= 0 && shotPosition.Y >= 0)
         {
@@ -119,9 +119,8 @@ public class CrosshairComponent : EntityComponent
     }
 
     /// <summary>Finds a random fully-grown standard target; (-1,-1) if none exist.</summary>
-    private Vector2 GetRandomShotPosition()
+    private static Vector2 GetRandomShotPosition(EntitySystem es)
     {
-        var es = EntitySystem;
         if (es == null)
             return new Vector2(-1, -1);
 
