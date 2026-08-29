@@ -207,7 +207,7 @@ public class TargetComponent : EntityComponent
         var es = GameRefs.EntitySystem;
         if (es != null)
         {
-            es.CreateEntity<FloatingPopUpText>(
+            FloatingPopUpComponent.Spawn(
                 Owner.Position,
                 2f,
                 score.ToString()

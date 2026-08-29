@@ -95,6 +95,9 @@
 #begin target_bomb.xml
 /copy:target_bomb.xml
 
+#begin popup.xml
+/copy:popup.xml
+
 #begin target.png
 /importer:TextureImporter
 /processor:TextureProcessor

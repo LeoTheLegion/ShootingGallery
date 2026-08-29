@@ -1,0 +1,18 @@
+<!--
+  Popup template: a plain GameObjectEntity for drifting, fading score popups.
+  Component order matters — FloatingPopUpComponent attaches first and creates the
+  screen-space CanvasComponent (which has no parameterless constructor, so it can't
+  be created by the template loader); LabelComponent then resolves that canvas on attach.
+  Per-popup values (text, color, scale, duration) are set by FloatingPopUpComponent.Spawn
+  right after instantiation.
+-->
+<EntityTemplate Type="GameObjectEntity" Rotation="0" Sort="10" Active="true">
+    <Tags>
+        <Tag Name="Popup" />
+    </Tags>
+    <Components>
+        <Component Type="FloatingPopUpComponent" />
+        <Component Type="LabelComponent" />
+        <Component Type="TweenComponent" />
+    </Components>
+</EntityTemplate>

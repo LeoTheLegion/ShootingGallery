@@ -44,7 +44,7 @@ public class GameScene : Scene
         {
             director.OnGameOver += (sender, args) =>
             {
-                entitySystem.CreateEntity<FloatingPopUpText>(
+                FloatingPopUpComponent.Spawn(
                     new Vector2(worldCenter.X, worldCenter.Y - 50),
                     5f,
                     "GAME OVER!",

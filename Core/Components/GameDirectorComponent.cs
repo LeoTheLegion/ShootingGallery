@@ -228,7 +228,7 @@ public class GameDirectorComponent : EntityComponent
             Vector2 worldCenter = World.Center;
             Color messageColor = new Color(0, 255, 0);
 
-            es.CreateEntity<FloatingPopUpText>(
+            FloatingPopUpComponent.Spawn(
                 new Vector2(worldCenter.X, 150),
                 3f,
                 $"MUTATION LEVEL {_currentMutationLevel}!",
@@ -238,7 +238,7 @@ public class GameDirectorComponent : EntityComponent
             );
 
             string detailMessage = $"You've grown {_currentMutationLevel} extra arm{(_currentMutationLevel > 1 ? "s" : "")}!";
-            es.CreateEntity<FloatingPopUpText>(
+            FloatingPopUpComponent.Spawn(
                 new Vector2(worldCenter.X, 200),
                 4f,
                 detailMessage,
@@ -258,7 +258,7 @@ public class GameDirectorComponent : EntityComponent
             return;
 
         // Shot feedback popup (random shots pulse like radiation, player shots are white).
-        es.CreateEntity<FloatingPopUpText>(
+        FloatingPopUpComponent.Spawn(
             e.Position,
             0.5f,
             "×",
