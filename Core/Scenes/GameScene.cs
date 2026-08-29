@@ -43,11 +43,10 @@ public class GameScene : Scene
                 PopupSpawner.Spawn(
                     entitySystem,
                     new Vector2(worldCenter.X, worldCenter.Y - 50),
-                    5f,
-                    "GAME OVER!",
-                    Color.Red,
-                    2.0f,
-                    false
+                    text: "GAME OVER!",
+                    duration: 5f,
+                    color: Color.Red,
+                    scale: 2.0f
                 );
 
                 SceneManager.LoadScene(new GameOverScene(args.FinalScore, args.MutationLevel));

@@ -25,8 +25,10 @@ public class StartMenuScene : Scene
         LoadEntitiesFromXml("start_menu.xml", entitySystem);
 
         var center = World.Center;
-        PopupSpawner.Spawn(entitySystem, new Vector2(center.X - 300, center.Y), 5f, "☢️ RADIATION ☢️", Color.LimeGreen, 1.5f, true);
-        PopupSpawner.Spawn(entitySystem, new Vector2(center.X + 300, center.Y), 5f, "☢️ RADIATION ☢️", Color.LimeGreen, 1.5f, true);
+        PopupSpawner.Spawn(entitySystem, new Vector2(center.X - 300, center.Y),
+            text: "☢️ RADIATION ☢️", duration: 5f, color: Color.LimeGreen, scale: 1.5f, radiationEffect: true);
+        PopupSpawner.Spawn(entitySystem, new Vector2(center.X + 300, center.Y),
+            text: "☢️ RADIATION ☢️", duration: 5f, color: Color.LimeGreen, scale: 1.5f, radiationEffect: true);
 
         yield return null;
     }

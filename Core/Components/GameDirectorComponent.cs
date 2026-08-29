@@ -230,22 +230,22 @@ public class GameDirectorComponent : EntityComponent
             PopupSpawner.Spawn(
                 EntitySystem,
                 new Vector2(worldCenter.X, 150),
-                3f,
-                $"MUTATION LEVEL {_currentMutationLevel}!",
-                messageColor,
-                1.5f,
-                true
+                text: $"MUTATION LEVEL {_currentMutationLevel}!",
+                duration: 3f,
+                color: messageColor,
+                scale: 1.5f,
+                radiationEffect: true
             );
 
             string detailMessage = $"You've grown {_currentMutationLevel} extra arm{(_currentMutationLevel > 1 ? "s" : "")}!";
             PopupSpawner.Spawn(
                 EntitySystem,
                 new Vector2(worldCenter.X, 200),
-                4f,
-                detailMessage,
-                messageColor,
-                1.2f,
-                true
+                text: detailMessage,
+                duration: 4f,
+                color: messageColor,
+                scale: 1.2f,
+                radiationEffect: true
             );
         }
     }
@@ -262,11 +262,11 @@ public class GameDirectorComponent : EntityComponent
         PopupSpawner.Spawn(
             es,
             e.Position,
-            0.5f,
-            "×",
-            e.IsRandomShot ? Color.LimeGreen : Color.White,
-            e.IsRandomShot ? 1.5f : 1.0f,
-            e.IsRandomShot
+            text: "×",
+            duration: 0.5f,
+            color: e.IsRandomShot ? Color.LimeGreen : Color.White,
+            scale: e.IsRandomShot ? 1.5f : 1.0f,
+            radiationEffect: e.IsRandomShot
         );
 
         // Spatial query: a target is only hittable within TARGET_RADIUS of the shot.

@@ -20,13 +20,13 @@ namespace ShootingGallery.Core
         // system instance already knows the template and (re)register when it changes.
         private static EntitySystem _registeredFor;
 
-        /// <summary>Spawns a standard white popup at normal scale.</summary>
-        public static void Spawn(EntitySystem es, Vector2 position, float time, string text)
-            => Spawn(es, position, time, text, Color.White, 1.0f, false);
-
-        /// <summary>Spawns a popup with explicit color, scale, and radiation pulse.</summary>
-        public static void Spawn(EntitySystem es, Vector2 position, float time, string text,
-            Color color, float scale, bool radiationEffect)
+        /// <summary>
+        /// Instantiates the popup prefab and applies per-instance overrides — Unity-style:
+        /// baseline values live in Content/popup.xml, callers only pass what differs.
+        /// Unspecified parameters keep the template's prefab defaults.
+        /// </summary>
+        public static void Spawn(EntitySystem es, Vector2 position, string text = null,
+            float? duration = null, Color? color = null, float? scale = null, bool? radiationEffect = null)
         {
             if (es == null)
                 return;
@@ -37,16 +37,16 @@ namespace ShootingGallery.Core
                 _registeredFor = es;
             }
 
-            var entity = es.Instantiate(TemplateName, position);
-            var component = entity.GetComponent<FloatingPopUpComponent>();
-            if (component != null)
-            {
-                component.Text = text;
-                component.TextColor = color;
-                component.Scale = scale;
-                component.Duration = time;
-                component.RadiationEffect = radiationEffect;
-            }
+            var component = es.Instantiate(TemplateName, position).GetComponent<FloatingPopUpComponent>();
+            if (component == null)
+                return;
+
+            // Only override what the caller specified — everything else stays at the prefab default.
+            if (text != null) component.Text = text;
+            if (duration.HasValue) component.Duration = duration.Value;
+            if (color.HasValue) component.TextColor = color.Value;
+            if (scale.HasValue) component.Scale = scale.Value;
+            if (radiationEffect.HasValue) component.RadiationEffect = radiationEffect.Value;
         }
     }
 }

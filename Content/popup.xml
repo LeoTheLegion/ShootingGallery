@@ -3,15 +3,27 @@
   Component order matters — FloatingPopUpComponent attaches first and creates the
   screen-space CanvasComponent (which has no parameterless constructor, so it can't
   be created by the template loader); LabelComponent then resolves that canvas on attach.
-  Per-popup values (text, color, scale, duration) are set by FloatingPopUpComponent.Spawn
-  right after instantiation.
+
+  Unity-style prefab defaults: the values below are the baseline for every popup.
+  Template properties are applied after OnAttach and before the first Update, so the
+  component's deferred init (EnsureInitialized) always sees them. Runtime code
+  (PopupSpawner.Spawn) only overrides what varies per spawn — mostly the text.
 -->
 <EntityTemplate Type="GameObjectEntity" Rotation="0" Sort="10" Active="true">
     <Tags>
         <Tag Name="Popup" />
     </Tags>
     <Components>
-        <Component Type="FloatingPopUpComponent" />
+        <Component Type="FloatingPopUpComponent">
+            <Properties>
+                <!-- Prefab defaults (overridden per-instance by PopupSpawner) -->
+                <Property Name="Text" Value="?" />
+                <Property Name="TextColor" Value="255,255,255,255" />
+                <Property Name="Scale" Value="1.0" />
+                <Property Name="Duration" Value="2" />
+                <Property Name="RadiationEffect" Value="false" />
+            </Properties>
+        </Component>
         <Component Type="LabelComponent" />
         <Component Type="TweenComponent" />
     </Components>
