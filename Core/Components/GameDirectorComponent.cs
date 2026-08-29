@@ -51,6 +51,13 @@ public class GameDirectorComponent : EntityComponent
     private const float MAX_RADIATION = 100f;
     private readonly float[] MUTATION_THRESHOLDS = { 0.25f, 0.5f, 0.75f };
 
+    // Unity-style serialized prefab references ([SerializeField] GameObject equivalent):
+    // assigned from Content/game_scene.xml <Properties>, like dragging prefabs into the
+    // inspector. The defaults keep the component runnable even without XML assignment.
+    public string RegularTargetTemplate { get; set; } = "target_regular.xml";
+    public string RadioactiveTargetTemplate { get; set; } = "target_radioactive.xml";
+    public string BombTargetTemplate { get; set; } = "target_bomb.xml";
+
     // Grid state
     private readonly bool[,] _occupiedCells;
     private readonly Dictionary<Vector2, (int Row, int Col)> _targetPositionToCell = new();
@@ -110,10 +117,10 @@ public class GameDirectorComponent : EntityComponent
         if (es == null)
             return;
 
-        // Register target templates once (definitions live in Content/*.xml)
-        es.RegisterTemplate("Regular", "target_regular.xml");
-        es.RegisterTemplate("Radioactive", "target_radioactive.xml");
-        es.RegisterTemplate("Bomb", "target_bomb.xml");
+        // Register the serialized target templates once (assets assigned in scene XML)
+        es.RegisterTemplate("Regular", RegularTargetTemplate);
+        es.RegisterTemplate("Radioactive", RadioactiveTargetTemplate);
+        es.RegisterTemplate("Bomb", BombTargetTemplate);
 
         // Resolve HUD labels by id
         _scoreUI = es.FindById("score")?.GetComponent<LabelComponent>();

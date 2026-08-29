@@ -148,10 +148,18 @@
   </EntityDefinition>
 
   <!-- Round director: a hidden GameObjectEntity (no sprite) whose GameDirectorComponent owns
-       the timer, score, multiplier, target grid, spawning, radiation/mutation and game-over. -->
+       the timer, score, multiplier, target grid, spawning, radiation/mutation and game-over.
+       The target templates are serialized references (Unity [SerializeField] style),
+       assigned here like prefab slots in the inspector. -->
   <EntityDefinition Type="GameObjectEntity" Id="director">
     <Components>
-      <Component Type="GameDirectorComponent" />
+      <Component Type="GameDirectorComponent">
+        <Properties>
+          <Property Name="RegularTargetTemplate" Value="target_regular.xml" />
+          <Property Name="RadioactiveTargetTemplate" Value="target_radioactive.xml" />
+          <Property Name="BombTargetTemplate" Value="target_bomb.xml" />
+        </Properties>
+      </Component>
     </Components>
   </EntityDefinition>
 </Scene>
