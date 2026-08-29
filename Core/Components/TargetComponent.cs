@@ -204,7 +204,7 @@ public class TargetComponent : EntityComponent
 
     private void ReportScore(int score)
     {
-        PopupSpawner.Spawn(Owner.Position, 2f, score.ToString());
+        PopupSpawner.Spawn(EntitySystem, Owner.Position, 2f, score.ToString());
 
         OnScore?.Invoke(this, new TargetScoreEventArgs(score, Owner.Position));
     }

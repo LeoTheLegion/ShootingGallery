@@ -106,7 +106,7 @@ public class GameDirectorComponent : EntityComponent
     /// </summary>
     private void Bootstrap()
     {
-        var es = GameRefs.EntitySystem;
+        var es = EntitySystem;
         if (es == null)
             return;
 
@@ -222,13 +222,13 @@ public class GameDirectorComponent : EntityComponent
             _mutationUI.Text = $"Arms: {_currentMutationLevel + 1}";
 
         // Celebrate with floating popups (purely presentational, spawned via the shared system)
-        var es = GameRefs.EntitySystem;
-        if (es != null && _currentMutationLevel > 0)
+        if (EntitySystem != null && _currentMutationLevel > 0)
         {
             Vector2 worldCenter = World.Center;
             Color messageColor = new Color(0, 255, 0);
 
             PopupSpawner.Spawn(
+                EntitySystem,
                 new Vector2(worldCenter.X, 150),
                 3f,
                 $"MUTATION LEVEL {_currentMutationLevel}!",
@@ -239,6 +239,7 @@ public class GameDirectorComponent : EntityComponent
 
             string detailMessage = $"You've grown {_currentMutationLevel} extra arm{(_currentMutationLevel > 1 ? "s" : "")}!";
             PopupSpawner.Spawn(
+                EntitySystem,
                 new Vector2(worldCenter.X, 200),
                 4f,
                 detailMessage,
@@ -253,12 +254,13 @@ public class GameDirectorComponent : EntityComponent
 
     private void HandleShot(object sender, CrosshairComponent.ShootEventArgs e)
     {
-        var es = GameRefs.EntitySystem;
+        var es = EntitySystem;
         if (es == null)
             return;
 
         // Shot feedback popup (random shots pulse like radiation, player shots are white).
         PopupSpawner.Spawn(
+            es,
             e.Position,
             0.5f,
             "×",
@@ -292,9 +294,9 @@ public class GameDirectorComponent : EntityComponent
 
     // ---- Spawning / grid ------------------------------------------------------
 
-    private static Entity CreateTargetAt(Vector2 position)
+    private Entity CreateTargetAt(Vector2 position)
     {
-        var es = GameRefs.EntitySystem;
+        var es = EntitySystem;
         float roll = GameRandom.NextFloat();
         string templateName;
         if (roll < BOMB_CHANCE)

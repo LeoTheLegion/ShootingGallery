@@ -76,7 +76,7 @@ public class CrosshairComponent : EntityComponent
             arm.Destroy();
         _arms.Clear();
 
-        var es = GameRefs.EntitySystem;
+        var es = EntitySystem;
         if (es == null || _mutationLevel <= 0)
             return;
 
@@ -119,9 +119,9 @@ public class CrosshairComponent : EntityComponent
     }
 
     /// <summary>Finds a random fully-grown standard target; (-1,-1) if none exist.</summary>
-    private static Vector2 GetRandomShotPosition()
+    private Vector2 GetRandomShotPosition()
     {
-        var es = GameRefs.EntitySystem;
+        var es = EntitySystem;
         if (es == null)
             return new Vector2(-1, -1);
 

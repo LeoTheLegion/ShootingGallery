@@ -18,9 +18,6 @@ public class StartMenuScene : Scene
     {
         var entitySystem = GetGameSystem<EntitySystem>();
 
-        // Publish the shared reference so components (e.g. popup spawning) can use it.
-        GameRefs.EntitySystem = entitySystem;
-
         // Layout, text, colors and the button are all data in Content/start_menu.xml
         // (CE GameObjectEntity + AnchorComponent + Label/Button components). The START
         // click is bound declaratively in XML (<Bind> to MenuCommandsComponent.StartGame);
@@ -28,8 +25,8 @@ public class StartMenuScene : Scene
         LoadEntitiesFromXml("start_menu.xml", entitySystem);
 
         var center = World.Center;
-        PopupSpawner.Spawn(new Vector2(center.X - 300, center.Y), 5f, "☢️ RADIATION ☢️", Color.LimeGreen, 1.5f, true);
-        PopupSpawner.Spawn(new Vector2(center.X + 300, center.Y), 5f, "☢️ RADIATION ☢️", Color.LimeGreen, 1.5f, true);
+        PopupSpawner.Spawn(entitySystem, new Vector2(center.X - 300, center.Y), 5f, "☢️ RADIATION ☢️", Color.LimeGreen, 1.5f, true);
+        PopupSpawner.Spawn(entitySystem, new Vector2(center.X + 300, center.Y), 5f, "☢️ RADIATION ☢️", Color.LimeGreen, 1.5f, true);
 
         yield return null;
     }

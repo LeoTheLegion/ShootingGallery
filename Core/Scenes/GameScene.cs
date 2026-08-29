@@ -10,9 +10,8 @@ namespace ShootingGallery.Core;
 /// <summary>
 /// The gameplay scene. Everything is data-driven: the HUD, crosshair and round director are
 /// all declared in Content/game_scene.xml as plain GameObjectEntities composed of components.
-/// This scene only loads the XML, publishes the shared EntitySystem reference (the seam that
-/// lets components spawn/query entities — see CE issue #80), and handles the game-over
-/// transition to the GameOverScene.
+/// This scene only loads the XML and handles the game-over transition to the GameOverScene;
+/// components reach their EntitySystem through CE 0.18.0's EntityComponent.EntitySystem.
 /// </summary>
 public class GameScene : Scene
 {
@@ -30,9 +29,6 @@ public class GameScene : Scene
 
         var entitySystem = GetGameSystem<EntitySystem>();
 
-        // Publish the shared reference BEFORE loading entities so components can use it.
-        GameRefs.EntitySystem = entitySystem;
-
         // Load the fully data-driven scene (HUD + crosshair + director).
         LoadEntitiesFromXml("game_scene.xml", entitySystem);
 
@@ -45,6 +41,7 @@ public class GameScene : Scene
             director.OnGameOver += (sender, args) =>
             {
                 PopupSpawner.Spawn(
+                    entitySystem,
                     new Vector2(worldCenter.X, worldCenter.Y - 50),
                     5f,
                     "GAME OVER!",
