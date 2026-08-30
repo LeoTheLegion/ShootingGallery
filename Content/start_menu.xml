@@ -23,9 +23,11 @@
     <Children>
       <EntityDefinition Type="GameObjectEntity" Id="title">
         <Components>
+          <!-- Left anchor + HorizontalAlignment=Center: 0.19.0 centers the widget on the
+               canvas; a TopCenter anchor would double-shift (viewport is the canvas rect). -->
           <Component Type="AnchorComponent">
             <Properties>
-              <Property Name="Preset" Value="TopCenter" />
+              <Property Name="Preset" Value="TopLeft" />
               <Property Name="Offset" Value="0,100" />
             </Properties>
           </Component>
@@ -34,6 +36,7 @@
               <Property Name="Text" Value="URANIUM REVOLVER" />
               <Property Name="TextColor" Value="LimeGreen" />
               <Property Name="Scale" Value="2.5" />
+              <Property Name="HorizontalAlignment" Value="Center" />
             </Properties>
           </Component>
         </Components>
@@ -43,7 +46,7 @@
         <Components>
           <Component Type="AnchorComponent">
             <Properties>
-              <Property Name="Preset" Value="TopCenter" />
+              <Property Name="Preset" Value="TopLeft" />
               <Property Name="Offset" Value="0,160" />
             </Properties>
           </Component>
@@ -52,6 +55,7 @@
               <Property Name="Text" Value="A Radioactive Shooting Gallery" />
               <Property Name="TextColor" Value="Yellow" />
               <Property Name="Scale" Value="1.5" />
+              <Property Name="HorizontalAlignment" Value="Center" />
             </Properties>
           </Component>
         </Components>
@@ -61,7 +65,7 @@
         <Components>
           <Component Type="AnchorComponent">
             <Properties>
-              <Property Name="Preset" Value="TopCenter" />
+              <Property Name="Preset" Value="TopLeft" />
               <Property Name="Offset" Value="0,240" />
             </Properties>
           </Component>
@@ -69,6 +73,7 @@
             <Properties>
               <Property Name="Text" Value="Shoot targets to score points and accumulate radiation" />
               <Property Name="TextColor" Value="White" />
+              <Property Name="HorizontalAlignment" Value="Center" />
             </Properties>
           </Component>
         </Components>
@@ -78,7 +83,7 @@
         <Components>
           <Component Type="AnchorComponent">
             <Properties>
-              <Property Name="Preset" Value="TopCenter" />
+              <Property Name="Preset" Value="TopLeft" />
               <Property Name="Offset" Value="0,290" />
             </Properties>
           </Component>
@@ -86,6 +91,7 @@
             <Properties>
               <Property Name="Text" Value="Mutations will give you extra arms to shoot with" />
               <Property Name="TextColor" Value="LightGreen" />
+              <Property Name="HorizontalAlignment" Value="Center" />
             </Properties>
           </Component>
         </Components>
@@ -95,7 +101,7 @@
         <Components>
           <Component Type="AnchorComponent">
             <Properties>
-              <Property Name="Preset" Value="TopCenter" />
+              <Property Name="Preset" Value="TopLeft" />
               <Property Name="Offset" Value="0,340" />
             </Properties>
           </Component>
@@ -103,6 +109,7 @@
             <Properties>
               <Property Name="Text" Value="Avoid radioactive bombs or face instant death!" />
               <Property Name="TextColor" Value="Red" />
+              <Property Name="HorizontalAlignment" Value="Center" />
             </Properties>
           </Component>
         </Components>
@@ -112,7 +119,7 @@
         <Components>
           <Component Type="AnchorComponent">
             <Properties>
-              <Property Name="Preset" Value="TopCenter" />
+              <Property Name="Preset" Value="TopLeft" />
               <Property Name="Offset" Value="0,390" />
             </Properties>
           </Component>
@@ -121,6 +128,7 @@
               <Property Name="Text" Value="WARNING: Extreme Radiation Exposure!" />
               <Property Name="TextColor" Value="Orange" />
               <Property Name="Scale" Value="1.2" />
+              <Property Name="HorizontalAlignment" Value="Center" />
             </Properties>
           </Component>
         </Components>
@@ -130,13 +138,14 @@
         <Components>
           <Component Type="AnchorComponent">
             <Properties>
-              <Property Name="Preset" Value="TopCenter" />
+              <Property Name="Preset" Value="TopLeft" />
               <Property Name="Offset" Value="0,490" />
             </Properties>
           </Component>
           <Component Type="ButtonComponent">
             <Properties>
               <Property Name="Text" Value="START MUTATION" />
+              <Property Name="HorizontalAlignment" Value="Center" />
             </Properties>
           </Component>
           <Bind Event="Clicked" Command="StartGame" />
@@ -147,7 +156,7 @@
         <Components>
           <Component Type="AnchorComponent">
             <Properties>
-              <Property Name="Preset" Value="BottomCenter" />
+              <Property Name="Preset" Value="BottomLeft" />
               <Property Name="Offset" Value="0,-80" />
             </Properties>
           </Component>
@@ -155,6 +164,7 @@
             <Properties>
               <Property Name="Text" Value="Created with Uranium Power - Warning: May Cause Mutations" />
               <Property Name="TextColor" Value="LightGreen" />
+              <Property Name="HorizontalAlignment" Value="Center" />
             </Properties>
           </Component>
         </Components>

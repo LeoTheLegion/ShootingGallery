@@ -22,9 +22,11 @@
     <Children>
       <EntityDefinition Type="GameObjectEntity" Id="title">
         <Components>
+          <!-- Left anchor + HorizontalAlignment=Center: 0.19.0 centers the widget on the
+               canvas; a TopCenter anchor would double-shift (viewport is the canvas rect). -->
           <Component Type="AnchorComponent">
             <Properties>
-              <Property Name="Preset" Value="TopCenter" />
+              <Property Name="Preset" Value="TopLeft" />
               <Property Name="Offset" Value="0,30" />
             </Properties>
           </Component>
@@ -33,6 +35,7 @@
               <Property Name="Text" Value="URANIUM REVOLVER" />
               <Property Name="TextColor" Value="LimeGreen" />
               <Property Name="Scale" Value="1.5,1.5" />
+              <Property Name="HorizontalAlignment" Value="Center" />
             </Properties>
           </Component>
         </Components>

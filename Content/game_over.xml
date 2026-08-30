@@ -23,9 +23,11 @@
     <Children>
       <EntityDefinition Type="GameObjectEntity" Id="gameOver">
         <Components>
+          <!-- Left anchor + HorizontalAlignment=Center: 0.19.0 centers the widget on the
+               canvas; a TopCenter anchor would double-shift (viewport is the canvas rect). -->
           <Component Type="AnchorComponent">
             <Properties>
-              <Property Name="Preset" Value="TopCenter" />
+              <Property Name="Preset" Value="TopLeft" />
               <Property Name="Offset" Value="0,100" />
             </Properties>
           </Component>
@@ -34,6 +36,7 @@
               <Property Name="Text" Value="GAME OVER" />
               <Property Name="TextColor" Value="Red" />
               <Property Name="Scale" Value="2" />
+              <Property Name="HorizontalAlignment" Value="Center" />
             </Properties>
           </Component>
         </Components>
@@ -43,7 +46,7 @@
         <Components>
           <Component Type="AnchorComponent">
             <Properties>
-              <Property Name="Preset" Value="TopCenter" />
+              <Property Name="Preset" Value="TopLeft" />
               <Property Name="Offset" Value="0,200" />
             </Properties>
           </Component>
@@ -51,6 +54,7 @@
             <Properties>
               <Property Name="Text" Value="Your 1 minute of shooting is up!" />
               <Property Name="TextColor" Value="White" />
+              <Property Name="HorizontalAlignment" Value="Center" />
             </Properties>
           </Component>
         </Components>
@@ -60,7 +64,7 @@
         <Components>
           <Component Type="AnchorComponent">
             <Properties>
-              <Property Name="Preset" Value="TopCenter" />
+              <Property Name="Preset" Value="TopLeft" />
               <Property Name="Offset" Value="0,280" />
             </Properties>
           </Component>
@@ -69,6 +73,7 @@
               <Property Name="Text" Value="Final Score: 0" />
               <Property Name="TextColor" Value="Yellow" />
               <Property Name="Scale" Value="1.5" />
+              <Property Name="HorizontalAlignment" Value="Center" />
             </Properties>
           </Component>
         </Components>
@@ -78,7 +83,7 @@
         <Components>
           <Component Type="AnchorComponent">
             <Properties>
-              <Property Name="Preset" Value="TopCenter" />
+              <Property Name="Preset" Value="TopLeft" />
               <Property Name="Offset" Value="0,360" />
             </Properties>
           </Component>
@@ -86,6 +91,7 @@
             <Properties>
               <Property Name="Text" Value="You escaped without mutations!" />
               <Property Name="TextColor" Value="White" />
+              <Property Name="HorizontalAlignment" Value="Center" />
             </Properties>
           </Component>
         </Components>
@@ -95,13 +101,14 @@
         <Components>
           <Component Type="AnchorComponent">
             <Properties>
-              <Property Name="Preset" Value="TopCenter" />
+              <Property Name="Preset" Value="TopLeft" />
               <Property Name="Offset" Value="0,460" />
             </Properties>
           </Component>
           <Component Type="ButtonComponent">
             <Properties>
               <Property Name="Text" Value="Play Again" />
+              <Property Name="HorizontalAlignment" Value="Center" />
             </Properties>
           </Component>
           <Bind Event="Clicked" Command="StartGame" />
@@ -112,13 +119,14 @@
         <Components>
           <Component Type="AnchorComponent">
             <Properties>
-              <Property Name="Preset" Value="TopCenter" />
+              <Property Name="Preset" Value="TopLeft" />
               <Property Name="Offset" Value="0,530" />
             </Properties>
           </Component>
           <Component Type="ButtonComponent">
             <Properties>
               <Property Name="Text" Value="Main Menu" />
+              <Property Name="HorizontalAlignment" Value="Center" />
             </Properties>
           </Component>
           <Bind Event="Clicked" Command="BackToMenu" />
