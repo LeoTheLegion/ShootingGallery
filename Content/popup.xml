@@ -1,8 +1,9 @@
 <!--
   Popup template: a plain GameObjectEntity for drifting, fading score popups.
-  Component order matters — FloatingPopUpComponent attaches first and creates the
-  screen-space CanvasComponent (which has no parameterless constructor, so it can't
-  be created by the template loader); LabelComponent then resolves that canvas on attach.
+  Component order matters — the screen-space CanvasComponent attaches first (CE 0.20.0 added
+  a parameterless constructor, so it can be declared in XML directly), then LabelComponent
+  resolves that canvas on attach. FloatingPopUpComponent just drives the label with per-popup
+  values; it no longer creates the canvas in code.
 
   Unity-style prefab defaults: the values below are the baseline for every popup.
   Template properties are applied after OnAttach and before the first Update, so the
@@ -14,6 +15,9 @@
         <Tag Name="Popup" />
     </Tags>
     <Components>
+        <!-- Screen-space canvas (parameterless ctor defaults to screen-space). Declared first so
+             LabelComponent.RequireCanvas finds it on the same entity when it attaches. -->
+        <Component Type="CanvasComponent" />
         <Component Type="FloatingPopUpComponent">
             <Properties>
                 <!-- Prefab defaults (overridden per-instance by PopupSpawner) -->

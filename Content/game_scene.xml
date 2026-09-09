@@ -10,6 +10,10 @@
 <Scene>
   <GameSystems>
     <System Type="EntitySystem">
+      <Prefabs>
+        <!-- Score/radiation popups are instantiated at runtime by the director and targets. -->
+        <Prefab Name="Popup" Asset="popup.xml" />
+      </Prefabs>
       <Entities>
   <EntityDefinition Type="GameObjectEntity" Id="hud">
     <Position X="0" Y="0" />
@@ -135,13 +139,22 @@
   </EntityDefinition>
 
   <!-- Player crosshair: a plain GameObjectEntity whose behavior is entirely components.
-       The main sprite is owned by CrosshairComponent (scene XML can't assign a Sprite
-       object); MouseFollow/MouseClick are declared before it so they exist at OnAttach. -->
+       The main sprite is declared on a SpriteComponent (CE 0.20.0 loads it from the SpriteAsset
+       property); CrosshairComponent only registers it for instanced rendering + sets the z-layer.
+       MouseFollow/MouseClick are declared before CrosshairComponent so they exist at OnAttach. -->
   <EntityDefinition Type="GameObjectEntity" Id="crosshair">
     <Tags>
       <Tag Name="Crosshair" />
     </Tags>
     <Components>
+      <!-- Declared first so its OnAttach has loaded the sprite before CrosshairComponent attaches.
+           Centered origin (0.5,0.5) matches the previous hand-drawn crosshair. -->
+      <Component Type="SpriteComponent">
+        <Properties>
+          <Property Name="SpriteAsset" Value="crosshair_sprite.xml" />
+          <Property Name="Origin" Value="0.5,0.5" />
+        </Properties>
+      </Component>
       <!-- Offset is 0: the sprite data (crosshair_sprite.xml) already declares a centered
            origin, and CE places the sprite's origin at the entity Position. -->
       <Component Type="MouseFollowComponent">

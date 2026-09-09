@@ -1,8 +1,8 @@
 <!--
   Target template: a plain GameObjectEntity whose entire behavior is the TargetComponent.
-  The sprite (asset + tint) is owned by the component at runtime; no SpriteComponent is
-  declared here because template instantiation re-applies XML component properties after
-  OnStart, which would clobber the component's sprite assignment.
+  The SpriteComponent (loads its own sprite from SpriteAsset) and TweenComponent are declared
+  here so TargetComponent can grab them at attach time instead of adding components to the
+  entity mid-enumeration (which CE's AttachPendingComponents does not allow).
 -->
 <Prefab Type="GameObjectEntity" Rotation="0" Sort="0" Active="true">
     <Tags>
@@ -10,6 +10,13 @@
         <Tag Name="Regular" />
     </Tags>
     <Components>
+        <Component Type="SpriteComponent">
+            <Properties>
+                <Property Name="SpriteAsset" Value="target_sprite.xml" />
+                <Property Name="Origin" Value="0.5,0.5" />
+            </Properties>
+        </Component>
+        <Component Type="TweenComponent" />
         <Component Type="TargetComponent">
             <Properties>
                 <Property Name="Type" Value="Standard" />

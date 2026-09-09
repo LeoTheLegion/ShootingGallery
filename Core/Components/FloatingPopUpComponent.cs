@@ -29,19 +29,6 @@ namespace ShootingGallery.Core
         private float _timeLeft;
         private bool _initialized;
 
-        /// <summary>
-        /// Declared first in the template so this runs before LabelComponent attaches. Create
-        /// the screen-space canvas the label requires — CanvasComponent has no parameterless
-        /// constructor, so it cannot be created from the template and must come from code.
-        /// </summary>
-        public override void OnAttach()
-        {
-            base.OnAttach();
-
-            if (Owner.GetComponent<CanvasComponent>() == null)
-                Owner.AddComponent(new CanvasComponent(true));
-        }
-
         public override void Update(GameTime gameTime)
         {
             if (Owner == null || Owner.Destroyed)

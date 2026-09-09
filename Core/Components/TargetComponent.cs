@@ -80,20 +80,20 @@ public class TargetComponent : EntityComponent
     {
         base.OnAttach();
 
+        // The SpriteComponent and TweenComponent are declared in the target prefab XML (declared
+        // before this component), so we grab them here rather than adding components to the entity
+        // — adding a component from within OnAttach would mutate the collection CE is enumerating.
         var sprite = AssetManager.LoadAsset<Sprite>("target_sprite.xml");
         _spriteComponent = Owner.GetComponent<SpriteComponent>();
-        if (_spriteComponent == null)
-            _spriteComponent = Owner.AddComponent(new SpriteComponent(sprite));
-        else if (_spriteComponent.Sprite == null)
+        if (_spriteComponent != null && _spriteComponent.Sprite == null)
             _spriteComponent.Sprite = sprite;
 
         Owner.RegisterForInstancedRendering(sprite);
         Owner.SetZLayer(0);
 
         var tweenComponent = Owner.GetComponent<TweenComponent>();
-        if (tweenComponent == null)
-            tweenComponent = Owner.AddComponent(new TweenComponent());
-        _growthTween = tweenComponent.TweenToFloat(0f, 1f, (float)TimeToFullSize);
+        if (tweenComponent != null)
+            _growthTween = tweenComponent.TweenToFloat(0f, 1f, (float)TimeToFullSize);
     }
 
     public override void Update(GameTime gameTime)

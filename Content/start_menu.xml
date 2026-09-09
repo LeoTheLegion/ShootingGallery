@@ -25,8 +25,9 @@
       </Component>
       <!-- Command target for the <Bind>-wired button below (no FindById + subscribe code). -->
       <Component Type="MenuCommandsComponent" />
-    </Components>
-
+            <!-- Hides CE's debug sticky log (must run after LoadGUI, so it lives in a component). -->
+            <Component Type="HideDebugLogComponent" />
+      </Components>
     <Children>
       <EntityDefinition Type="GameObjectEntity" Id="title">
         <Components>

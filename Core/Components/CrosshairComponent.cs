@@ -47,17 +47,15 @@ public class CrosshairComponent : EntityComponent
 
     public override void OnAttach()
     {
-        // Own the main crosshair sprite: scene XML can't assign a Sprite object property, so
-        // the component creates its own SpriteComponent. This entity is a plain GameObjectEntity.
-        var mainSprite = AssetManager.LoadAsset<Sprite>("crosshair_sprite.xml");
-        var spriteComponent = Owner.GetComponent<SpriteComponent>();
-        if (spriteComponent == null)
-            Owner.AddComponent(new SpriteComponent(mainSprite));
-        else if (spriteComponent.Sprite == null)
-            spriteComponent.Sprite = mainSprite;
-
-        Owner.RegisterForInstancedRendering(mainSprite);
-        Owner.SetZLayer(10);
+        // The main crosshair sprite is declared on a SpriteComponent in the scene XML (declared
+        // before this component, so its OnAttach has already loaded the asset). We only register it
+        // for instanced rendering and set the z-layer — both safe, non-mutating of the component list.
+        var mainSprite = Owner.GetComponent<SpriteComponent>()?.Sprite;
+        if (mainSprite != null)
+        {
+            Owner.RegisterForInstancedRendering(mainSprite);
+            Owner.SetZLayer(10);
+        }
 
         // Fire OnShoot on a left-mouse click at the cursor position. MouseClickComponent must be
         // declared before this component in the scene XML so it exists by the time we attach.
