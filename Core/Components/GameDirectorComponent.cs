@@ -43,6 +43,17 @@ public class GameDirectorComponent : EntityComponent
     public string RadioactiveTargetTemplate { get; set; } = "target_radioactive.xml";
     public string BombTargetTemplate { get; set; } = "target_bomb.xml";
 
+    // World size (design dimensions, not the window). Default 0 means "fall back to the actual
+    // screen/window size"; set either in scene XML <Properties> to make the world a different
+    // size than what the art shows (e.g. sprites authored for a larger stage).
+    public int WorldWidth { get; set; } = 0;
+    public int WorldHeight { get; set; } = 0;
+
+    // Resolved once in Bootstrap from the values above (or the window when left at 0).
+    private int _resolvedWorldWidth;
+    private int _resolvedWorldHeight;
+    private Vector2 _worldCenter;
+
     // Grid state
     private readonly bool[,] _occupiedCells;
     private readonly Dictionary<Vector2, (int Row, int Col)> _targetPositionToCell = new();
@@ -102,6 +113,12 @@ public class GameDirectorComponent : EntityComponent
         var es = EntitySystem;
         if (es == null)
             return;
+
+        // Resolve the world size: explicit XML values win, otherwise fall back to the window.
+        var graphics = Game?.Graphics;
+        _resolvedWorldWidth = WorldWidth > 0 ? WorldWidth : (graphics?.PreferredBackBufferWidth ?? 1280);
+        _resolvedWorldHeight = WorldHeight > 0 ? WorldHeight : (graphics?.PreferredBackBufferHeight ?? 720);
+        _worldCenter = new Vector2(_resolvedWorldWidth / 2f, _resolvedWorldHeight / 2f);
 
         // Register the serialized target prefabs once (assets assigned in scene XML)
         es.RegisterPrefab("Regular", RegularTargetTemplate);
@@ -217,7 +234,7 @@ public class GameDirectorComponent : EntityComponent
         // Celebrate with floating popups (purely presentational)
         if (_currentMutationLevel > 0)
         {
-            Vector2 worldCenter = World.Center;
+            Vector2 worldCenter = _worldCenter;
             Color messageColor = new Color(0, 255, 0);
 
             SpawnPopup(EntitySystem, new Vector2(worldCenter.X, 150), $"MUTATION LEVEL {_currentMutationLevel}!", 3f, messageColor, 1.5f, true);
@@ -260,7 +277,7 @@ public class GameDirectorComponent : EntityComponent
         var es = EntitySystem;
         if (es != null)
         {
-            Vector2 worldCenter = World.Center;
+            Vector2 worldCenter = _worldCenter;
             SpawnPopup(es, new Vector2(worldCenter.X, worldCenter.Y - 50), "GAME OVER!", 5f, Color.Red, 2.0f, false);
         }
 
@@ -350,8 +367,8 @@ public class GameDirectorComponent : EntityComponent
         if (!HasAvailableCell())
             return null;
 
-        float cellWidth = World.Width / (float)GRID_COLS;
-        float cellHeight = World.Height / (float)GRID_ROWS;
+        float cellWidth = _resolvedWorldWidth / (float)GRID_COLS;
+        float cellHeight = _resolvedWorldHeight / (float)GRID_ROWS;
 
         for (int attempts = 0; attempts < 100; attempts++)
         {
@@ -409,8 +426,8 @@ public class GameDirectorComponent : EntityComponent
 
     private void PopulateGrid()
     {
-        float cellWidth = World.Width / (float)GRID_COLS;
-        float cellHeight = World.Height / (float)GRID_ROWS;
+        float cellWidth = _resolvedWorldWidth / (float)GRID_COLS;
+        float cellHeight = _resolvedWorldHeight / (float)GRID_ROWS;
 
         for (int row = 0; row < GRID_ROWS; row++)
         {

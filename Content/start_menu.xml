@@ -181,7 +181,7 @@
   </EntityDefinition>
 
         <!-- Decorative radiation popups: static instances of the Popup prefab. Positions are
-             fixed relative to World.Center (640,360) at +/-300 on X. Text is set via <Overrides>
+             fixed relative to the window center (640,360) at +/-300 on X. Text is set via <Overrides>
              because both FloatingPopUpComponent and LabelComponent expose a "Text" property
              (a flat Text="..." override would be ambiguous). -->
         <EntityDefinition Source="Popup" Id="popupLeft">
