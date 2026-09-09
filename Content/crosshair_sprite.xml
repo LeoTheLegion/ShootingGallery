@@ -2,12 +2,13 @@
 <SpriteData xmlns="http://schemas.coreessentials.monogame/2025/sprite">
   <SourceType>texture2d</SourceType>
   <Source>crosshairs</Source>
+  <!-- Kenney Crosshair Pack (CC0), crosshair-013.png "Light" variant, 64x64. -->
   <Size>
-    <Width>50</Width>
-    <Height>50</Height>
+    <Width>64</Width>
+    <Height>64</Height>
   </Size>
   <Origin>
-    <X>25</X>
-    <Y>25</Y>
+    <X>32</X>
+    <Y>32</Y>
   </Origin>
 </SpriteData>
