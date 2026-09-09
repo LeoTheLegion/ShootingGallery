@@ -206,7 +206,7 @@ public class TargetComponent : EntityComponent
     {
         // Unity-style: instantiate the "Popup" prefab; its XML defaults (duration 2s, white,
         // scale 1) apply — only the text varies per hit.
-        var popup = InstantiateTemplate("Popup", Owner.Position)?.GetComponent<FloatingPopUpComponent>();
+        var popup = InstantiatePrefab("Popup", Owner.Position)?.GetComponent<FloatingPopUpComponent>();
         if (popup != null)
             popup.Text = score.ToString();
 

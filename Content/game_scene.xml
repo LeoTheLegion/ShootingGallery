@@ -1,12 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  Fully data-driven game scene: a root GameObjectEntity carries the CanvasComponent; every
-  label is a child composed of an AnchorComponent (preset + pixel offset) plus a LabelComponent.
-  The crosshair and round director are also declared here as plain GameObjectEntities whose
-  entire behavior lives in components (CrosshairComponent / GameDirectorComponent). Each label
-  carries an Id so the director can resolve it by id on its first Update.
+  Fully data-driven game scene (CE 0.20.0 strict scene format): a root GameObjectEntity carries
+  the CanvasComponent; every label is a child composed of an AnchorComponent (preset + pixel
+  offset) plus a LabelComponent. The crosshair and round director are also declared here as plain
+  GameObjectEntities whose entire behavior lives in components (CrosshairComponent /
+  GameDirectorComponent). Each label carries an Id so the director can resolve it by id on its
+  first Update.
 -->
 <Scene>
+  <GameSystems>
+    <System Type="EntitySystem">
+      <Entities>
   <EntityDefinition Type="GameObjectEntity" Id="hud">
     <Position X="0" Y="0" />
     <Components>
@@ -165,4 +169,7 @@
       </Component>
     </Components>
   </EntityDefinition>
+      </Entities>
+    </System>
+  </GameSystems>
 </Scene>

@@ -1,11 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  Start menu, fully data-driven with CE's anchored GUI: a root GameObjectEntity carries the
-  CanvasComponent; each label/button is a child of AnchorComponent + Label/Button component.
-  The START MUTATION button click is bound declaratively (<Bind> to MenuCommandsComponent.StartGame);
-  the two decorative radiation popups are created in StartMenuScene because they are gameplay entities, not GUI.
+  Start menu, fully data-driven with CE's anchored GUI (CE 0.20.0 strict scene format).
+  A root GameObjectEntity carries the CanvasComponent; each label/button is a child of
+  AnchorComponent + Label/Button component. The START MUTATION button click is bound
+  declaratively (<Bind> to MenuCommandsComponent.StartGame). The two decorative radiation
+  popups are static entities referencing the Popup prefab, with per-instance overrides.
 -->
 <Scene>
+  <GameSystems>
+    <System Type="EntitySystem">
+      <Prefabs>
+        <Prefab Name="Popup" Asset="popup.xml" />
+      </Prefabs>
+      <Entities>
   <EntityDefinition Type="GameObjectEntity" Id="hud">
     <Position X="0" Y="0" />
     <Components>
@@ -171,4 +178,37 @@
       </EntityDefinition>
     </Children>
   </EntityDefinition>
+
+        <!-- Decorative radiation popups: static instances of the Popup prefab. Positions are
+             fixed relative to World.Center (640,360) at +/-300 on X. Text is set via <Overrides>
+             because both FloatingPopUpComponent and LabelComponent expose a "Text" property
+             (a flat Text="..." override would be ambiguous). -->
+        <EntityDefinition Source="Popup" Id="popupLeft">
+          <Position X="340" Y="360" />
+          <Overrides>
+            <Component Type="FloatingPopUpComponent">
+              <Property Name="Text" Value="☢️ RADIATION ☢️" />
+              <Property Name="TextColor" Value="50,205,50,255" />
+              <Property Name="Scale" Value="1.5" />
+              <Property Name="Duration" Value="5" />
+              <Property Name="RadiationEffect" Value="true" />
+            </Component>
+          </Overrides>
+        </EntityDefinition>
+
+        <EntityDefinition Source="Popup" Id="popupRight">
+          <Position X="940" Y="360" />
+          <Overrides>
+            <Component Type="FloatingPopUpComponent">
+              <Property Name="Text" Value="☢️ RADIATION ☢️" />
+              <Property Name="TextColor" Value="50,205,50,255" />
+              <Property Name="Scale" Value="1.5" />
+              <Property Name="Duration" Value="5" />
+              <Property Name="RadiationEffect" Value="true" />
+            </Component>
+          </Overrides>
+        </EntityDefinition>
+      </Entities>
+    </System>
+  </GameSystems>
 </Scene>

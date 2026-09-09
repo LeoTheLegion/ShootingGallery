@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Data-driven loading screen (CE 0.20.0). Boots purely from this file — no C# LoadingScene.
+
+    Strict scene format: <Scene> -> <GameSystems> -> <System Type="EntitySystem">. A single flat
+    entity owns the canvas and carries a centered label plus the TransitionProgressComponent, which
+    mirrors SceneManager.TransitionProgress each frame and keeps its own LabelComponent's text in
+    sync as a live percentage (0% -> 100%). Kept as one flat entity on purpose (see playground notes).
+-->
+<Scene>
+    <GameSystems>
+        <System Type="EntitySystem">
+            <Entities>
+                <EntityDefinition Type="GameObjectEntity" Id="loadingLabel">
+                    <Position X="0" Y="0" />
+                    <Components>
+                        <Component Type="CanvasComponent" />
+                        <Component Type="LabelComponent">
+                            <Properties>
+                                <Property Name="Text" Value="Loading..." />
+                                <Property Name="TextColor" Value="White" />
+                                <Property Name="Scale" Value="2,2" />
+                                <Property Name="HorizontalAlignment" Value="Center" />
+                                <Property Name="VerticalAlignment" Value="Center" />
+                            </Properties>
+                        </Component>
+                        <Component Type="TransitionProgressComponent" />
+                    </Components>
+                </EntityDefinition>
+            </Entities>
+        </System>
+    </GameSystems>
+</Scene>

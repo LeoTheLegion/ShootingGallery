@@ -9,7 +9,7 @@
   component's deferred init (EnsureInitialized) always sees them. Each spawn site
   instantiates the template and pokes only what varies per spawn — mostly the text.
 -->
-<EntityTemplate Type="GameObjectEntity" Rotation="0" Sort="10" Active="true">
+<Prefab Type="GameObjectEntity" Rotation="0" Sort="10" Active="true">
     <Tags>
         <Tag Name="Popup" />
     </Tags>
@@ -27,4 +27,4 @@
         <Component Type="LabelComponent" />
         <Component Type="TweenComponent" />
     </Components>
-</EntityTemplate>
+</Prefab>

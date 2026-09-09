@@ -83,6 +83,12 @@
 #begin game_over.xml
 /copy:game_over.xml
 
+#begin scenes.xml
+/copy:scenes.xml
+
+#begin loading.xml
+/copy:loading.xml
+
 #begin game_config.xml
 /copy:game_config.xml
 

@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  Game over screen, fully data-driven with CE's anchored GUI: a root GameObjectEntity carries
-  the CanvasComponent; each label/button is a child of AnchorComponent + Label/Button component.
-  The cause / score / mutation labels carry placeholder text here; GameOverScene overrides them
-  at runtime. Button clicks are bound declaratively (<Bind> to MenuCommandsComponent).
+  Game over screen, fully data-driven with CE's anchored GUI (CE 0.20.0 strict scene format).
+  A root GameObjectEntity carries the CanvasComponent; each label/button is a child of
+  AnchorComponent + Label/Button component. The cause / score / mutation labels carry
+  placeholder text here; GameOverScene overrides them at runtime. Button clicks are bound
+  declaratively (<Bind> to MenuCommandsComponent).
 -->
 <Scene>
+  <GameSystems>
+    <System Type="EntitySystem">
+      <Entities>
   <EntityDefinition Type="GameObjectEntity" Id="hud">
     <Position X="0" Y="0" />
     <Components>
@@ -18,6 +22,8 @@
       </Component>
       <!-- Command target for the <Bind>-wired buttons below (no FindById + subscribe code). -->
       <Component Type="MenuCommandsComponent" />
+      <!-- Reads GameDirectorComponent's static handoff and pokes cause/score/mutation labels. -->
+      <Component Type="GameOverSummaryComponent" />
     </Components>
 
     <Children>
@@ -134,4 +140,6 @@
       </EntityDefinition>
     </Children>
   </EntityDefinition>
-</Scene>
+      </Entities>
+    </System>
+  </GameSystems></Scene>

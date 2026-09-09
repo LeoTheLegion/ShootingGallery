@@ -1,5 +1,5 @@
 <!-- Target template: plain GameObjectEntity + TargetComponent (Radioactive behavior). -->
-<EntityTemplate Type="GameObjectEntity" Rotation="0" Sort="0" Active="true">
+<Prefab Type="GameObjectEntity" Rotation="0" Sort="0" Active="true">
     <Tags>
         <Tag Name="Target" />
         <Tag Name="Radioactive" />
@@ -11,4 +11,4 @@
             </Properties>
         </Component>
     </Components>
-</EntityTemplate>
+</Prefab>

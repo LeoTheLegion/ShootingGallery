@@ -19,21 +19,6 @@ namespace ShootingGallery.Core;
 /// </summary>
 public class GameDirectorComponent : EntityComponent
 {
-    /// <summary>Raised when the round ends (timer expired or a bomb was hit).</summary>
-    public event EventHandler<GameOverEventArgs> OnGameOver;
-
-    public class GameOverEventArgs : EventArgs
-    {
-        public int FinalScore { get; }
-        public int MutationLevel { get; }
-
-        public GameOverEventArgs(int finalScore, int mutationLevel)
-        {
-            FinalScore = finalScore;
-            MutationLevel = mutationLevel;
-        }
-    }
-
     // Round configuration (static readonly so it captures the XML-loaded values from GameConstants)
     private static readonly double ROUND_TIME = GameConstants.RoundTime;
     private static readonly float TIME_MULTIPLIER_START = GameConstants.TimeMultiplierStart;
@@ -67,6 +52,7 @@ public class GameDirectorComponent : EntityComponent
     private int _score;
     private float _timeMultiplier;
     private double _targetSpawnTimer;
+    private bool _roundEnded;
 
     // Radiation / mutation state
     private float _currentRadiation;
@@ -117,10 +103,10 @@ public class GameDirectorComponent : EntityComponent
         if (es == null)
             return;
 
-        // Register the serialized target templates once (assets assigned in scene XML)
-        es.RegisterTemplate("Regular", RegularTargetTemplate);
-        es.RegisterTemplate("Radioactive", RadioactiveTargetTemplate);
-        es.RegisterTemplate("Bomb", BombTargetTemplate);
+        // Register the serialized target prefabs once (assets assigned in scene XML)
+        es.RegisterPrefab("Regular", RegularTargetTemplate);
+        es.RegisterPrefab("Radioactive", RadioactiveTargetTemplate);
+        es.RegisterPrefab("Bomb", BombTargetTemplate);
 
         // Resolve HUD labels by id
         _scoreUI = es.FindById("score")?.GetComponent<LabelComponent>();
@@ -173,7 +159,7 @@ public class GameDirectorComponent : EntityComponent
         if (_timer <= 0)
         {
             _timer = 0;
-            OnGameOver?.Invoke(this, new GameOverEventArgs(_score, _currentMutationLevel));
+            EndRound(bombHit: false);
         }
     }
 
@@ -261,6 +247,27 @@ public class GameDirectorComponent : EntityComponent
         popup.RadiationEffect = radiationEffect;
     }
 
+    /// <summary>
+    /// Ends the round: fires a "GAME OVER!" popup, hands this run's result to the game-over screen
+    /// via GameOverSummaryComponent.LastResult (name-based loads can't carry parameters), and
+    /// transitions to the data-driven game_over scene. Guarded so it runs at most once.
+    /// </summary>
+    private void EndRound(bool bombHit)
+    {
+        if (_roundEnded) return;
+        _roundEnded = true;
+
+        var es = EntitySystem;
+        if (es != null)
+        {
+            Vector2 worldCenter = World.Center;
+            SpawnPopup(es, new Vector2(worldCenter.X, worldCenter.Y - 50), "GAME OVER!", 5f, Color.Red, 2.0f, false);
+        }
+
+        GameOverSummaryComponent.LastResult = new GameOverSummaryComponent.GameOverResult(_score, _currentMutationLevel, bombHit);
+        Game?.SceneManager.LoadScene("game_over.xml");
+    }
+
     // ---- Shot resolution ------------------------------------------------------
 
     private void HandleShot(object sender, CrosshairComponent.ShootEventArgs e)
@@ -324,8 +331,8 @@ public class GameDirectorComponent : EntityComponent
 
         target.OnRadiationChange += (sender, args) => AddRadiation(args.RadiationAmount);
 
-        target.OnGameOver += (sender, args) =>
-            OnGameOver?.Invoke(this, new GameOverEventArgs(_score, _currentMutationLevel));
+        // A bomb ends the round immediately (with the bomb flag set for the game-over cause).
+        target.OnGameOver += (sender, args) => EndRound(bombHit: true);
 
         // Free the grid cell when the target dies (no per-frame scan needed)
         target.OnDestroyed += (sender, deadPosition) =>

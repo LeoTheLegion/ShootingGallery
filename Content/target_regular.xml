@@ -4,7 +4,7 @@
   declared here because template instantiation re-applies XML component properties after
   OnStart, which would clobber the component's sprite assignment.
 -->
-<EntityTemplate Type="GameObjectEntity" Rotation="0" Sort="0" Active="true">
+<Prefab Type="GameObjectEntity" Rotation="0" Sort="0" Active="true">
     <Tags>
         <Tag Name="Target" />
         <Tag Name="Regular" />
@@ -16,4 +16,4 @@
             </Properties>
         </Component>
     </Components>
-</EntityTemplate>
+</Prefab>

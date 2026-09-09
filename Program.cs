@@ -1,7 +1,5 @@
 ﻿
 using CoreEssentials;
-using CoreEssentials.Scenes;
-using Microsoft.Xna.Framework;
 using ShootingGallery.Core;
 
 using var game = new MainGame();
@@ -14,22 +12,11 @@ game.Graphics.ApplyChanges();
 // The world is 1:1 with the window (no camera); gameplay only ever asks World.
 World.Initialize(game.Graphics.PreferredBackBufferWidth, game.Graphics.PreferredBackBufferHeight);
 
-// XML-declared <Bind> commands in the menu scenes resolve through this reference.
-MenuCommandsComponent.Initialize(game);
-
-// Create a loading scene with custom colors
-LoadingScene loadingScene = new LoadingScene(
-    "Loading Character Demo...", 
-    Color.Black, 
-    Color.LightBlue, 
-    Color.White
-);
-
-// Set the loading scene for the SceneManager to use during transitions
-game.SceneManager.SetLoadingScene(loadingScene);
-
-var scene = new StartMenuScene();
-
-game.SceneManager.LoadScene(scene);
+// Boot purely from data files (CE 0.20.0 scene-as-data). The loading screen and every scene are
+// strict-format XML assets staged into Content/ — no C# LoadingScene or scene subclass. The scene
+// manifest gates all name-based loads; the first <GameScenes> entry (start_menu.xml) is startup.
+game.SceneManager.SetManifestAsset("scenes.xml");
+game.SceneManager.SetLoadingScene("loading.xml");
+game.SceneManager.LoadScene("start_menu.xml");
 
 game.Run();
