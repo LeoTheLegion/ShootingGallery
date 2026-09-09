@@ -175,6 +175,10 @@
     <Components>
       <Component Type="GameDirectorComponent">
         <Properties>
+          <!-- World size (design dimensions, not the window). Declared explicitly so there's no
+               hidden fallback; change these to make the stage a different size than the screen. -->
+          <Property Name="WorldWidth" Value="1280" />
+          <Property Name="WorldHeight" Value="720" />
           <Property Name="RegularTargetTemplate" Value="target_regular.xml" />
           <Property Name="RadioactiveTargetTemplate" Value="target_radioactive.xml" />
           <Property Name="BombTargetTemplate" Value="target_bomb.xml" />
