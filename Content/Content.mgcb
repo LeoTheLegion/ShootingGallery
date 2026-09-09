@@ -89,9 +89,6 @@
 #begin loading.xml
 /copy:loading.xml
 
-#begin game_config.xml
-/copy:game_config.xml
-
 #begin target_regular.xml
 /copy:target_regular.xml
 

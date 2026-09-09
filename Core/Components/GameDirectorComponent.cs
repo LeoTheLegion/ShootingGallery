@@ -19,18 +19,9 @@ namespace ShootingGallery.Core;
 /// </summary>
 public class GameDirectorComponent : EntityComponent
 {
-    // Round configuration (static readonly so it captures the XML-loaded values from GameConstants)
-    private static readonly double ROUND_TIME = GameConstants.RoundTime;
-    private static readonly float TIME_MULTIPLIER_START = GameConstants.TimeMultiplierStart;
-    private static readonly float TIME_MULTIPLIER_MIN = GameConstants.TimeMultiplierMin;
-    private static readonly float TIME_MULTIPLIER_DECAY = GameConstants.TimeMultiplierDecay;
-    private static readonly double TARGET_SPAWN_DELAY = GameConstants.TargetSpawnDelay;
-    private static readonly float BOMB_CHANCE = GameConstants.BombChance;
-    private static readonly float RADIOACTIVE_CHANCE = GameConstants.RadioactiveChance;
-
-    // Target grid configuration
-    private static readonly int GRID_ROWS = GameConstants.GridRows;
-    private static readonly int GRID_COLS = GameConstants.GridCols;
+    // Balance configuration resolved by tag in Bootstrap (declared on the "GameConfig" entity in
+    // game_scene.xml). All tuning lives in that data component — no statics here.
+    private GameConfigComponent _config;
 
     // Radiation / mutation configuration
     private const float MAX_RADIATION = 100f;
@@ -52,8 +43,8 @@ public class GameDirectorComponent : EntityComponent
     // World center, derived from the declared size above.
     private Vector2 _worldCenter;
 
-    // Grid state
-    private readonly bool[,] _occupiedCells;
+    // Grid state (allocated in Bootstrap once the config's grid dimensions are known)
+    private bool[,] _occupiedCells;
     private readonly Dictionary<Vector2, (int Row, int Col)> _targetPositionToCell = new();
 
     // Round state
@@ -78,10 +69,7 @@ public class GameDirectorComponent : EntityComponent
 
     public GameDirectorComponent()
     {
-        _occupiedCells = new bool[GRID_ROWS, GRID_COLS];
-        _timer = ROUND_TIME;
         _score = 0;
-        _timeMultiplier = TIME_MULTIPLIER_START;
         _targetSpawnTimer = 0;
     }
 
@@ -111,6 +99,18 @@ public class GameDirectorComponent : EntityComponent
         var es = EntitySystem;
         if (es == null)
             return;
+
+        // Resolve balance configuration by tag (declared on the "GameConfig" entity in scene XML).
+        _config = es.GetEntitiesByTag("GameConfig")
+            .Select(e => e.GetComponent<GameConfigComponent>())
+            .FirstOrDefault(c => c != null);
+        if (_config == null)
+            return;
+
+        // Allocate the grid and seed round state from the config values.
+        _occupiedCells = new bool[_config.GridRows, _config.GridCols];
+        _timer = _config.RoundTime;
+        _timeMultiplier = _config.TimeMultiplierStart;
 
         // World center comes straight from the declared WorldWidth/WorldHeight (set in scene XML).
         _worldCenter = new Vector2(WorldWidth / 2f, WorldHeight / 2f);
@@ -151,8 +151,8 @@ public class GameDirectorComponent : EntityComponent
         // Timer + multiplier decay
         _timer -= elapsedSeconds;
         _timeMultiplier = MathHelper.Max(
-            _timeMultiplier - (TIME_MULTIPLIER_DECAY * elapsedSeconds),
-            TIME_MULTIPLIER_MIN
+            _timeMultiplier - (_config.TimeMultiplierDecay * elapsedSeconds),
+            _config.TimeMultiplierMin
         );
 
         // UI updates
@@ -183,10 +183,10 @@ public class GameDirectorComponent : EntityComponent
             SpawnRandomTarget();
 
             // Aggressive spawn rate, accelerating as the round progresses
-            _targetSpawnTimer = (TARGET_SPAWN_DELAY / 2.0) + (GameRandom.NextFloat() * GameConstants.TargetSpawnRandomFactor);
-            if (_timer < GameConstants.SpawnAccelThreshold1) _targetSpawnTimer *= GameConstants.SpawnAccelMultiplier1;
-            if (_timer < GameConstants.SpawnAccelThreshold2) _targetSpawnTimer *= GameConstants.SpawnAccelMultiplier2;
-            if (_timer < GameConstants.SpawnAccelThreshold3) _targetSpawnTimer *= GameConstants.SpawnAccelMultiplier3;
+            _targetSpawnTimer = (_config.TargetSpawnDelay / 2.0f) + (GameRandom.NextFloat() * _config.TargetSpawnRandomFactor);
+            if (_timer < _config.SpawnAccelThreshold1) _targetSpawnTimer *= _config.SpawnAccelMultiplier1;
+            if (_timer < _config.SpawnAccelThreshold2) _targetSpawnTimer *= _config.SpawnAccelMultiplier2;
+            if (_timer < _config.SpawnAccelThreshold3) _targetSpawnTimer *= _config.SpawnAccelMultiplier3;
         }
     }
 
@@ -298,7 +298,7 @@ public class GameDirectorComponent : EntityComponent
         // A single shot resolves to ONE target — the closest one (so a bomb near the aim
         // point can't end the game when you're shooting a regular target beside it).
         bool targetHit = false;
-        float maxHitRadius = GameConstants.TargetRadius;
+        float maxHitRadius = _config.TargetRadius;
 
         var candidates = es.FindNearby(e.Position, maxHitRadius)
             .Where(entity => entity.GetComponent<TargetComponent>() != null)
@@ -319,13 +319,13 @@ public class GameDirectorComponent : EntityComponent
 
     // ---- Spawning / grid ------------------------------------------------------
 
-    private static Entity CreateTargetAt(EntitySystem es, Vector2 position)
+    private Entity CreateTargetAt(EntitySystem es, Vector2 position)
     {
         float roll = GameRandom.NextFloat();
         string templateName;
-        if (roll < BOMB_CHANCE)
+        if (roll < _config.BombChance)
             templateName = "Bomb";
-        else if (roll < BOMB_CHANCE + RADIOACTIVE_CHANCE)
+        else if (roll < _config.BombChance + _config.RadioactiveChance)
             templateName = "Radioactive";
         else
             templateName = "Regular";
@@ -362,20 +362,20 @@ public class GameDirectorComponent : EntityComponent
         if (!HasAvailableCell())
             return null;
 
-        float cellWidth = WorldWidth / (float)GRID_COLS;
-        float cellHeight = WorldHeight / (float)GRID_ROWS;
+        float cellWidth = WorldWidth / (float)_config.GridCols;
+        float cellHeight = WorldHeight / (float)_config.GridRows;
 
         for (int attempts = 0; attempts < 100; attempts++)
         {
-            int row = GameRandom.Next(GRID_ROWS);
-            int col = GameRandom.Next(GRID_COLS);
+            int row = GameRandom.Next(_config.GridRows);
+            int col = GameRandom.Next(_config.GridCols);
             if (!_occupiedCells[row, col])
                 return OccupyCell(row, col, cellWidth, cellHeight);
         }
 
-        for (int row = 0; row < GRID_ROWS; row++)
+        for (int row = 0; row < _config.GridRows; row++)
         {
-            for (int col = 0; col < GRID_COLS; col++)
+            for (int col = 0; col < _config.GridCols; col++)
             {
                 if (!_occupiedCells[row, col])
                     return OccupyCell(row, col, cellWidth, cellHeight);
@@ -387,9 +387,9 @@ public class GameDirectorComponent : EntityComponent
 
     private bool HasAvailableCell()
     {
-        for (int row = 0; row < GRID_ROWS; row++)
+        for (int row = 0; row < _config.GridRows; row++)
         {
-            for (int col = 0; col < GRID_COLS; col++)
+            for (int col = 0; col < _config.GridCols; col++)
             {
                 if (!_occupiedCells[row, col])
                     return true;
@@ -421,12 +421,12 @@ public class GameDirectorComponent : EntityComponent
 
     private void PopulateGrid()
     {
-        float cellWidth = WorldWidth / (float)GRID_COLS;
-        float cellHeight = WorldHeight / (float)GRID_ROWS;
+        float cellWidth = WorldWidth / (float)_config.GridCols;
+        float cellHeight = WorldHeight / (float)_config.GridRows;
 
-        for (int row = 0; row < GRID_ROWS; row++)
+        for (int row = 0; row < _config.GridRows; row++)
         {
-            for (int col = 0; col < GRID_COLS; col++)
+            for (int col = 0; col < _config.GridCols; col++)
             {
                 Vector2 position = new Vector2(
                     col * cellWidth + (cellWidth / 2),

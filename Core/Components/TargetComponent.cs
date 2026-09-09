@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using CoreEssentials.Assets;
 using CoreEssentials.GameSystems.EntitySystems.EntityOOPSystem.Components;
 using CoreEssentials.GameSystems.EntitySystems.EntityOOPSystem.Components.BuiltIn;
@@ -49,16 +50,13 @@ public class TargetComponent : EntityComponent
         }
     }
 
-    // Configuration (static readonly so it captures the XML-loaded values from GameConstants)
-    private static readonly int TargetRadius = GameConstants.TargetRadius;
-    private static readonly float DefaultScale = GameConstants.TargetDefaultScale;
-    private static readonly double TimeToFullSize = GameConstants.TargetTimeToFullSize;
-    private static readonly double BombFadeStartTime = GameConstants.BombFadeStartTime;
-    private static readonly double BombFadeDuration = GameConstants.BombFadeDuration;
+    // Balance configuration resolved by tag in OnAttach (declared on the "GameConfig" entity in
+    // game_scene.xml). No statics — every value is declarative data.
+    private GameConfigComponent _config;
 
     // State
     private bool _initialized;
-    private float _scale = DefaultScale;
+    private float _scale;
     private SpriteComponent _spriteComponent;
     private TweenFloat _growthTween;
     private Color _tintColor = Color.White;
@@ -68,7 +66,7 @@ public class TargetComponent : EntityComponent
     public bool IsDestroyed => _isDestroyed;
 
     /// <summary>True once the growth tween has reached full size (scale >= large threshold).</summary>
-    public bool IsFullyGrown => _scale >= GameConstants.TargetGrowthLarge;
+    public bool IsFullyGrown => _config != null && _scale >= _config.TargetGrowthLarge;
 
     /// <summary>
     /// Component creation (sprite + tween) happens here, outside the entity's per-frame
@@ -79,6 +77,17 @@ public class TargetComponent : EntityComponent
     public override void OnAttach()
     {
         base.OnAttach();
+
+        // Resolve balance configuration by tag (declared on the "GameConfig" entity in scene XML).
+        // The config entity is already in the scene, and this target has its system reference set
+        // before OnAttach runs, so the lookup succeeds here.
+        _config = EntitySystem?.GetEntitiesByTag("GameConfig")
+            .Select(e => e.GetComponent<GameConfigComponent>())
+            .FirstOrDefault(c => c != null);
+        if (_config == null)
+            return;
+
+        _scale = _config.TargetDefaultScale;
 
         // The SpriteComponent and TweenComponent are declared in the target prefab XML (declared
         // before this component), so we grab them here rather than adding components to the entity
@@ -93,7 +102,7 @@ public class TargetComponent : EntityComponent
 
         var tweenComponent = Owner.GetComponent<TweenComponent>();
         if (tweenComponent != null)
-            _growthTween = tweenComponent.TweenToFloat(0f, 1f, (float)TimeToFullSize);
+            _growthTween = tweenComponent.TweenToFloat(0f, 1f, _config.TimeToFullSize);
     }
 
     public override void Update(GameTime gameTime)
@@ -114,9 +123,9 @@ public class TargetComponent : EntityComponent
         if (Type == TargetType.Bomb)
         {
             _lifeTime += gameTime.ElapsedGameTime.TotalSeconds;
-            if (_lifeTime > BombFadeStartTime)
+            if (_lifeTime > _config.BombFadeStartTime)
             {
-                float fadeProgress = (float)((_lifeTime - BombFadeStartTime) / BombFadeDuration);
+                float fadeProgress = (float)((_lifeTime - _config.BombFadeStartTime) / _config.BombFadeDuration);
                 float alpha = Math.Max(0, 1.0f - fadeProgress);
                 byte alphaByte = (byte)Math.Round(alpha * 255);
                 _tintColor = new Color((byte)255, (byte)0, (byte)0, alphaByte);
@@ -163,7 +172,7 @@ public class TargetComponent : EntityComponent
     {
         float distanceToShot = Vector2.Distance(Owner.Position, shotPosition);
 
-        if (distanceToShot < TargetRadius * _scale)
+        if (_config != null && distanceToShot < _config.TargetRadius * _scale)
             ProcessHit();
     }
 
@@ -172,18 +181,18 @@ public class TargetComponent : EntityComponent
         switch (Type)
         {
             case TargetType.Standard:
-                ReportScore(CalculateScore(GameConstants.ScoreRegularLarge,
-                                           GameConstants.ScoreRegularMedium,
-                                           GameConstants.ScoreRegularSmall));
-                OnRadiationChange?.Invoke(this, new TargetRadiationEventArgs(GameConstants.RadiationRegular));
+                ReportScore(CalculateScore(_config.ScoreRegularLarge,
+                                           _config.ScoreRegularMedium,
+                                           _config.ScoreRegularSmall));
+                OnRadiationChange?.Invoke(this, new TargetRadiationEventArgs(_config.RadiationRegular));
                 Destroy();
                 break;
 
             case TargetType.Radioactive:
-                ReportScore(CalculateScore(GameConstants.ScoreRadioactiveLarge,
-                                           GameConstants.ScoreRadioactiveMedium,
-                                           GameConstants.ScoreRadioactiveSmall));
-                OnRadiationChange?.Invoke(this, new TargetRadiationEventArgs(GameConstants.RadiationRadioactive));
+                ReportScore(CalculateScore(_config.ScoreRadioactiveLarge,
+                                           _config.ScoreRadioactiveMedium,
+                                           _config.ScoreRadioactiveSmall));
+                OnRadiationChange?.Invoke(this, new TargetRadiationEventArgs(_config.RadiationRadioactive));
                 Destroy();
                 break;
 
@@ -195,9 +204,9 @@ public class TargetComponent : EntityComponent
 
     private int CalculateScore(int large, int medium, int small)
     {
-        if (_scale >= GameConstants.TargetGrowthLarge)
+        if (_scale >= _config.TargetGrowthLarge)
             return large;
-        if (_scale >= GameConstants.TargetGrowthMedium)
+        if (_scale >= _config.TargetGrowthMedium)
             return medium;
         return small;
     }

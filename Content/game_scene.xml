@@ -167,6 +167,62 @@
     </Components>
   </EntityDefinition>
 
+  <!-- Balance configuration: a hidden GameObjectEntity (no sprite) whose GameConfigComponent is
+       pure data. Every value is declared explicitly here so there's no hidden static load; the
+       director and spawned targets resolve it by tag "GameConfig". -->
+  <EntityDefinition Type="GameObjectEntity" Id="config">
+    <Tags>
+      <Tag Name="GameConfig" />
+    </Tags>
+    <Components>
+      <Component Type="GameConfigComponent">
+        <Properties>
+          <!-- Game timing -->
+          <Property Name="RoundTime" Value="60.0" />
+          <Property Name="TimeMultiplierStart" Value="10.0" />
+          <Property Name="TimeMultiplierMin" Value="1.0" />
+          <Property Name="TimeMultiplierDecay" Value="0.3" />
+          <!-- Target spawning -->
+          <Property Name="TargetSpawnDelay" Value="0.25" />
+          <Property Name="TargetSpawnRandomFactor" Value="0.2" />
+          <!-- Target growth -->
+          <Property Name="TargetDefaultScale" Value="0.3" />
+          <Property Name="TimeToFullSize" Value="0.75" />
+          <!-- Target type chances -->
+          <Property Name="BombChance" Value="0.2" />
+          <Property Name="RadioactiveChance" Value="0.15" />
+          <!-- Bomb fade -->
+          <Property Name="BombFadeStartTime" Value="5.0" />
+          <Property Name="BombFadeDuration" Value="3.0" />
+          <!-- Target size / grid -->
+          <Property Name="TargetRadius" Value="45" />
+          <Property Name="GridRows" Value="5" />
+          <Property Name="GridCols" Value="5" />
+          <!-- Scoring -->
+          <Property Name="ScoreRegularSmall" Value="5" />
+          <Property Name="ScoreRegularMedium" Value="10" />
+          <Property Name="ScoreRegularLarge" Value="15" />
+          <Property Name="ScoreRadioactiveSmall" Value="10" />
+          <Property Name="ScoreRadioactiveMedium" Value="20" />
+          <Property Name="ScoreRadioactiveLarge" Value="30" />
+          <!-- Radiation -->
+          <Property Name="RadiationRegular" Value="1.0" />
+          <Property Name="RadiationRadioactive" Value="3.0" />
+          <!-- Growth thresholds -->
+          <Property Name="TargetGrowthMedium" Value="0.6" />
+          <Property Name="TargetGrowthLarge" Value="1.0" />
+          <!-- Spawn acceleration (time remaining) -->
+          <Property Name="SpawnAccelThreshold1" Value="45.0" />
+          <Property Name="SpawnAccelThreshold2" Value="30.0" />
+          <Property Name="SpawnAccelThreshold3" Value="15.0" />
+          <Property Name="SpawnAccelMultiplier1" Value="0.6" />
+          <Property Name="SpawnAccelMultiplier2" Value="0.5" />
+          <Property Name="SpawnAccelMultiplier3" Value="0.4" />
+        </Properties>
+      </Component>
+    </Components>
+  </EntityDefinition>
+
   <!-- Round director: a hidden GameObjectEntity (no sprite) whose GameDirectorComponent owns
        the timer, score, multiplier, target grid, spawning, radiation/mutation and game-over.
        The target templates are serialized references (Unity [SerializeField] style),
