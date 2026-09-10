@@ -36,11 +36,56 @@
 /processorParam:TextureFormat=Color
 /build:Sprites/target.png
 
+#begin Sprites/target_bomb.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Sprites/target_bomb.png
+
+#begin Sprites/hit_ring.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Sprites/hit_ring.png
+
+#begin Sprites/explosion_fireball.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Sprites/explosion_fireball.png
+
 #begin Sprites/crosshair_sprite.xml
 /copy:Sprites/crosshair_sprite.xml
 
 #begin Sprites/target_sprite.xml
 /copy:Sprites/target_sprite.xml
+
+#begin Sprites/target_bomb_sprite.xml
+/copy:Sprites/target_bomb_sprite.xml
+
+#begin Sprites/hit_ring_sprite.xml
+/copy:Sprites/hit_ring_sprite.xml
+
+#begin Sprites/explosion_fireball_sprite.xml
+/copy:Sprites/explosion_fireball_sprite.xml
 
 #begin Scenes/scenes.xml
 /copy:Scenes/scenes.xml
@@ -68,3 +113,9 @@
 
 #begin Prefabs/target_bomb.xml
 /copy:Prefabs/target_bomb.xml
+
+#begin Prefabs/hit_effect.xml
+/copy:Prefabs/hit_effect.xml
+
+#begin Prefabs/bomb_effect.xml
+/copy:Prefabs/bomb_effect.xml

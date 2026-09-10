@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<SpriteData xmlns="http://schemas.coreessentials.monogame/2025/sprite">
+  <SourceType>texture2d</SourceType>
+  <!-- Kenney Particle Pack (CC0), star_03.png: a soft impact ring used as the hit flash. -->
+  <Source>Sprites/hit_ring</Source>
+  <Size>
+    <Width>90</Width>
+    <Height>90</Height>
+  </Size>
+  <Origin>
+    <X>45</X>
+    <Y>45</Y>
+  </Origin>
+</SpriteData>

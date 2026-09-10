@@ -7,7 +7,9 @@
     <Components>
         <Component Type="SpriteComponent">
             <Properties>
-                <Property Name="SpriteAsset" Value="Sprites/target_sprite.xml" />
+                <!-- Red bullseye + white skull baked in; TargetComponent uses a white tint so the
+                     pixels read true and the warning pulse fades via alpha. -->
+                <Property Name="SpriteAsset" Value="Sprites/target_bomb_sprite.xml" />
                 <Property Name="Origin" Value="0.5,0.5" />
             </Properties>
         </Component>

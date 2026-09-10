@@ -128,7 +128,9 @@ public class TargetComponent : EntityComponent
                 float fadeProgress = (float)((_lifeTime - _config.BombFadeStartTime) / _config.BombFadeDuration);
                 float alpha = Math.Max(0, 1.0f - fadeProgress);
                 byte alphaByte = (byte)Math.Round(alpha * 255);
-                _tintColor = new Color((byte)255, (byte)0, (byte)0, alphaByte);
+                // Fade a WHITE tint: the red is already baked into target_bomb.png, so multiplying
+                // a red tint over it would double-darken. Alpha alone gives the warning pulse.
+                _tintColor = new Color((byte)255, (byte)255, (byte)255, alphaByte);
                 if (_spriteComponent != null)
                     _spriteComponent.Color = _tintColor;
 
@@ -154,7 +156,9 @@ public class TargetComponent : EntityComponent
                 _tintColor = new Color(0, 255, 0);
                 break;
             case TargetType.Bomb:
-                _tintColor = new Color(255, 0, 0, 255);
+                // Red + skull are baked into the bomb texture (target_bomb.png), so a white resting
+                // tint keeps them true; the pre-death warning pulse fades this alpha (see Update).
+                _tintColor = Color.White;
                 break;
         }
 
@@ -185,6 +189,7 @@ public class TargetComponent : EntityComponent
                                            _config.ScoreRegularMedium,
                                            _config.ScoreRegularSmall));
                 OnRadiationChange?.Invoke(this, new TargetRadiationEventArgs(_config.RadiationRegular));
+                SpawnEffect("HitEffect");
                 Destroy();
                 break;
 
@@ -193,13 +198,26 @@ public class TargetComponent : EntityComponent
                                            _config.ScoreRadioactiveMedium,
                                            _config.ScoreRadioactiveSmall));
                 OnRadiationChange?.Invoke(this, new TargetRadiationEventArgs(_config.RadiationRadioactive));
+                SpawnEffect("HitEffect");
                 Destroy();
                 break;
 
             case TargetType.Bomb:
+                // Big fireball first so it plays during the game-over transition, then end the round.
+                SpawnEffect("BombEffect");
                 OnGameOver?.Invoke(this, EventArgs.Empty);
                 break;
         }
+    }
+
+    /// <summary>
+    /// Spawns a transient effect prefab at this target's position. The effect is an independent entity
+    /// that self-destructs via its own EffectComponent lifetime, so it keeps playing after this target
+    /// (or the whole round) is torn down.
+    /// </summary>
+    private void SpawnEffect(string prefabName)
+    {
+        InstantiatePrefab(prefabName, Owner.Position);
     }
 
     private int CalculateScore(int large, int medium, int small)

@@ -13,6 +13,9 @@
       <Prefabs>
         <!-- Score/radiation popups are instantiated at runtime by the director and targets. -->
         <Prefab Name="Popup" Asset="Prefabs/popup.xml" />
+        <!-- Transient hit/detonation effects, spawned by TargetComponent on impact. -->
+        <Prefab Name="HitEffect" Asset="Prefabs/hit_effect.xml" />
+        <Prefab Name="BombEffect" Asset="Prefabs/bomb_effect.xml" />
       </Prefabs>
       <Entities>
   <EntityDefinition Type="GameObjectEntity" Id="hud">

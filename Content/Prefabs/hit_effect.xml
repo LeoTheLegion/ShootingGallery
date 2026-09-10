@@ -1,0 +1,24 @@
+<!-- Hit-effect template: a plain GameObjectEntity + Sprite/Tween-free Effect component. Spawned at a
+     target's position on any hit; EffectComponent scales it up and fades it out, then self-destructs. -->
+<Prefab Type="GameObjectEntity" Rotation="0" Sort="20" Active="true">
+    <Tags>
+        <Tag Name="Effect" />
+    </Tags>
+    <Components>
+        <Component Type="SpriteComponent">
+            <Properties>
+                <Property Name="SpriteAsset" Value="Sprites/hit_ring_sprite.xml" />
+                <Property Name="Origin" Value="0.5,0.5" />
+            </Properties>
+        </Component>
+        <Component Type="EffectComponent">
+            <Properties>
+                <!-- Prefab defaults (overridden per-instance by the spawn site) -->
+                <Property Name="StartScale" Value="0.5" />
+                <Property Name="EndScale" Value="1.4" />
+                <Property Name="Tint" Value="255,255,255,255" />
+                <Property Name="Duration" Value="0.25" />
+            </Properties>
+        </Component>
+    </Components>
+</Prefab>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<SpriteData xmlns="http://schemas.coreessentials.monogame/2025/sprite">
+  <SourceType>texture2d</SourceType>
+  <!-- Red bullseye with a white skull baked in (Content/Sprites/target_bomb.png). The red is
+       already in the pixels, so the bomb uses a WHITE resting tint and fades via alpha. -->
+  <Source>Sprites/target_bomb</Source>
+  <Size>
+    <Width>90</Width>
+    <Height>90</Height>
+  </Size>
+  <Origin>
+    <X>45</X>
+    <Y>45</Y>
+  </Origin>
+</SpriteData>
