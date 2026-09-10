@@ -7,16 +7,17 @@
       if absent, the default loading screen is used.
     - <LoadingScenes> lists the loading screens; exactly one may be marked Default="true".
 
-    Loaded and enforced by the core: SceneManager.SetManifestAsset("scenes.xml") must be called before
-    any name-based LoadScene/SetLoadingScene call, and every name-based load must reference an entry here.
+    Loaded and enforced by the core: SceneManager.SetManifestAsset("Scenes/scenes.xml") must be called
+    before any name-based LoadScene/SetLoadingScene call, and every name-based load must reference an
+    entry here. Scene names are content-relative paths (forward slashes).
 -->
 <Scenes>
     <GameScenes>
-        <Scene Name="start_menu.xml" />
-        <Scene Name="game_scene.xml" />
-        <Scene Name="game_over.xml" />
+        <Scene Name="Scenes/start_menu.xml" />
+        <Scene Name="Scenes/game_scene.xml" />
+        <Scene Name="Scenes/game_over.xml" />
     </GameScenes>
     <LoadingScenes>
-        <LoadingScene Name="loading.xml" Default="true" />
+        <LoadingScene Name="Scenes/loading.xml" Default="true" />
     </LoadingScenes>
 </Scenes>

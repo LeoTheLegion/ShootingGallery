@@ -8,7 +8,7 @@ namespace ShootingGallery.Core;
 /// Applies this run's result to the game-over screen. Name-based scene loads can't carry
 /// parameters, so GameDirectorComponent publishes the outcome via the static LastResult handoff
 /// right before transitioning here; this component reads it and pokes the cause / score / mutation
-/// labels (resolved by id) that Content/game_over.xml declares as placeholders. The poking is
+/// labels (resolved by id) that Content/Scenes/game_over.xml declares as placeholders. The poking is
 /// deferred to the first Update because DataDrivenScene attaches components pre-order (parents
 /// before children), so the child label entities don't exist yet at OnAttach time.
 /// </summary>

@@ -28,14 +28,14 @@ public class GameDirectorComponent : EntityComponent
     private readonly float[] MUTATION_THRESHOLDS = { 0.25f, 0.5f, 0.75f };
 
     // Unity-style serialized prefab references ([SerializeField] GameObject equivalent):
-    // assigned from Content/game_scene.xml <Properties>, like dragging prefabs into the
+    // assigned from Content/Scenes/game_scene.xml <Properties>, like dragging prefabs into the
     // inspector. The defaults keep the component runnable even without XML assignment.
-    public string RegularTargetTemplate { get; set; } = "target_regular.xml";
-    public string RadioactiveTargetTemplate { get; set; } = "target_radioactive.xml";
-    public string BombTargetTemplate { get; set; } = "target_bomb.xml";
+    public string RegularTargetTemplate { get; set; } = "Prefabs/target_regular.xml";
+    public string RadioactiveTargetTemplate { get; set; } = "Prefabs/target_radioactive.xml";
+    public string BombTargetTemplate { get; set; } = "Prefabs/target_bomb.xml";
 
     // World size — design dimensions, not the window. These are declared explicitly in scene
-    // XML <Properties> (see Content/game_scene.xml) so there's no hidden fallback: the world can
+    // XML <Properties> (see Content/Scenes/game_scene.xml) so there's no hidden fallback: the world can
     // be a different size than what the art shows (e.g. sprites authored for a larger stage).
     public int WorldWidth { get; set; } = 1280;
     public int WorldHeight { get; set; } = 720;
@@ -241,7 +241,7 @@ public class GameDirectorComponent : EntityComponent
 
     /// <summary>
     /// Spawns a floating popup: instantiates the "Popup" prefab and applies per-popup values.
-    /// Values not passed here fall back to the prefab defaults in Content/popup.xml.
+    /// Values not passed here fall back to the prefab defaults in Content/Prefabs/popup.xml.
     /// </summary>
     private static void SpawnPopup(EntitySystem es, Vector2 position, string text, float duration, Color color, float scale, bool radiationEffect)
     {
@@ -277,7 +277,7 @@ public class GameDirectorComponent : EntityComponent
         }
 
         GameOverSummaryComponent.LastResult = new GameOverSummaryComponent.GameOverResult(_score, _currentMutationLevel, bombHit);
-        Game?.SceneManager.LoadScene("game_over.xml");
+        Game?.SceneManager.LoadScene("Scenes/game_over.xml");
     }
 
     // ---- Shot resolution ------------------------------------------------------

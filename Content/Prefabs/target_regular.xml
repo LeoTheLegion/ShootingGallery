@@ -12,7 +12,7 @@
     <Components>
         <Component Type="SpriteComponent">
             <Properties>
-                <Property Name="SpriteAsset" Value="target_sprite.xml" />
+                <Property Name="SpriteAsset" Value="Sprites/target_sprite.xml" />
                 <Property Name="Origin" Value="0.5,0.5" />
             </Properties>
         </Component>

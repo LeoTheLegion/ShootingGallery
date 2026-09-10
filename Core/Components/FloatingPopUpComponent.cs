@@ -8,7 +8,7 @@ namespace ShootingGallery.Core
 {
     /// <summary>
     /// Drifting, fading score popup. The entity is a plain GameObjectEntity declared in the
-    /// "popup" template (Content/popup.xml); this component just drives its CanvasComponent
+    /// "popup" template (Content/Prefabs/popup.xml); this component just drives its CanvasComponent
     /// and LabelComponent with per-popup values (text, color, scale, duration) that each spawn
     /// site pokes right after InstantiateTemplate — before the first Update — so the deferred
     /// setup in <see cref="EnsureInitialized"/> always sees them.

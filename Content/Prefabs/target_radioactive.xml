@@ -1,20 +1,20 @@
-<!-- Target template: plain GameObjectEntity + Sprite/Tween/Target components (Bomb behavior). -->
+<!-- Target template: plain GameObjectEntity + Sprite/Tween/Target components (Radioactive behavior). -->
 <Prefab Type="GameObjectEntity" Rotation="0" Sort="0" Active="true">
     <Tags>
         <Tag Name="Target" />
-        <Tag Name="Bomb" />
+        <Tag Name="Radioactive" />
     </Tags>
     <Components>
         <Component Type="SpriteComponent">
             <Properties>
-                <Property Name="SpriteAsset" Value="target_sprite.xml" />
+                <Property Name="SpriteAsset" Value="Sprites/target_sprite.xml" />
                 <Property Name="Origin" Value="0.5,0.5" />
             </Properties>
         </Component>
         <Component Type="TweenComponent" />
         <Component Type="TargetComponent">
             <Properties>
-                <Property Name="Type" Value="Bomb" />
+                <Property Name="Type" Value="Radioactive" />
             </Properties>
         </Component>
     </Components>

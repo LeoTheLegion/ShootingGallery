@@ -12,7 +12,7 @@
     <System Type="EntitySystem">
       <Prefabs>
         <!-- Score/radiation popups are instantiated at runtime by the director and targets. -->
-        <Prefab Name="Popup" Asset="popup.xml" />
+        <Prefab Name="Popup" Asset="Prefabs/popup.xml" />
       </Prefabs>
       <Entities>
   <EntityDefinition Type="GameObjectEntity" Id="hud">
@@ -151,7 +151,7 @@
            Centered origin (0.5,0.5) matches the previous hand-drawn crosshair. -->
       <Component Type="SpriteComponent">
         <Properties>
-          <Property Name="SpriteAsset" Value="crosshair_sprite.xml" />
+          <Property Name="SpriteAsset" Value="Sprites/crosshair_sprite.xml" />
           <Property Name="Origin" Value="0.5,0.5" />
         </Properties>
       </Component>
@@ -235,9 +235,9 @@
                hidden fallback; change these to make the stage a different size than the screen. -->
           <Property Name="WorldWidth" Value="1280" />
           <Property Name="WorldHeight" Value="720" />
-          <Property Name="RegularTargetTemplate" Value="target_regular.xml" />
-          <Property Name="RadioactiveTargetTemplate" Value="target_radioactive.xml" />
-          <Property Name="BombTargetTemplate" Value="target_bomb.xml" />
+          <Property Name="RegularTargetTemplate" Value="Prefabs/target_regular.xml" />
+          <Property Name="RadioactiveTargetTemplate" Value="Prefabs/target_radioactive.xml" />
+          <Property Name="BombTargetTemplate" Value="Prefabs/target_bomb.xml" />
         </Properties>
       </Component>
     </Components>

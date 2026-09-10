@@ -1,4 +1,3 @@
-
 #----------------------------- Global Properties ----------------------------#
 
 /outputDir:bin/$(Platform)
@@ -13,7 +12,7 @@
 
 #---------------------------------- Content ---------------------------------#
 
-#begin button_hover.png
+#begin Sprites/crosshairs.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -23,9 +22,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:button_hover.png
+/build:Sprites/crosshairs.png
 
-#begin button.png
+#begin Sprites/target.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -35,81 +34,37 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:button.png
+/build:Sprites/target.png
 
-#begin crosshair_sprite.xml
-/copy:crosshair_sprite.xml
+#begin Sprites/crosshair_sprite.xml
+/copy:Sprites/crosshair_sprite.xml
 
-#begin crosshairs.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:crosshairs.png
+#begin Sprites/target_sprite.xml
+/copy:Sprites/target_sprite.xml
 
-#begin galleryFont.spritefont
-/importer:FontDescriptionImporter
-/processor:FontDescriptionProcessor
-/processorParam:PremultiplyAlpha=True
-/processorParam:TextureFormat=Compressed
-/build:galleryFont.spritefont
+#begin Scenes/scenes.xml
+/copy:Scenes/scenes.xml
 
-#begin sky.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:sky.png
+#begin Scenes/loading.xml
+/copy:Scenes/loading.xml
 
-#begin target_sprite.xml
-/copy:target_sprite.xml
+#begin Scenes/start_menu.xml
+/copy:Scenes/start_menu.xml
 
-#begin start_menu.xml
-/copy:start_menu.xml
+#begin Scenes/game_scene.xml
+/copy:Scenes/game_scene.xml
 
-#begin game_scene.xml
-/copy:game_scene.xml
+#begin Scenes/game_over.xml
+/copy:Scenes/game_over.xml
 
-#begin game_over.xml
-/copy:game_over.xml
+#begin Prefabs/popup.xml
+/copy:Prefabs/popup.xml
 
-#begin scenes.xml
-/copy:scenes.xml
+#begin Prefabs/target_regular.xml
+/copy:Prefabs/target_regular.xml
 
-#begin loading.xml
-/copy:loading.xml
+#begin Prefabs/target_radioactive.xml
+/copy:Prefabs/target_radioactive.xml
 
-#begin target_regular.xml
-/copy:target_regular.xml
-
-#begin target_radioactive.xml
-/copy:target_radioactive.xml
-
-#begin target_bomb.xml
-/copy:target_bomb.xml
-
-#begin popup.xml
-/copy:popup.xml
-
-#begin target.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:target.png
-
+#begin Prefabs/target_bomb.xml
+/copy:Prefabs/target_bomb.xml

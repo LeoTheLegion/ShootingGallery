@@ -142,7 +142,7 @@ public class CrosshairComponent : EntityComponent
     private void SetupArmSprite(Entity arm)
     {
         if (_armSprite == null)
-            _armSprite = AssetManager.LoadAsset<Sprite>("crosshair_sprite.xml");
+            _armSprite = AssetManager.LoadAsset<Sprite>("Sprites/crosshair_sprite.xml");
 
         var spriteComponent = arm.AddComponent(new SpriteComponent(_armSprite));
         spriteComponent.Color = ArmColor;

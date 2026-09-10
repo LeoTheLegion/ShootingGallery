@@ -92,7 +92,7 @@ public class TargetComponent : EntityComponent
         // The SpriteComponent and TweenComponent are declared in the target prefab XML (declared
         // before this component), so we grab them here rather than adding components to the entity
         // — adding a component from within OnAttach would mutate the collection CE is enumerating.
-        var sprite = AssetManager.LoadAsset<Sprite>("target_sprite.xml");
+        var sprite = AssetManager.LoadAsset<Sprite>("Sprites/target_sprite.xml");
         _spriteComponent = Owner.GetComponent<SpriteComponent>();
         if (_spriteComponent != null && _spriteComponent.Sprite == null)
             _spriteComponent.Sprite = sprite;

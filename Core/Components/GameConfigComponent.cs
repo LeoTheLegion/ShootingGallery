@@ -4,7 +4,7 @@ namespace ShootingGallery.Core;
 
 /// <summary>
 /// The round's balance configuration, held as a plain data component on a tagged entity in the
-/// scene (see Content/game_scene.xml, tag "GameConfig"). Every value is settable and declared
+/// scene (see Content/Scenes/game_scene.xml, tag "GameConfig"). Every value is settable and declared
 /// explicitly in the scene XML &lt;Properties&gt;, so there is no hidden static load or fallback —
 /// designers tune balance by editing one block of declarative data. The director resolves it by
 /// tag on bootstrap; spawned targets resolve it by tag on attach.

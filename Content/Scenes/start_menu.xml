@@ -10,7 +10,7 @@
   <GameSystems>
     <System Type="EntitySystem">
       <Prefabs>
-        <Prefab Name="Popup" Asset="popup.xml" />
+        <Prefab Name="Popup" Asset="Prefabs/popup.xml" />
       </Prefabs>
       <Entities>
   <EntityDefinition Type="GameObjectEntity" Id="hud">
