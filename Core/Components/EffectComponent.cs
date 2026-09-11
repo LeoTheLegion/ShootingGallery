@@ -53,12 +53,19 @@ namespace ShootingGallery.Core
 
             // The SpriteComponent is declared before this one in the prefab, so it's attached by now.
             _sprite = Owner.GetComponent<SpriteComponent>();
-            if (_sprite == null)
+            if (_sprite == null || _sprite.Sprite == null)
             {
                 // No sprite to drive — just let the lifetime expire.
                 Owner.DestroyAfter(TimeSpan.FromSeconds(Duration));
                 return;
             }
+
+            // Render on top of every other world sprite. Without a registered batch texture the
+            // entity system routes this to the back-most (no-texture) pass, which draws behind the
+            // target grid and hides the effect; registering + setting a high z-layer puts it in the
+            // front z-layer pass instead. Mirrors how targets (z 0) and the crosshair (z 10) render.
+            Owner.RegisterForInstancedRendering(_sprite.Sprite);
+            Owner.SetZLayer(20);
 
             Owner.Scale = new Vector2(StartScale);
             _sprite.Color = Tint;
