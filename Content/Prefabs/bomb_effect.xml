@@ -13,11 +13,12 @@
         </Component>
         <Component Type="EffectComponent">
             <Properties>
-                <!-- Prefab defaults (overridden per-instance by the spawn site) -->
-                <Property Name="StartScale" Value="0.6" />
-                <Property Name="EndScale" Value="2.2" />
+                <!-- Prefab defaults (the spawn site does not override these). The bomb fireball
+                     is the big payoff: a radial fireball that grows 90 -> 360px over a longer burn. -->
+                <Property Name="StartScale" Value="1.5" />
+                <Property Name="EndScale" Value="4.0" />
                 <Property Name="Tint" Value="255,180,80,255" />
-                <Property Name="Duration" Value="0.4" />
+                <Property Name="Duration" Value="0.8" />
             </Properties>
         </Component>
     </Components>

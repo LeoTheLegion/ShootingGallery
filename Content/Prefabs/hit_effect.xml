@@ -13,11 +13,12 @@
         </Component>
         <Component Type="EffectComponent">
             <Properties>
-                <!-- Prefab defaults (overridden per-instance by the spawn site) -->
-                <Property Name="StartScale" Value="0.5" />
-                <Property Name="EndScale" Value="1.4" />
+                <!-- Prefab defaults (the spawn site does not override these). Large + long
+                     enough to read clearly: a target is ~90px, so this grows 90 -> 315px. -->
+                <Property Name="StartScale" Value="1.0" />
+                <Property Name="EndScale" Value="3.5" />
                 <Property Name="Tint" Value="255,255,255,255" />
-                <Property Name="Duration" Value="0.25" />
+                <Property Name="Duration" Value="0.6" />
             </Properties>
         </Component>
     </Components>

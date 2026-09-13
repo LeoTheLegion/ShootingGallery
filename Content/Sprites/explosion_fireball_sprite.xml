@@ -1,15 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <SpriteData xmlns="http://schemas.coreessentials.monogame/2025/sprite">
   <SourceType>texture2d</SourceType>
-  <!-- Kenney Particle Pack (CC0), muzzle_03.png: a bright fireball used as the bomb detonation.
-       Aspect kept ~1:1.93 (tall flame) so it isn't squashed; EffectComponent scales it up. -->
+  <!-- Kenney Particle Pack (CC0), fire_01.png: a radial fireball (bright core, flames billowing
+       outward) used as the bomb detonation. Square footprint, centered origin; EffectComponent
+       scales it up over its lifetime. -->
   <Source>Sprites/explosion_fireball</Source>
   <Size>
-    <Width>60</Width>
-    <Height>116</Height>
+    <Width>90</Width>
+    <Height>90</Height>
   </Size>
   <Origin>
-    <X>30</X>
-    <Y>58</Y>
+    <X>45</X>
+    <Y>45</Y>
   </Origin>
 </SpriteData>

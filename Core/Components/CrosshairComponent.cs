@@ -41,6 +41,7 @@ public class CrosshairComponent : EntityComponent
     private int _mutationLevel;
     private readonly List<Entity> _arms = new();
     private Sprite _armSprite;
+    private bool _disabled;
 
     /// <summary>The current number of extra (mutated) arms.</summary>
     public int MutationLevel => _mutationLevel;
@@ -61,8 +62,22 @@ public class CrosshairComponent : EntityComponent
         // declared before this component in the scene XML so it exists by the time we attach.
         var click = Owner.GetComponent<MouseClickComponent>();
         if (click != null)
-            click.Clicked += position => OnShoot?.Invoke(this, new ShootEventArgs(position));
+            click.Clicked += HandleClick;
     }
+
+    /// <summary>Player click handler: ignores input while disabled (e.g. the bomb detonation beat).</summary>
+    private void HandleClick(Vector2 position)
+    {
+        if (_disabled)
+            return;
+        OnShoot?.Invoke(this, new ShootEventArgs(position));
+    }
+
+    /// <summary>Locks out player shooting (used while a bomb is detonating). Random shots are also blocked.</summary>
+    public void Disable() => _disabled = true;
+
+    /// <summary>Re-enables player shooting after a disable.</summary>
+    public void Enable() => _disabled = false;
 
     /// <summary>Rebuilds the mutated arms around the crosshair for the given level (0-3).</summary>
     public void SetMutationLevel(int level)
@@ -100,7 +115,7 @@ public class CrosshairComponent : EntityComponent
     /// <summary>Triggers a random shot aimed at a fully-grown standard target.</summary>
     public void TriggerRandomShot()
     {
-        if (_mutationLevel <= 0 || _arms.Count == 0)
+        if (_disabled || _mutationLevel <= 0 || _arms.Count == 0)
             return;
 
         int randomArm = GameRandom.Next(1, _arms.Count + 1); // 1..N

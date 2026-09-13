@@ -4,6 +4,7 @@ using System.Linq;
 using CoreEssentials.GameSystems.EntitySystems.EntityOOPSystem;
 using CoreEssentials.GameSystems.EntitySystems.EntityOOPSystem.Components;
 using CoreEssentials.GameSystems.EntitySystems.EntityOOPSystem.Components.BuiltIn;
+using CoreEssentials.Inputs;
 using CoreEssentials.Utils;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -54,6 +55,12 @@ public class GameDirectorComponent : EntityComponent
     private double _targetSpawnTimer;
     private bool _roundEnded;
 
+    // Detonation phase: when a bomb is hit, we hold on the scene long enough for the fireball to
+    // play out (and show it off) before transitioning to game over. Input is locked during this beat.
+    private const double DetonationDuration = 1.0;
+    private bool _detonating;
+    private double _detonationTimer;
+
     // Radiation / mutation state
     private float _currentRadiation;
     private int _currentMutationLevel;
@@ -85,8 +92,48 @@ public class GameDirectorComponent : EntityComponent
                 return; // references not ready yet (shouldn't happen)
         }
 
+        // [DEBUG] Press F3 to toggle the entity debugger (bounding boxes + red position markers
+        // around every active entity). Lets us see whether a hit/detonation effect ENTITY exists at
+        // the impact point even when its sprite is invisible. The config flags default to false, so
+        // enable bounds + position markers alongside DebugMode.
+        if (Input.Keyboard.IsKeyPressedOnce(Microsoft.Xna.Framework.Input.Keys.F3))
+        {
+            EntitySystem.DebugMode = !EntitySystem.DebugMode;
+            EntitySystem.DebugConfig.ShowEntityBounds = true;
+            EntitySystem.DebugConfig.ShowEntityPosition = true;
+        }
+
+        if (_detonating)
+        {
+            UpdateDetonation(gameTime);
+            return; // normal gameplay + spawning are frozen while the fireball plays out
+        }
+
         ProcessGameplay(gameTime);
         UpdateTargetSpawning(gameTime);
+    }
+
+    /// <summary>
+    /// Begins the post-bomb-hit "detonation" beat: input is locked and, after the fireball has had
+    /// time to play out, the round ends for real. Called from the bomb's OnGameOver instead of
+    /// EndRound directly so we don't cut the effect off mid-animation.
+    /// </summary>
+    private void StartDetonation()
+    {
+        if (_roundEnded || _detonating)
+            return;
+
+        _detonating = true;
+        _detonationTimer = DetonationDuration;
+        _crosshair?.Disable();
+    }
+
+    /// <summary>Counts down the detonation beat and ends the round once it elapses.</summary>
+    private void UpdateDetonation(GameTime gameTime)
+    {
+        _detonationTimer -= gameTime.ElapsedGameTime.TotalSeconds;
+        if (_detonationTimer <= 0)
+            EndRound(bombHit: true);
     }
 
     /// <summary>
@@ -343,8 +390,9 @@ public class GameDirectorComponent : EntityComponent
 
         target.OnRadiationChange += (sender, args) => AddRadiation(args.RadiationAmount);
 
-        // A bomb ends the round immediately (with the bomb flag set for the game-over cause).
-        target.OnGameOver += (sender, args) => EndRound(bombHit: true);
+        // A bomb starts the detonation beat: the fireball plays out with input locked, then the
+        // round ends (with the bomb flag set for the game-over cause). See StartDetonation.
+        target.OnGameOver += (sender, args) => StartDetonation();
 
         // Free the grid cell when the target dies (no per-frame scan needed)
         target.OnDestroyed += (sender, deadPosition) =>
