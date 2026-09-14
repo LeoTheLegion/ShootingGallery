@@ -18,6 +18,55 @@
         <Prefab Name="BombEffect" Asset="Prefabs/bomb_effect.xml" />
       </Prefabs>
       <Entities>
+  <!-- Full-screen backdrop: plain SpriteComponent → back-most pass, behind GUI text. -->
+  <EntityDefinition Type="GameObjectEntity" Id="background">
+    <Position X="640" Y="360" />
+    <Components>
+      <Component Type="SpriteComponent">
+        <Properties>
+          <Property Name="SpriteAsset" Value="Sprites/background_sprite.xml" />
+          <Property Name="Origin" Value="0.5,0.5" />
+        </Properties>
+      </Component>
+    </Components>
+  </EntityDefinition>
+
+  <!-- HUD panel framing the left cluster (score / multiplier / arms), top-left. -->
+  <EntityDefinition Type="GameObjectEntity" Id="leftPanel">
+    <Position X="140" Y="65" />
+    <Components>
+      <Component Type="SpriteComponent">
+        <Properties>
+          <Property Name="SpriteAsset" Value="Sprites/ui_panel_sprite.xml" />
+          <Property Name="Origin" Value="0.5,0.5" />
+        </Properties>
+      </Component>
+      <Component Type="UiPlateComponent">
+        <Properties>
+          <Property Name="Scale" Value="1.6" />
+        </Properties>
+      </Component>
+    </Components>
+  </EntityDefinition>
+
+  <!-- HUD panel framing the right cluster (time / radiation), top-right. -->
+  <EntityDefinition Type="GameObjectEntity" Id="rightPanel">
+    <Position X="1180" Y="55" />
+    <Components>
+      <Component Type="SpriteComponent">
+        <Properties>
+          <Property Name="SpriteAsset" Value="Sprites/ui_panel_sprite.xml" />
+          <Property Name="Origin" Value="0.5,0.5" />
+        </Properties>
+      </Component>
+      <Component Type="UiPlateComponent">
+        <Properties>
+          <Property Name="Scale" Value="1.5" />
+        </Properties>
+      </Component>
+    </Components>
+  </EntityDefinition>
+
   <EntityDefinition Type="GameObjectEntity" Id="hud">
     <Position X="0" Y="0" />
     <Components>
@@ -44,7 +93,8 @@
           <Component Type="LabelComponent">
             <Properties>
               <Property Name="Text" Value="URANIUM REVOLVER" />
-              <Property Name="TextColor" Value="LimeGreen" />
+              <!-- Primary accent (muted radioactive green) — brand. -->
+              <Property Name="TextColor" Value="176,204,120" />
               <Property Name="Scale" Value="1.5,1.5" />
               <Property Name="HorizontalAlignment" Value="Center" />
             </Properties>
@@ -63,7 +113,8 @@
           <Component Type="LabelComponent">
             <Properties>
               <Property Name="Text" Value="Score: 0" />
-              <Property Name="TextColor" Value="White" />
+              <!-- Secondary accent (muted amber) — reward. -->
+              <Property Name="TextColor" Value="224,183,92" />
               <Property Name="Scale" Value="1.2,1.2" />
             </Properties>
           </Component>
@@ -81,7 +132,8 @@
           <Component Type="LabelComponent">
             <Properties>
               <Property Name="Text" Value="Time: 300" />
-              <Property Name="TextColor" Value="Yellow" />
+              <!-- Neutral body text — countdown reads as information, not reward. -->
+              <Property Name="TextColor" Value="206,214,222" />
               <Property Name="Scale" Value="1.2,1.2" />
             </Properties>
           </Component>
@@ -99,7 +151,8 @@
           <Component Type="LabelComponent">
             <Properties>
               <Property Name="Text" Value="Multiplier: x10.0" />
-              <Property Name="TextColor" Value="Orange" />
+              <!-- De-emphasized (cool grey-blue) — supporting stat. -->
+              <Property Name="TextColor" Value="158,173,190" />
             </Properties>
           </Component>
         </Components>
@@ -116,7 +169,8 @@
           <Component Type="LabelComponent">
             <Properties>
               <Property Name="Text" Value="Radiation: 0%" />
-              <Property Name="TextColor" Value="LimeGreen" />
+              <!-- Primary accent — core mechanic. -->
+              <Property Name="TextColor" Value="176,204,120" />
             </Properties>
           </Component>
         </Components>
@@ -133,7 +187,8 @@
           <Component Type="LabelComponent">
             <Properties>
               <Property Name="Text" Value="Arms: 1" />
-              <Property Name="TextColor" Value="LimeGreen" />
+              <!-- Primary accent — core mechanic. -->
+              <Property Name="TextColor" Value="176,204,120" />
             </Properties>
           </Component>
         </Components>

@@ -40,6 +40,7 @@ public class GameConfigComponent : EntityComponent
     public int TargetRadius { get; set; } = 45;                 // hit radius for targets
     public int GridRows { get; set; } = 5;                      // rows in the target grid
     public int GridCols { get; set; } = 5;                      // columns in the target grid
+    public float GridTopMargin { get; set; } = 120f;            // px reserved at top for the HUD band (targets spawn below it)
 
     // ---- Scoring --------------------------------------------------------------
     public int ScoreRegularSmall { get; set; } = 5;

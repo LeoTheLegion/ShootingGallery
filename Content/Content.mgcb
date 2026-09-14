@@ -72,6 +72,30 @@
 /processorParam:TextureFormat=Color
 /build:Sprites/explosion_fireball.png
 
+#begin Sprites/background.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Sprites/background.png
+
+#begin Sprites/ui_panel.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Sprites/ui_panel.png
+
 #begin Sprites/crosshair_sprite.xml
 /copy:Sprites/crosshair_sprite.xml
 
@@ -86,6 +110,12 @@
 
 #begin Sprites/explosion_fireball_sprite.xml
 /copy:Sprites/explosion_fireball_sprite.xml
+
+#begin Sprites/background_sprite.xml
+/copy:Sprites/background_sprite.xml
+
+#begin Sprites/ui_panel_sprite.xml
+/copy:Sprites/ui_panel_sprite.xml
 
 #begin Scenes/scenes.xml
 /copy:Scenes/scenes.xml

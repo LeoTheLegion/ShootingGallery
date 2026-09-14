@@ -10,6 +10,19 @@
   <GameSystems>
     <System Type="EntitySystem">
       <Entities>
+  <!-- Full-screen backdrop: plain SpriteComponent → back-most pass, behind GUI text. -->
+  <EntityDefinition Type="GameObjectEntity" Id="background">
+    <Position X="640" Y="360" />
+    <Components>
+      <Component Type="SpriteComponent">
+        <Properties>
+          <Property Name="SpriteAsset" Value="Sprites/background_sprite.xml" />
+          <Property Name="Origin" Value="0.5,0.5" />
+        </Properties>
+      </Component>
+    </Components>
+  </EntityDefinition>
+
   <EntityDefinition Type="GameObjectEntity" Id="hud">
     <Position X="0" Y="0" />
     <Components>
@@ -40,7 +53,8 @@
           <Component Type="LabelComponent">
             <Properties>
               <Property Name="Text" Value="GAME OVER" />
-              <Property Name="TextColor" Value="Red" />
+              <!-- Danger (muted terracotta red) — the alarm on this screen. -->
+              <Property Name="TextColor" Value="214,106,92" />
               <Property Name="Scale" Value="2" />
               <Property Name="HorizontalAlignment" Value="Center" />
             </Properties>
@@ -59,7 +73,8 @@
           <Component Type="LabelComponent">
             <Properties>
               <Property Name="Text" Value="Your 1 minute of shooting is up!" />
-              <Property Name="TextColor" Value="White" />
+              <!-- Neutral body text. -->
+              <Property Name="TextColor" Value="206,214,222" />
               <Property Name="HorizontalAlignment" Value="Center" />
             </Properties>
           </Component>
@@ -77,7 +92,8 @@
           <Component Type="LabelComponent">
             <Properties>
               <Property Name="Text" Value="Final Score: 0" />
-              <Property Name="TextColor" Value="Yellow" />
+              <!-- Secondary accent (muted amber) — reward. -->
+              <Property Name="TextColor" Value="224,183,92" />
               <Property Name="Scale" Value="1.5" />
               <Property Name="HorizontalAlignment" Value="Center" />
             </Properties>
@@ -96,7 +112,8 @@
           <Component Type="LabelComponent">
             <Properties>
               <Property Name="Text" Value="You escaped without mutations!" />
-              <Property Name="TextColor" Value="White" />
+              <!-- Primary accent (muted radioactive green) — mechanic recap. -->
+              <Property Name="TextColor" Value="176,204,120" />
               <Property Name="HorizontalAlignment" Value="Center" />
             </Properties>
           </Component>

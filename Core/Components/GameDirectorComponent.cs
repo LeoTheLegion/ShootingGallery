@@ -411,7 +411,9 @@ public class GameDirectorComponent : EntityComponent
             return null;
 
         float cellWidth = WorldWidth / (float)_config.GridCols;
-        float cellHeight = WorldHeight / (float)_config.GridRows;
+        // Reserve the top band for the HUD so row 0 spawns below it, not under the labels.
+        float usableHeight = WorldHeight - _config.GridTopMargin;
+        float cellHeight = usableHeight / (float)_config.GridRows;
 
         for (int attempts = 0; attempts < 100; attempts++)
         {
@@ -451,7 +453,7 @@ public class GameDirectorComponent : EntityComponent
         _occupiedCells[row, col] = true;
         Vector2 position = new Vector2(
             col * cellWidth + (cellWidth / 2),
-            row * cellHeight + (cellHeight / 2)
+            _config.GridTopMargin + row * cellHeight + (cellHeight / 2)
         );
         return (position, row, col);
     }
@@ -470,7 +472,9 @@ public class GameDirectorComponent : EntityComponent
     private void PopulateGrid()
     {
         float cellWidth = WorldWidth / (float)_config.GridCols;
-        float cellHeight = WorldHeight / (float)_config.GridRows;
+        // Reserve the top band for the HUD so row 0 spawns below it, not under the labels.
+        float usableHeight = WorldHeight - _config.GridTopMargin;
+        float cellHeight = usableHeight / (float)_config.GridRows;
 
         for (int row = 0; row < _config.GridRows; row++)
         {
@@ -478,7 +482,7 @@ public class GameDirectorComponent : EntityComponent
             {
                 Vector2 position = new Vector2(
                     col * cellWidth + (cellWidth / 2),
-                    row * cellHeight + (cellHeight / 2)
+                    _config.GridTopMargin + row * cellHeight + (cellHeight / 2)
                 );
 
                 _occupiedCells[row, col] = true;

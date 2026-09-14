@@ -13,6 +13,20 @@
         <Prefab Name="Popup" Asset="Prefabs/popup.xml" />
       </Prefabs>
       <Entities>
+  <!-- Full-screen backdrop: a plain SpriteComponent (no instanced-registration) so the entity
+       system routes it to the back-most pass, behind the GUI text and every z-layered sprite. -->
+  <EntityDefinition Type="GameObjectEntity" Id="background">
+    <Position X="640" Y="360" />
+    <Components>
+      <Component Type="SpriteComponent">
+        <Properties>
+          <Property Name="SpriteAsset" Value="Sprites/background_sprite.xml" />
+          <Property Name="Origin" Value="0.5,0.5" />
+        </Properties>
+      </Component>
+    </Components>
+  </EntityDefinition>
+
   <EntityDefinition Type="GameObjectEntity" Id="hud">
     <Position X="0" Y="0" />
     <Components>
@@ -42,7 +56,8 @@
           <Component Type="LabelComponent">
             <Properties>
               <Property Name="Text" Value="URANIUM REVOLVER" />
-              <Property Name="TextColor" Value="LimeGreen" />
+              <!-- Primary accent (muted radioactive green) — the single hero color on this screen. -->
+              <Property Name="TextColor" Value="176,204,120" />
               <Property Name="Scale" Value="2.5" />
               <Property Name="HorizontalAlignment" Value="Center" />
             </Properties>
@@ -61,7 +76,8 @@
           <Component Type="LabelComponent">
             <Properties>
               <Property Name="Text" Value="A Radioactive Shooting Gallery" />
-              <Property Name="TextColor" Value="Yellow" />
+              <!-- Secondary (cool grey-blue) — de-emphasized under the hero title. -->
+              <Property Name="TextColor" Value="158,173,190" />
               <Property Name="Scale" Value="1.5" />
               <Property Name="HorizontalAlignment" Value="Center" />
             </Properties>
@@ -80,7 +96,8 @@
           <Component Type="LabelComponent">
             <Properties>
               <Property Name="Text" Value="Shoot targets to score points and accumulate radiation" />
-              <Property Name="TextColor" Value="White" />
+              <!-- Neutral body text (soft off-white, not pure white — easier on the eyes). -->
+              <Property Name="TextColor" Value="206,214,222" />
               <Property Name="HorizontalAlignment" Value="Center" />
             </Properties>
           </Component>
@@ -98,7 +115,8 @@
           <Component Type="LabelComponent">
             <Properties>
               <Property Name="Text" Value="Mutations will give you extra arms to shoot with" />
-              <Property Name="TextColor" Value="LightGreen" />
+              <!-- Neutral body text. -->
+              <Property Name="TextColor" Value="206,214,222" />
               <Property Name="HorizontalAlignment" Value="Center" />
             </Properties>
           </Component>
@@ -116,7 +134,8 @@
           <Component Type="LabelComponent">
             <Properties>
               <Property Name="Text" Value="Avoid radioactive bombs or face instant death!" />
-              <Property Name="TextColor" Value="Red" />
+              <!-- Neutral body text — the alarm is carried by the WARNING line below. -->
+              <Property Name="TextColor" Value="206,214,222" />
               <Property Name="HorizontalAlignment" Value="Center" />
             </Properties>
           </Component>
@@ -134,7 +153,8 @@
           <Component Type="LabelComponent">
             <Properties>
               <Property Name="Text" Value="WARNING: Extreme Radiation Exposure!" />
-              <Property Name="TextColor" Value="Orange" />
+              <!-- Danger (muted terracotta red) — the single alarm accent on this screen. -->
+              <Property Name="TextColor" Value="214,106,92" />
               <Property Name="Scale" Value="1.2" />
               <Property Name="HorizontalAlignment" Value="Center" />
             </Properties>
@@ -171,7 +191,9 @@
           <Component Type="LabelComponent">
             <Properties>
               <Property Name="Text" Value="Created with Uranium Power - Warning: May Cause Mutations" />
-              <Property Name="TextColor" Value="LightGreen" />
+              <!-- Muted grey + reduced opacity — least important, recedes to the background. -->
+              <Property Name="TextColor" Value="120,132,144" />
+              <Property Name="Opacity" Value="0.8" />
               <Property Name="HorizontalAlignment" Value="Center" />
             </Properties>
           </Component>
@@ -189,7 +211,8 @@
           <Overrides>
             <Component Type="FloatingPopUpComponent">
               <Property Name="Text" Value="☢️ RADIATION ☢️" />
-              <Property Name="TextColor" Value="50,205,50,255" />
+              <!-- Primary accent (muted radioactive green). -->
+              <Property Name="TextColor" Value="176,204,120,255" />
               <Property Name="Scale" Value="1.5" />
               <Property Name="Duration" Value="5" />
               <Property Name="RadiationEffect" Value="true" />
@@ -202,7 +225,8 @@
           <Overrides>
             <Component Type="FloatingPopUpComponent">
               <Property Name="Text" Value="☢️ RADIATION ☢️" />
-              <Property Name="TextColor" Value="50,205,50,255" />
+              <!-- Primary accent (muted radioactive green). -->
+              <Property Name="TextColor" Value="176,204,120,255" />
               <Property Name="Scale" Value="1.5" />
               <Property Name="Duration" Value="5" />
               <Property Name="RadiationEffect" Value="true" />

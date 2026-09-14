@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<SpriteData xmlns="http://schemas.coreessentials.monogame/2025/sprite">
+  <SourceType>texture2d</SourceType>
+  <Source>Sprites/ui_panel</Source>
+  <!-- Kenney "UI Pack – Space Expansion" (CC0), Extra/Default/panel_rectangle.png, 192x64.
+       Used as a framed back-plate behind the in-game HUD label clusters. -->
+  <Size>
+    <Width>192</Width>
+    <Height>64</Height>
+  </Size>
+  <Origin>
+    <X>96</X>
+    <Y>32</Y>
+  </Origin>
+</SpriteData>

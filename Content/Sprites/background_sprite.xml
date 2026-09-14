@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<SpriteData xmlns="http://schemas.coreessentials.monogame/2025/sprite">
+  <SourceType>texture2d</SourceType>
+  <Source>Sprites/background</Source>
+  <!-- Generated CC0 dark-space gradient (deep navy → near-black) with a soft radioactive-green
+       glow at bottom-center and faint stars. Full-screen backdrop for every scene. -->
+  <Size>
+    <Width>1280</Width>
+    <Height>720</Height>
+  </Size>
+  <Origin>
+    <X>640</X>
+    <Y>360</Y>
+  </Origin>
+</SpriteData>
