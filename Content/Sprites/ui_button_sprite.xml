@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<SpriteData xmlns="http://schemas.coreessentials.monogame/2025/sprite">
+  <SourceType>texture2d</SourceType>
+  <Source>Sprites/ui_button</Source>
+  <!-- Kenney "UI Pack – Space Expansion" (CC0), Grey/Default/button_square_header_large_rectangle.png, 192x64.
+       Neutral slate back-plate rendered behind CE's white-text buttons (z-layer 1, below the GUI text pass). -->
+  <Size>
+    <Width>192</Width>
+    <Height>64</Height>
+  </Size>
+  <Origin>
+    <X>96</X>
+    <Y>32</Y>
+  </Origin>
+</SpriteData>

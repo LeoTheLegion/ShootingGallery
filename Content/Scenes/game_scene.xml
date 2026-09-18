@@ -33,7 +33,7 @@
 
   <!-- HUD panel framing the left cluster (score / multiplier / arms), top-left. -->
   <EntityDefinition Type="GameObjectEntity" Id="leftPanel">
-    <Position X="140" Y="65" />
+    <Position X="135" Y="54" />
     <Components>
       <Component Type="SpriteComponent">
         <Properties>
@@ -43,7 +43,9 @@
       </Component>
       <Component Type="UiPlateComponent">
         <Properties>
-          <Property Name="Scale" Value="1.6" />
+          <!-- Dark cool-slate tint: the light Kenney panel is too bright for colored HUD text. -->
+          <Property Name="Tint" Value="44,52,66" />
+          <Property Name="Scale" Value="1.4" />
         </Properties>
       </Component>
     </Components>
@@ -51,7 +53,7 @@
 
   <!-- HUD panel framing the right cluster (time / radiation), top-right. -->
   <EntityDefinition Type="GameObjectEntity" Id="rightPanel">
-    <Position X="1180" Y="55" />
+    <Position X="1140" Y="54" />
     <Components>
       <Component Type="SpriteComponent">
         <Properties>
@@ -61,7 +63,9 @@
       </Component>
       <Component Type="UiPlateComponent">
         <Properties>
-          <Property Name="Scale" Value="1.5" />
+          <!-- Dark cool-slate tint: the light Kenney panel is too bright for colored HUD text. -->
+          <Property Name="Tint" Value="44,52,66" />
+          <Property Name="Scale" Value="1.4" />
         </Properties>
       </Component>
     </Components>

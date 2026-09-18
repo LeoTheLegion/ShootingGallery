@@ -23,6 +23,48 @@
     </Components>
   </EntityDefinition>
 
+  <!-- Play Again back-plate: Kenney button sprite at z-layer 1, centered on the button (x=640). -->
+  <EntityDefinition Type="GameObjectEntity" Id="restartButtonPlate">
+    <!-- Centered on the button text: anchor top (460) + ~12px half line-height. -->
+    <Position X="640" Y="472" />
+    <Components>
+      <Component Type="SpriteComponent">
+        <Properties>
+          <Property Name="SpriteAsset" Value="Sprites/ui_button_sprite.xml" />
+          <Property Name="Origin" Value="0.5,0.5" />
+        </Properties>
+      </Component>
+      <Component Type="UiPlateComponent">
+        <Properties>
+          <!-- Dark cool-slate tint: multiplies the light Kenney plate down so CE's white button text pops. -->
+          <Property Name="Tint" Value="58,68,86" />
+          <Property Name="Scale" Value="1.3" />
+        </Properties>
+      </Component>
+    </Components>
+  </EntityDefinition>
+
+  <!-- Main Menu back-plate: Kenney button sprite at z-layer 1, centered on the button (x=640). -->
+  <EntityDefinition Type="GameObjectEntity" Id="menuButtonPlate">
+    <!-- Centered on the button text: anchor top (530) + ~12px half line-height. -->
+    <Position X="640" Y="542" />
+    <Components>
+      <Component Type="SpriteComponent">
+        <Properties>
+          <Property Name="SpriteAsset" Value="Sprites/ui_button_sprite.xml" />
+          <Property Name="Origin" Value="0.5,0.5" />
+        </Properties>
+      </Component>
+      <Component Type="UiPlateComponent">
+        <Properties>
+          <!-- Dark cool-slate tint: multiplies the light Kenney plate down so CE's white button text pops. -->
+          <Property Name="Tint" Value="58,68,86" />
+          <Property Name="Scale" Value="1.3" />
+        </Properties>
+      </Component>
+    </Components>
+  </EntityDefinition>
+
   <EntityDefinition Type="GameObjectEntity" Id="hud">
     <Position X="0" Y="0" />
     <Components>
@@ -131,6 +173,9 @@
           <Component Type="ButtonComponent">
             <Properties>
               <Property Name="Text" Value="Play Again" />
+              <!-- Fully transparent background (alpha 0): draws nothing so the Kenney back-plate behind
+                   shows through, but keeps a non-null brush so Myra still hit-tests the button. -->
+              <Property Name="BackgroundTint" Value="0,0,0,0" />
               <Property Name="HorizontalAlignment" Value="Center" />
             </Properties>
           </Component>
@@ -149,6 +194,9 @@
           <Component Type="ButtonComponent">
             <Properties>
               <Property Name="Text" Value="Main Menu" />
+              <!-- Fully transparent background (alpha 0): draws nothing so the Kenney back-plate behind
+                   shows through, but keeps a non-null brush so Myra still hit-tests the button. -->
+              <Property Name="BackgroundTint" Value="0,0,0,0" />
               <Property Name="HorizontalAlignment" Value="Center" />
             </Properties>
           </Component>

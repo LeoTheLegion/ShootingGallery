@@ -96,6 +96,18 @@
 /processorParam:TextureFormat=Color
 /build:Sprites/ui_panel.png
 
+#begin Sprites/ui_button.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Sprites/ui_button.png
+
 #begin Sprites/crosshair_sprite.xml
 /copy:Sprites/crosshair_sprite.xml
 
@@ -116,6 +128,9 @@
 
 #begin Sprites/ui_panel_sprite.xml
 /copy:Sprites/ui_panel_sprite.xml
+
+#begin Sprites/ui_button_sprite.xml
+/copy:Sprites/ui_button_sprite.xml
 
 #begin Scenes/scenes.xml
 /copy:Scenes/scenes.xml
