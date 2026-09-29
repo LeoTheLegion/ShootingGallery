@@ -73,6 +73,7 @@ public class GameDirectorComponent : EntityComponent
     private LabelComponent _radiationUI;
     private LabelComponent _mutationUI;
     private CrosshairComponent _crosshair;
+    private ScreenFxComponent _screenFx;
 
     public GameDirectorComponent()
     {
@@ -126,6 +127,9 @@ public class GameDirectorComponent : EntityComponent
         _detonating = true;
         _detonationTimer = DetonationDuration;
         _crosshair?.Disable();
+
+        // Spike the full-screen kill-flash over the fireball beat.
+        _screenFx?.TriggerKillFlash();
     }
 
     /// <summary>Counts down the detonation beat and ends the round once it elapses.</summary>
@@ -174,6 +178,9 @@ public class GameDirectorComponent : EntityComponent
         _radiationUI = es.FindById("radiation")?.GetComponent<LabelComponent>();
         _mutationUI = es.FindById("mutation")?.GetComponent<LabelComponent>();
 
+        // Screen-space post passes (radiation vignette + bomb kill-flash).
+        _screenFx = es.FindById("screenFx")?.GetComponent<ScreenFxComponent>();
+
         // Resolve the crosshair by tag
         foreach (var entity in es.GetEntitiesByTag("Crosshair"))
         {
@@ -213,6 +220,10 @@ public class GameDirectorComponent : EntityComponent
         // Radiation UI + mutation check
         if (_radiationUI != null)
             _radiationUI.Text = $"Radiation: {(int)(_currentRadiation / MAX_RADIATION * 100)}%";
+
+        // Drive the radiation vignette post pass from the current fraction (0..1).
+        _screenFx?.SetRadiationIntensity(_currentRadiation / MAX_RADIATION);
+
         CheckForMutation();
 
         if (_timer <= 0)

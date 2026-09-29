@@ -11,6 +11,17 @@
                 <Property Name="Origin" Value="0.5,0.5" />
             </Properties>
         </Component>
+        <!-- Per-sprite radioactive glow (CE 0.21.x render pipeline). Confirmed working on this
+             DesktopGL/ANGLE build — custom SpriteBatch effects apply fine; the earlier "no glow" was the
+             CE <EffectParameter> parse bug (issue #104, fixed in 0.21.1). GlowStrength is kept well under
+             1.0 so the target sprite still reads through with a green tint rather than being fully
+             overwritten (at 1.0 the shader output == the flat green tint). Bump toward ~1.6 for "hotter". -->
+        <Component Type="ShaderComponent">
+            <Properties>
+                <Property Name="EffectAsset" Value="Effects/GlowRadioactive" />
+            </Properties>
+            <EffectParameter Name="GlowStrength" Value="0.35" />
+        </Component>
         <Component Type="TweenComponent" />
         <Component Type="TargetComponent">
             <Properties>
@@ -18,4 +29,31 @@
             </Properties>
         </Component>
     </Components>
+    <!-- Radiating halo: a LARGER carrier sprite drawn BEHIND the target (ZLayer -1) that runs
+         GlowHalo.fx — a procedural radial falloff that ignores the texture and paints light from
+         center out, fading to zero at the quad's edge. Because it is a nested <Prefab> child it
+         renders (CE 0.21.2 BuildSubtree -> CreateEntityUnstarted), sits at its own ZLayer, follows
+         the target's position (child Position defaults to 0,0 = centered), and is destroyed with it.
+         The carrier is 200x200 vs the 90x90 target, so the glow radiates well past the edge. -->
+    <Children>
+        <Prefab Type="GameObjectEntity" Rotation="0" Sort="0" ZLayer="-1" Active="true">
+            <Tags>
+                <Tag Name="Halo" />
+            </Tags>
+            <Components>
+                <Component Type="SpriteComponent">
+                    <Properties>
+                        <Property Name="SpriteAsset" Value="Sprites/halo_carrier_sprite.xml" />
+                        <Property Name="Origin" Value="0.5,0.5" />
+                    </Properties>
+                </Component>
+                <Component Type="ShaderComponent">
+                    <Properties>
+                        <Property Name="EffectAsset" Value="Effects/GlowHalo" />
+                    </Properties>
+                    <EffectParameter Name="GlowStrength" Value="1.0" />
+                </Component>
+            </Components>
+        </Prefab>
+    </Children>
 </Prefab>

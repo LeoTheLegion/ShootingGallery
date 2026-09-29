@@ -48,6 +48,18 @@
 /processorParam:TextureFormat=Color
 /build:Sprites/target_bomb.png
 
+#begin Sprites/halo_carrier.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Sprites/halo_carrier.png
+
 #begin Sprites/hit_ring.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -117,6 +129,9 @@
 #begin Sprites/target_bomb_sprite.xml
 /copy:Sprites/target_bomb_sprite.xml
 
+#begin Sprites/halo_carrier_sprite.xml
+/copy:Sprites/halo_carrier_sprite.xml
+
 #begin Sprites/hit_ring_sprite.xml
 /copy:Sprites/hit_ring_sprite.xml
 
@@ -131,6 +146,26 @@
 
 #begin Sprites/ui_button_sprite.xml
 /copy:Sprites/ui_button_sprite.xml
+
+#begin Effects/RadiationVignette.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/build:Effects/RadiationVignette.fx
+
+#begin Effects/KillFlash.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/build:Effects/KillFlash.fx
+
+#begin Effects/GlowRadioactive.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/build:Effects/GlowRadioactive.fx
+
+#begin Effects/GlowHalo.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/build:Effects/GlowHalo.fx
 
 #begin Scenes/scenes.xml
 /copy:Scenes/scenes.xml

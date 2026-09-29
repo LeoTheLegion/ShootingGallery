@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<SpriteData xmlns="http://schemas.coreessentials.monogame/2025/sprite">
+  <SourceType>texture2d</SourceType>
+  <Source>Sprites/halo_carrier</Source>
+  <Size>
+    <Width>200</Width>
+    <Height>200</Height>
+  </Size>
+  <Origin>
+    <X>100</X>
+    <Y>100</Y>
+  </Origin>
+</SpriteData>

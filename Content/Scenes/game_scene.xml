@@ -304,6 +304,17 @@
       </Component>
     </Components>
   </EntityDefinition>
+
+  <!-- Screen-space post passes (CE 0.21.0 render pipeline): a radiation vignette whose intensity
+       tracks the round's radiation level, and a bomb kill-flash that spikes on detonation. Both are
+       additive full-screen overlays registered on the static RenderPipeline; GameDirectorComponent
+       resolves this entity by id and pokes it. Hidden (no sprite). -->
+  <EntityDefinition Type="GameObjectEntity" Id="screenFx">
+    <Position X="0" Y="0" />
+    <Components>
+      <Component Type="ScreenFxComponent" />
+    </Components>
+  </EntityDefinition>
       </Entities>
     </System>
   </GameSystems>
