@@ -54,11 +54,22 @@
 /processorParam:ColorKeyColor=255,0,255,255
 /processorParam:ColorKeyEnabled=False
 /processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Sprites/halo_carrier.png
+
+#begin Sprites/radiation_overlay.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Sprites/radiation_overlay.png
 
 #begin Sprites/hit_ring.png
 /importer:TextureImporter
@@ -131,6 +142,9 @@
 
 #begin Sprites/halo_carrier_sprite.xml
 /copy:Sprites/halo_carrier_sprite.xml
+
+#begin Sprites/radiation_overlay_sprite.xml
+/copy:Sprites/radiation_overlay_sprite.xml
 
 #begin Sprites/hit_ring_sprite.xml
 /copy:Sprites/hit_ring_sprite.xml

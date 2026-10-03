@@ -18,8 +18,13 @@
         <Prefab Name="BombEffect" Asset="Prefabs/bomb_effect.xml" />
       </Prefabs>
       <Entities>
-  <!-- Full-screen backdrop: plain SpriteComponent → back-most pass, behind GUI text. -->
-  <EntityDefinition Type="GameObjectEntity" Id="background">
+  <!-- Full-screen backdrop: plain SpriteComponent. Each back-layer gets its OWN integer ZLayer so
+       their relative draw order is deterministic (layer-based) rather than dependent on CE's per-frame
+       non-stable SortEntities() + Dictionary iteration order. Stack: background(-3) < radiation overlay(-2)
+       < radioactive halos(-1, see target_radioactive.xml) < targets(0). Sharing a ZLayer between two
+       DIFFERENT textures (e.g. the overlay and the halos both at -1) let their relative order flip frame
+       to frame as the entity set changed -> visible shimmer while the vignette ramped after a kill. -->
+  <EntityDefinition Type="GameObjectEntity" Id="background" ZLayer="-3">
     <Position X="640" Y="360" />
     <Components>
       <Component Type="SpriteComponent">
@@ -27,6 +32,32 @@
           <Property Name="SpriteAsset" Value="Sprites/background_sprite.xml" />
           <Property Name="Origin" Value="0.5,0.5" />
         </Properties>
+      </Component>
+    </Components>
+  </EntityDefinition>
+
+  <!-- Full-screen radiation vignette: a SCENE ENTITY at its OWN ZLayer -2 (above the backdrop at -3,
+       BELOW the radioactive halos at -1, and behind every target at ZLayer 0). Because it sits behind
+       the targets in normal scene order they occlude it pixel-wise — the green only shows through empty
+       space and never tints the targets. It must NOT share a layer with the halo children (target_radioactive.xml,
+       ZLayer -1): two different textures in one layer get an unstable relative draw order from CE's
+       per-frame non-stable sort + Dictionary iteration, which shimmered while the vignette ramped.
+       The shader paints a procedural radial vignette from screen-space UV; ScreenFxComponent drives its
+       ShaderComponent's Intensity from the round's radiation level. -->
+  <EntityDefinition Type="GameObjectEntity" Id="radiationOverlay" ZLayer="-2">
+    <Position X="640" Y="360" />
+    <Components>
+      <Component Type="SpriteComponent">
+        <Properties>
+          <Property Name="SpriteAsset" Value="Sprites/radiation_overlay_sprite.xml" />
+          <Property Name="Origin" Value="0.5,0.5" />
+        </Properties>
+      </Component>
+      <Component Type="ShaderComponent">
+        <Properties>
+          <Property Name="EffectAsset" Value="Effects/RadiationVignette" />
+        </Properties>
+        <EffectParameter Name="Intensity" Value="0.0" />
       </Component>
     </Components>
   </EntityDefinition>

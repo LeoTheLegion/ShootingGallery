@@ -1,11 +1,12 @@
-// Full-screen additive radiation vignette post pass (CE 0.21.0 render pipeline).
+// Full-screen radiation vignette — a SCENE ENTITY, not a post pass (CE 0.21.x render pipeline).
 //
-// Registered through RenderPipeline.AddPostPass (additive mode — no render target required). The
-// pipeline draws a full-screen quad through this effect after the scene + GUI. It only needs the
-// screen-space UV to shape the vignette; the 1x1 white quad texture SpriteBatch binds to sampler0
-// is ignored. Output is a sickly radioactive green whose alpha rises toward the corners, scaled by
-// `Intensity` (0..1) which ScreenFxComponent drives from the current radiation level. AlphaBlend
-// tints the frame edges green as radiation builds, leaving the center untouched at low levels.
+// It is drawn by a full-screen SpriteComponent (radiationOverlay, 1280x720) at ZLayer -2 — above the
+// backdrop (-3), below the radioactive halos (-1) and every target (0). That placement is the whole
+// point: because it sits behind the targets in normal scene order, the targets OCCLUDE it pixel-wise —
+// a post pass would render on top of everything and tint the targets too. The shader only needs screen-space UV to shape
+// the vignette; the white carrier texture bound to sampler0 is ignored. Output is a sickly radioactive
+// green whose alpha rises toward the edges, scaled by `Intensity` (0..1) which ScreenFxComponent drives
+// from the current radiation level via the overlay's ShaderComponent.
 float4x4 Projection;
 
 // 0 = no vignette, 1 = full. Driven by ScreenFxComponent from the director's radiation state.
@@ -37,12 +38,16 @@ VSOutput MainVS(VSInput input)
 
 float4 MainPS(VSOutput input) : COLOR
 {
-    // Distance from screen center in UV space (center is 0.5, 0.5). Normalize so the corner is ~1.
+    // Distance from screen center in UV space (center is 0.5, 0.5). Normalized so the straight-edge
+    // midpoint is ~1.0 and the corners reach ~1.41.
     float2 centered = input.UV - 0.5;
     float dist = length(centered * 2.0);
 
-    // Ease the falloff so the effect stays off-center and only grips the outer edges as it grows.
-    float edge = saturate(dist - 0.45) / (1.0 - 0.45);
+    // Confine the effect to a narrow outer frame: zero everywhere inside dist < 0.85 (the whole
+    // central target grid stays clean) and ramping to full at the straight-edge midpoint (dist ~1.0),
+    // clamped at the corners. As radiation rises the green only ever lives in this border band — it
+    // grows stronger there but never washes over the targets.
+    float edge = saturate((dist - 0.85) / (1.0 - 0.85));
 
     // Scale by the radiation intensity — ScreenFxComponent eases this up/down, so no per-frame
     // temporal term is needed here (keeps the pass cheap and free of banding artifacts).

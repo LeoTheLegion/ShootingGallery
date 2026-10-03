@@ -221,7 +221,7 @@ public class GameDirectorComponent : EntityComponent
         if (_radiationUI != null)
             _radiationUI.Text = $"Radiation: {(int)(_currentRadiation / MAX_RADIATION * 100)}%";
 
-        // Drive the radiation vignette post pass from the current fraction (0..1).
+        // Drive the radiation vignette from the current fraction (0..1).
         _screenFx?.SetRadiationIntensity(_currentRadiation / MAX_RADIATION);
 
         CheckForMutation();
